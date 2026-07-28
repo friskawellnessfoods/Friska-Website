@@ -6,7 +6,8 @@
 <title>Friska Wellness — Healthy Meals, Delivered Daily in Hyderabad</title>
 <meta name="description" content="Chef-crafted, preservative-free meals delivered fresh across Hyderabad. Never choose between tasty and healthy again.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -38,18 +39,29 @@
         <a class="btn btn-outline" href="about.html">Our Story</a>
       </div>
       <div class="hero-badges">
-        <div class="badge"><span class="ico"></span>Zero preservatives</div>
-        <div class="badge"><span class="ico"></span>Chef-designed plates</div>
-        <div class="badge"><span class="ico"></span>Delivered fresh, daily</div>
+        <div class="badge"><span class="ico">&#10003;</span>Zero preservatives</div>
+        <div class="badge"><span class="ico">&#10003;</span>Chef-designed plates</div>
+        <div class="badge"><span class="ico">&#10003;</span>Delivered fresh, daily</div>
       </div>
     </div>
+
     <div class="hero-visual">
       <span class="hero-tag">Fresh today</span>
-      <div class="hero-frame">
-        <img src="https://static.wixstatic.com/media/d30046_a9aac880bee746c19bd0ddc9a4362870~mv2.jpg" alt="Fresh Friska meal">
+
+      <div class="carousel">
+        <div class="carousel-track">
+          <div class="carousel-slide active"><img src="assets/hero-1.jpg" alt="Friska meals packed fresh"></div>
+          <div class="carousel-slide"><img src="assets/hero-2.jpg" alt="Chef preparing a Friska plate"></div>
+          <div class="carousel-slide"><img src="assets/hero-3.jpg" alt="Balanced Friska meal box"></div>
+          <div class="carousel-slide"><img src="assets/hero-4.jpg" alt="Friska daily delivery"></div>
+        </div>
+        <button class="carousel-btn prev" aria-label="Previous image">&#8249;</button>
+        <button class="carousel-btn next" aria-label="Next image">&#8250;</button>
+        <div class="carousel-dots"></div>
       </div>
+
       <div class="hero-float">
-        <div class="thumb"><img src="https://static.wixstatic.com/media/d30046_c9fd6cc568fe4551ae3647e67e7e624d~mv2.jpg" alt=""></div>
+        <div class="thumb"><img src="assets/float-thumb.jpg" alt=""></div>
         <div>
           <strong>Balanced plates</strong>
           <span>Portion &amp; calorie controlled</span>
@@ -59,33 +71,75 @@
   </div>
 </section>
 
-<section class="tiers" id="why" data-reveal>
+<section class="why" id="why" data-reveal>
+  <div class="wrap">
+    <div class="why-qa">
+      <div>
+        <span class="eyebrow">Why Friska</span>
+        <h2>Why Friska?</h2>
+      </div>
+      <div class="why-answer">
+        <p class="kicker">Never choose between tasty &amp; healthy again.</p>
+        <p>Friska Wellness offers expertly crafted meals with the perfect balance of nutrition, portion control, and calorie management. Our internationally trained chefs create delicious, healthy options designed to support your well-being and help you achieve your health goals.</p>
+      </div>
+    </div>
+
+    <div class="why-cards">
+      <figure class="why-card">
+        <img src="assets/why-1.jpg" alt="Friska wrap">
+        <figcaption>yum in every bite!</figcaption>
+      </figure>
+      <figure class="why-card">
+        <img src="assets/why-2.jpg" alt="Friska delivery packaging">
+        <figcaption>fresh, daily deliveries</figcaption>
+      </figure>
+      <figure class="why-card">
+        <img src="assets/why-3.jpg" alt="Friska meal box">
+        <figcaption>magic in every meal!</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="tiers" data-reveal>
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Why Friska</span>
-      <h2>Never choose between tasty &amp; healthy again.</h2>
-      <p>Four things stacked into every tiffin we send out — the same way a real tiffin carrier stacks its tiers.</p>
+      <span class="eyebrow">What's inside</span>
+      <h2>Four tiers in every tiffin.</h2>
+      <p>Stacked the same way a real tiffin carrier stacks its tiers.</p>
     </div>
     <div class="tier-grid">
       <div class="tier-item">
-        <span class="tier-num">Tier 01</span>
-        <h3>Chef-crafted</h3>
-        <p>Internationally trained chefs design every recipe for flavour first, nutrition always.</p>
+        <div class="tier-media"><img src="assets/tier-1.jpg" alt=""></div>
+        <div class="tier-body">
+          <span class="tier-num">Tier 01</span>
+          <h3>Chef-crafted</h3>
+          <p>Internationally trained chefs design every recipe for flavour first, nutrition always.</p>
+        </div>
       </div>
       <div class="tier-item">
-        <span class="tier-num">Tier 02</span>
-        <h3>Portion &amp; calorie control</h3>
-        <p>Meals built around your goals — high protein, low carb, or a balanced plate.</p>
+        <div class="tier-media"><img src="assets/tier-2.jpg" alt=""></div>
+        <div class="tier-body">
+          <span class="tier-num">Tier 02</span>
+          <h3>Portion &amp; calorie control</h3>
+          <p>Meals built around your goals — high protein, low carb, or a balanced plate.</p>
+        </div>
       </div>
       <div class="tier-item">
-        <span class="tier-num">Tier 03</span>
-        <h3>Zero preservatives</h3>
-        <p>Cooked fresh, delivered the same day. Pure ingredients, nothing else.</p>
+        <div class="tier-media"><img src="assets/tier-3.jpg" alt=""></div>
+        <div class="tier-body">
+          <span class="tier-num">Tier 03</span>
+          <h3>Zero preservatives</h3>
+          <p>Cooked fresh, delivered the same day. Pure ingredients, nothing else.</p>
+        </div>
       </div>
       <div class="tier-item">
-        <span class="tier-num">Tier 04</span>
-        <h3>Delivered daily</h3>
-        <p>Across Hyderabad &amp; Secunderabad, straight to your door, on schedule.</p>
+        <div class="tier-media"><img src="assets/tier-4.jpg" alt=""></div>
+        <div class="tier-body">
+          <span class="tier-num">Tier 04</span>
+          <h3>Delivered daily</h3>
+          <p>Across Hyderabad &amp; Secunderabad, straight to your door, on schedule.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -95,13 +149,13 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">From the kitchen</span>
-      <h2>Yum in every bite.</h2>
+      <h2>Made fresh, every morning.</h2>
     </div>
     <div class="gallery-grid">
-      <figure><img src="https://static.wixstatic.com/media/cf8ffe16566f413d864bef27019de358.jpg" alt="Healthy fit meal"><figcaption>Stay Fit</figcaption></figure>
-      <figure><img src="https://static.wixstatic.com/media/d30046_bd0889042dd547e48689c40ceb20e0b8~mv2.jpg" alt="High protein meal"><figcaption>High Protein</figcaption></figure>
-      <figure><img src="https://static.wixstatic.com/media/d30046_69e8e32605b542718297d4aeabf2fdb8~mv2.jpg" alt="Balanced diet meal"><figcaption>Balanced Diet</figcaption></figure>
-      <figure><img src="https://static.wixstatic.com/media/d30046_a6beff048a4746649d61b05f90dccfe6~mv2.jpg" alt="Low carb meal"><figcaption>Low-Carb</figcaption></figure>
+      <figure><img src="assets/gallery-1.jpg" alt="Healthy fit meal"><figcaption>Stay Fit</figcaption></figure>
+      <figure><img src="assets/gallery-2.jpg" alt="High protein meal"><figcaption>High Protein</figcaption></figure>
+      <figure><img src="assets/gallery-3.jpg" alt="Balanced diet meal"><figcaption>Balanced Diet</figcaption></figure>
+      <figure><img src="assets/gallery-4.jpg" alt="Low carb meal"><figcaption>Low-Carb</figcaption></figure>
     </div>
   </div>
 </section>
@@ -133,15 +187,18 @@
 </section>
 
 <section class="cta-band" id="contact" data-reveal>
-  <span class="cta-ring"></span>
-  <span class="cta-ring"></span>
   <div class="wrap">
+    <div class="cta-inner">
+      <span class="cta-ring"></span>
+      <span class="cta-ring"></span>
     <div>
-      <span class="eyebrow" style="color:var(--gold)">Book a trial meal</span>
+      <span class="eyebrow">Book a trial meal</span>
       <h2>Choose health and taste, every day. Subscribe now.</h2>
       <p>+91 84009 64170 · friskawellnessfoods@gmail.com</p>
     </div>
-    <a class="btn btn-primary" href="https://wa.me/918400964170" target="_blank" rel="noopener">Message us on WhatsApp</a>
+    <a class="btn" href="https://wa.me/918400964170" target="_blank" rel="noopener">Message us on WhatsApp</a>
+  
+    </div>
   </div>
 </section>
 
