@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Choose Your Plan | Friska Wellness</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--navy:#0a1a6e;
+--navy-deep:#08155a;
+--accent:#10b981;
+--accent-soft:#e7f7f1;
+--bg:#f4f7fc;
+--ink:#16213e;
+--muted:#6b7596;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
+background:var(--bg);
+margin:0;
+padding:0;
+color:var(--ink);
+position:relative;
+overflow-x:hidden;
+}
+
+body::before,
+body::after{
+content:"";
+position:fixed;
+border-radius:50%;
+filter:blur(70px);
+z-index:0;
+pointer-events:none;
+}
+body::before{
+width:340px; height:340px;
+background:rgba(16,185,129,0.16);
+top:-120px; left:-120px;
+}
+body::after{
+width:380px; height:380px;
+background:rgba(10,26,110,0.10);
+bottom:-160px; right:-140px;
+}
+
+h1,h2,h3,.brandFont,.stepTitle,.railLabel,.btn,.goalText b,.tileLabel{
+font-family:"Poppins",system-ui,sans-serif;
+}
+
+.header{
+position:sticky;
+top:0;
+background:rgba(255,255,255,0.92);
+backdrop-filter:blur(8px);
+padding:14px 0;
+display:flex;
+justify-content:center;
+align-items:center;
+border-bottom:1px solid #eef1f7;
+z-index:30;
+}
+
+.logo{ height:44px; max-width:200px; object-fit:contain; display:block; }
+
+.backLink{
+position:absolute; left:18px;
+display:flex; align-items:center; gap:6px;
+font-family:"Poppins",system-ui,sans-serif;
+font-size:14px; font-weight:600; color:var(--navy);
+text-decoration:none;
+}
+.backLink svg{ width:17px; height:17px; }
+.backLink span{ display:none; }
+@media(min-width:520px){ .backLink span{ display:inline; } }
+
+.menuButton{ position:absolute; right:18px; font-size:24px; cursor:pointer; color:var(--navy); }
+
+.headerMenu{
+position:fixed;
+top:64px; right:18px;
+background:white;
+border-radius:12px;
+box-shadow:0 6px 20px rgba(0,0,0,0.15);
+overflow:hidden;
+display:none;
+z-index:1000;
+}
+.headerMenu div{ padding:12px 18px; cursor:pointer; font-size:15px; white-space:nowrap; }
+.headerMenu div:hover{ background:#f5f5f5; }
+
+.shell{
+position:relative;
+z-index:1;
+display:flex;
+gap:30px;
+max-width:840px;
+margin:0 auto;
+padding:24px 18px 150px;
+align-items:flex-start;
+justify-content:center;
+}
+
+.stepRail{ display:none; }
+
+.railInner{ position:relative; padding:8px 0; }
+.railTrack{ position:absolute; left:19px; top:32px; width:3px; height:448px; background:#e1e6f2; border-radius:9px; }
+.railFill{ position:absolute; left:19px; top:32px; width:3px; height:0; background:var(--accent); border-radius:9px; transition:height .35s ease; }
+
+.railNode{ position:relative; display:flex; align-items:center; gap:12px; height:64px; z-index:2; }
+.railDot{
+width:40px; height:40px;
+border-radius:50%;
+background:white;
+border:2px solid #e1e6f2;
+display:flex; align-items:center; justify-content:center;
+color:#aab1c9;
+transition:all .25s ease;
+flex:none;
+}
+.railDot svg{ width:20px; height:20px; }
+.railLabel{ font-size:13px; color:#9aa2bd; font-weight:600; transition:all .2s ease; }
+
+.railNode.done .railDot{ border-color:var(--accent); color:var(--accent); }
+.railNode.done .railLabel{ color:#5a6488; }
+.railNode.active .railDot{
+background:var(--navy); border-color:var(--navy); color:white;
+box-shadow:0 6px 16px rgba(10,26,110,0.30);
+transform:scale(1.1);
+}
+.railNode.active .railLabel{ color:var(--navy); font-weight:700; }
+
+.main{ flex:1; max-width:480px; width:100%; }
+
+.progressWrap{ margin-bottom:18px; }
+
+.mNodes{ position:relative; display:flex; justify-content:space-between; padding:4px 0; }
+.mTrack,.mFill{ position:absolute; top:50%; transform:translateY(-50%); height:3px; border-radius:9px; z-index:0; }
+.mTrack{ left:18px; right:18px; background:#e1e6f2; }
+.mFill{ left:18px; width:0; background:var(--accent); transition:width .35s ease; }
+.mNode{
+position:relative; z-index:2; flex:none;
+width:36px; height:36px; border-radius:50%;
+background:white; border:2px solid #e1e6f2;
+display:flex; align-items:center; justify-content:center;
+color:#aab1c9; transition:all .25s ease;
+}
+.mNode svg{ width:17px; height:17px; }
+.mNode.done{ border-color:var(--accent); color:var(--accent); }
+.mNode.active{ background:var(--navy); border-color:var(--navy); color:white; box-shadow:0 4px 12px rgba(10,26,110,0.30); }
+
+.card{
+background:white;
+border-radius:24px;
+padding:26px 22px 24px;
+box-shadow:0 20px 50px rgba(20,33,62,0.10);
+}
+
+.step{ display:none; animation:fadeStep .3s ease; }
+.step.active{ display:block; }
+@keyframes fadeStep{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:translateY(0);} }
+
+.stepEyebrow{
+display:inline-flex; align-items:center; gap:7px;
+background:var(--accent-soft); color:var(--accent);
+font-size:12px; font-weight:700; letter-spacing:.3px;
+padding:6px 12px; border-radius:99px; margin-bottom:12px;
+}
+.stepEyebrow svg{ width:15px; height:15px; }
+
+.stepTitle{ font-size:24px; font-weight:700; margin:0 0 5px; color:var(--navy); line-height:1.2; }
+.stepSub{ font-size:14px; color:var(--muted); margin-bottom:20px; line-height:1.5; }
+
+input[type="text"],input[type="tel"],input[type="number"]{
+width:100%; padding:15px 14px; margin-top:10px;
+border-radius:13px; border:1.5px solid #e2e7f1; font-size:16px; background:#fbfcfe;
+}
+input:focus{ outline:none; border-color:var(--accent); background:white; box-shadow:0 0 0 3px rgba(16,185,129,0.12); }
+
+.fieldLabel{ font-size:13px; font-weight:600; color:#445; margin-top:18px; display:block; }
+.fieldLabel:first-child{ margin-top:0; }
+.dualField{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.goalCard{
+display:flex; align-items:center; gap:14px;
+background:white;
+border:1.5px solid #e6e9f2;
+border-radius:99px;
+padding:13px 18px;
+margin-top:13px;
+cursor:pointer;
+transition:all .15s ease;
+}
+.goalCard:hover{ border-color:#cfd5e6; transform:translateY(-1px); box-shadow:0 6px 16px rgba(20,33,62,0.07); }
+.goalCard.active{ border-color:var(--accent); background:var(--accent-soft); }
+.goalIcon{
+font-size:22px; width:42px; height:42px;
+display:flex; align-items:center; justify-content:center;
+background:#f1f4fb; border-radius:50%; flex:none;
+}
+.goalCard.active .goalIcon{ background:white; }
+.goalText b{ font-size:15.5px; color:var(--navy); }
+.goalText span{ display:block; font-size:12.5px; color:var(--muted); margin-top:1px; }
+
+.plan-card{
+position:relative; border-radius:18px; overflow:hidden; cursor:pointer;
+border:2.5px solid transparent; margin-top:16px; background:white;
+box-shadow:0 4px 14px rgba(20,33,62,0.06); transition:all .15s ease;
+}
+.plan-card.active{ border-color:var(--accent); box-shadow:0 8px 22px rgba(16,185,129,0.20); }
+.plan-card img{ width:100%; display:block; }
+.recBadge{
+position:absolute; bottom:12px; left:12px;
+background:rgba(16,185,129,0.62);
+backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
+color:white; text-shadow:0 1px 2px rgba(0,0,0,0.25);
+font-size:11.5px; font-weight:700; padding:5px 12px; border-radius:99px;
+border:1px solid rgba(255,255,255,0.35);
+z-index:2; box-shadow:0 2px 8px rgba(0,0,0,0.18);
+}
+
+.tileGrid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.tile{
+position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+gap:10px; background:white; border:2px solid #eaecf3; border-radius:18px;
+padding:18px 12px; cursor:pointer; transition:all .15s ease; text-align:center;
+}
+.tile:hover{ border-color:#cfd5e6; }
+.tile input{ position:absolute; opacity:0; pointer-events:none; }
+.tileIcon{ width:50px; height:50px; border-radius:15px; display:flex; align-items:center; justify-content:center; font-size:25px; background:var(--tint); transition:all .15s ease; }
+.tileLabel{ font-size:15px; font-weight:600; color:#222; }
+.tileTime{ font-size:11.5px; color:#889; margin-top:-4px; }
+.tile.on{ border-color:var(--ta); background:var(--tint); box-shadow:0 5px 16px rgba(0,0,0,0.08); }
+.tile.on .tileLabel{ color:var(--ta); }
+.tileCheck{ position:absolute; top:9px; right:9px; width:22px; height:22px; border-radius:50%; background:var(--ta); color:white; display:none; align-items:center; justify-content:center; font-size:13px; }
+.tile.on .tileCheck{ display:flex; }
+
+.locWrap{ position:relative; margin-top:10px; }
+.locWrap input{ padding-right:54px; }
+.locBtn{ position:absolute; right:8px; top:50%; transform:translateY(-50%); border:none; background:transparent; cursor:pointer; padding:8px; }
+#locationSpinner{ position:absolute; right:46px; top:50%; transform:translateY(-50%); width:16px; height:16px; border:2px solid #ddd; border-top:2px solid var(--navy); border-radius:50%; animation:spin .8s linear infinite; display:none; }
+@keyframes spin{ 0%{transform:translateY(-50%) rotate(0);} 100%{transform:translateY(-50%) rotate(360deg);} }
+
+.navRow{ display:flex; gap:12px; margin-top:26px; }
+.btn{ flex:1; padding:15px; border:none; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; }
+.btnPrimary{ background:var(--navy); color:white; box-shadow:0 6px 16px rgba(10,26,110,0.22); }
+.btnPrimary:active{ background:var(--navy-deep); }
+.btnGhost{ flex:none; width:54px; background:white; color:var(--navy); border:1.5px solid #e2e7f1; font-size:20px; }
+.skipLink{ display:block; width:100%; margin-top:16px; background:transparent; border:none; color:#aab; font-size:12px; text-decoration:underline; cursor:pointer; padding:4px; }
+
+.resultCard{
+background:linear-gradient(140deg,var(--navy) 0%,#1c318f 60%,#13a06f 140%);
+border-radius:22px; padding:30px 22px; text-align:center; color:white;
+box-shadow:0 16px 36px rgba(10,26,110,0.28);
+}
+.resultTick{ width:56px; height:56px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:27px; }
+.resultEyebrow{ font-size:12px; letter-spacing:1.6px; opacity:.85; font-weight:700; }
+.resultPrice{ font-size:44px; font-weight:800; margin:6px 0 2px; }
+.resultNote{ font-size:13px; opacity:.85; }
+.resultPlan{ display:inline-block; margin-top:14px; background:rgba(255,255,255,0.18); padding:7px 16px; border-radius:99px; font-size:13.5px; font-weight:600; }
+
+.summaryBox{ background:white; border-radius:18px; padding:16px 18px; margin-top:16px; box-shadow:0 4px 14px rgba(20,33,62,0.06); font-size:14px; }
+.summaryBox .row{ display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid #f0f2f7; }
+.summaryBox .row:last-child{ border-bottom:none; }
+.summaryBox .row span:first-child{ color:var(--muted); flex:none; }
+.summaryBox .row span:last-child{ font-weight:600; text-align:right; }
+
+.toastPopup{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:16px 22px; border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.18); font-size:15px; font-weight:500; color:#333; z-index:9999; display:none; max-width:280px; text-align:center; }
+
+.bookBar{ position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,0.96); backdrop-filter:blur(8px); padding:14px 18px; border-top:1px solid #eee; box-shadow:0 -3px 12px rgba(0,0,0,0.07); display:none; z-index:50; }
+.bookBar button{ display:block; max-width:340px; width:100%; margin:0 auto; padding:16px; border-radius:14px; border:none; background:#25D366; color:white; font-size:17px; font-weight:700; cursor:pointer; box-shadow:0 6px 16px rgba(37,211,102,0.32); }
+
+@media(min-width:920px){
+.stepRail{ display:block; width:218px; position:sticky; top:96px; }
+.progressWrap{ display:none; }
+.card{ padding:32px 30px 30px; }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<a href="../index.html" class="backLink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg><span>Website</span></a>
+<img src="logo.png" class="logo">
+<div class="menuButton" onclick="toggleMenu()">&#9776;</div>
+</div>
+
+<div class="headerMenu" id="headerMenu">
+<div onclick="location.href='../index.html'">Back to Website</div>
+<div onclick="openWeeklyMenu()">Weekly Menu</div>
+<div onclick="contactSupport()">Customer Service</div>
+</div>
+
+<div class="shell">
+
+<div class="stepRail">
+<div class="railInner">
+<div class="railTrack"></div>
+<div class="railFill" id="railFill"></div>
+<div id="railNodes"></div>
+</div>
+</div>
+
+<div class="main">
+
+<div class="progressWrap">
+<div class="mNodes" id="mNodes">
+<div class="mTrack"></div>
+<div class="mFill" id="mFill"></div>
+</div>
+</div>
+
+<div class="card">
+
+<div class="step active" data-step>
+<div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>Get started</div>
+<div class="stepTitle">Welcome to Friska</div>
+<div class="stepSub">Let's start with a few details so we can prepare your plan.</div>
+
+<label class="fieldLabel">Your name</label>
+<input type="text" id="clientName" placeholder="Enter your name">
+<label class="fieldLabel">Phone number</label>
+<input type="tel" id="clientPhone" placeholder="10-digit mobile number" maxlength="10">
+
+<div class="navRow"><button class="btn btnPrimary" onclick="next(0)">Continue</button></div>
+</div>
+
+<div class="step" data-step>
+<div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Delivery</div>
+<div class="stepTitle">Delivery location</div>
+<div class="stepSub">Tell us where we'll be delivering. This helps us check timing and delivery charges.</div>
+
+<div class="locWrap">
+<input id="location" type="text" placeholder="Enter delivery location">
+<div id="locationSpinner"></div>
+<button type="button" class="locBtn" onclick="useCurrentLocation()">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#0a1a6e" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="#0a1a6e"/></svg>
+</button>
+</div>
+
+<div class="navRow"><button class="btn btnGhost" onclick="back(1)">&#8592;</button><button class="btn btnPrimary" onclick="next(1)">Continue</button></div>
+</div>
+
+<div class="step" data-step>
+<div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/></svg>Your goal</div>
+<div class="stepTitle">What's your goal?</div>
+<div class="stepSub">We'll use this to recommend the right plan for you.</div>
+
+<div class="goalCard" onclick="selectGoal(this,'weightloss')"><div class="goalIcon">&#128293;</div><div class="goalText"><b>Weight Loss</b><span>Lighter meals, controlled carbs</span></div></div>
+<div class="goalCard" onclick="selectGoal(this,'musclegain')"><div class="goalIcon">&#128170;</div><div class="goalText"><b>Muscle Gain</b><span>Higher protein, performance focused</span></div></div>
+<div class="goalCard" onclick="selectGoal(this,'wellness')"><div class="goalIcon">&#127807;</div><div class="goalText"><b>Overall Wellness</b><span>Balanced everyday nutrition</span></div></div>
+
+<div class="navRow"><button class="btn btnGhost" onclick="back(2)">&#8592;</button><button class="btn btnPrimary" onclick="next(2)">Continue</button></div>
+</div>
+
+<div class="step" data-step>
+<div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16a8 8 0 0 1 16 0"/><path d="M12 16l4-3"/></svg>About you</div>
+<div class="stepTitle">A little about you</div>
+<div class="stepSub">This lets us match you to the best plan for your body and goal.</div>
+
+<label class="fieldLabel">Age</label>
+<input type="number" id="age" placeholder="Years">
+<label class="fieldLabel">Height</label>
+<div class="dualField"><input type="number" id="heightFt" placeholder="Feet"><input type="number" id="heightIn" placeholder="Inches"></div>
+<label class="fieldLabel">Weight (kg)</label>
+<input type="number" id="weight" placeholder="e.g. 68">
+
+<div class="navRow"><button class="btn btnGhost" onclick="back(3)">&#8592;</button><button class="btn btnPrimary" onclick="next(3)">Continue</button></div>
+<button class="skipLink" onclick="skipBody()">Skip</button>
+</div>
+
+<div class="step" data-step>
+<div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 11h6M9 15h4"/></svg>Your plan</div>
+<div class="stepTitle">Choose your plan</div>
+<div class="stepSub">Macros and suitability are explained on each plan banner.</div>
+<div id="planList"></div>
+<div class="navRow"><button class="btn btnGhost" onclick="back(4)">&#8592;</button><button class="btn btnPrimary" onclick="next(4)">Continue</button></div>
+</div>
+
+<div class="step" data-step>
+<div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3v6a2 2 0 0 0 4 0V3"/><path d="M8 9v12"/><path d="M16 3c2 2 2 7 0 9v9"/></svg>Meals</div>
+<div class="stepTitle">Select your meals</div>
+<div class="stepSub">Tap to add the meals you'd like delivered each day.</div>
+<div class="tileGrid">
+<label class="tile" style="--ta:#F59E0B;--tint:#FEF3E2;"><input type="checkbox" id="breakfast"><div class="tileIcon">&#127859;</div><div class="tileLabel">Breakfast</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#8B5CF6;--tint:#F1ECFD;"><input type="checkbox" id="snack"><div class="tileIcon">&#127822;</div><div class="tileLabel">Snack</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#10B981;--tint:#E7F7F1;"><input type="checkbox" id="lunch"><div class="tileIcon">&#127857;</div><div class="tileLabel">Lunch</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#EC4899;--tint:#FCE9F3;"><input type="checkbox" id="juice1"><div class="tileIcon">&#129380;</div><div class="tileLabel">1 Juice</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#3B82F6;--tint:#E8F1FE;"><input type="checkbox" id="dinner"><div class="tileIcon">&#127858;</div><div class="tileLabel">Dinner</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#14B8A6;--tint:#E5F6F4;"><input type="checkbox" id="juice2"><div class="tileIcon">&#129380;</div><div class="tileLabel">2 Juices</div><div class="tileCheck">&#10003;</div></label>
+</div>
+<div class="navRow"><button class="btn btnGhost" onclick="back(5)">&#8592;</button><button class="btn btnPrimary" onclick="next(5)">Continue</button></div>
+</div>
+
+<div class="step" data-step>
+<div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/></svg>Duration</div>
+<div class="stepTitle">Choose duration</div>
+<div class="stepSub">How long would you like to subscribe?</div>
+<div class="tileGrid">
+<label class="tile" style="--ta:#0a1a6e;--tint:#eef1fb;"><input type="radio" name="duration" value="d"><div class="tileIcon">&#9889;</div><div class="tileLabel">2 Day Trial</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#0a1a6e;--tint:#eef1fb;"><input type="radio" name="duration" value="w"><div class="tileIcon">&#128197;</div><div class="tileLabel">1 Week</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#0a1a6e;--tint:#eef1fb;"><input type="radio" name="duration" value="m"><div class="tileIcon">&#128467;</div><div class="tileLabel">26 Days</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#0a1a6e;--tint:#eef1fb;"><input type="radio" name="duration" value="q"><div class="tileIcon">&#127775;</div><div class="tileLabel">3 Months</div><div class="tileCheck">&#10003;</div></label>
+</div>
+<div class="navRow"><button class="btn btnGhost" onclick="back(6)">&#8592;</button><button class="btn btnPrimary" onclick="next(6)">Continue</button></div>
+</div>
+
+<div class="step" data-step>
+<div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Slot</div>
+<div class="stepTitle">Delivery slot</div>
+<div class="stepSub">Pick the timings that work best for you.</div>
+<div class="tileGrid">
+<label class="tile" id="morningLabel" style="--ta:#F59E0B;--tint:#FEF3E2;"><input type="checkbox" id="morning"><div class="tileIcon">&#127749;</div><div class="tileLabel">Morning</div><div class="tileTime">7am - 8am</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#F97316;--tint:#FFF0E6;"><input type="checkbox" id="afternoon"><div class="tileIcon">&#9728;</div><div class="tileLabel">Afternoon</div><div class="tileTime">11:30am - 1:30pm</div><div class="tileCheck">&#10003;</div></label>
+<label class="tile" style="--ta:#6366F1;--tint:#ECECFB;"><input type="checkbox" id="evening"><div class="tileIcon">&#127769;</div><div class="tileLabel">Evening</div><div class="tileTime">6pm - 8pm</div><div class="tileCheck">&#10003;</div></label>
+</div>
+<div class="navRow"><button class="btn btnGhost" onclick="back(7)">&#8592;</button><button class="btn btnPrimary" onclick="next(7)">See your price</button></div>
+</div>
+
+<div class="step" data-step>
+<div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Done</div>
+<div class="stepTitle">You're all set</div>
+<div class="stepSub">Here's your personalised plan and estimated pricing.</div>
+<div id="quoteResult"></div>
+<div id="quoteSummary"></div>
+<div class="navRow"><button class="btn btnGhost" onclick="back(8)">&#8592;</button></div>
+</div>
+
+</div>
+</div>
+</div>
+
+<div class="bookBar" id="bookBar"><button onclick="bookNow()">Book Now</button></div>
+<div id="toastPopup" class="toastPopup"><span id="toastMessage"></span></div>
+
+<script src="config.js"></script>
+
+<script>
+
+const PRICING_URL = (typeof API_URL !== "undefined" && API_URL) ? API_URL : "";
+if(!PRICING_URL){ console.warn("API_URL not found — make sure config.js is present and loaded."); }
+const WHATSAPP_NUMBER = "919390097670";
+const SUPPORT_NUMBER  = "918400964170";
+const KITCHEN = { lat:17.452623115758335, lng:78.41967516576499 };
+
+const PLANS = {
+  nb:{ name:"Nutri Balance", img:"nutri_balance.webp" },
+  hp:{ name:"High Protein",  img:"high_protein.webp"  },
+  lc:{ name:"Low Carb",      img:"low_carb.webp"      },
+  hc:{ name:"High Carb",     img:"high_carb.webp"     },
+  nc:{ name:"No Carb",       img:"no_carb.webp"       }
+};
+const GOAL_PLANS = { weightloss:["nb","lc","nc"], musclegain:["hp","nc"], wellness:["hc","nb"] };
+const GOAL_NAME  = { weightloss:"Weight Loss", musclegain:"Muscle Gain", wellness:"Overall Wellness" };
+
+function recommendByBMI(goal, bmi){
+  if(goal === "weightloss"){ if(bmi < 25) return "nb"; if(bmi < 30) return "lc"; return "nc"; }
+  if(goal === "musclegain"){ if(bmi < 25) return "hp"; return "nc"; }
+  if(goal === "wellness"){ if(bmi < 18.5) return "hc"; return "nb"; }
+  return GOAL_PLANS[goal][0];
+}
+
+let selectedPlan="", selectedGoal="", recommendedPlan="", bmiValue=0, distance=0, pricing={};
+fetch(PRICING_URL).then(r=>r.json()).then(d=>{ pricing=d; });
+function getPrice(key){ if(!pricing[key]) return 0; return Number(pricing[key]); }
+
+const RAIL = [
+  { label:"Your details", svg:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>' },
+  { label:"Location",     svg:'<path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>' },
+  { label:"Goal",         svg:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/>' },
+  { label:"About you",    svg:'<path d="M4 16a8 8 0 0 1 16 0"/><path d="M12 16l4-3"/>' },
+  { label:"Plan",         svg:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9z"/><path d="M9 11h6M9 15h4"/>' },
+  { label:"Meals",        svg:'<path d="M6 3v6a2 2 0 0 0 4 0V3"/><path d="M8 9v12"/><path d="M16 3c2 2 2 7 0 9v9"/>' },
+  { label:"Duration",     svg:'<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9h16M8 3v4M16 3v4"/>' },
+  { label:"Slot",         svg:'<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>' }
+];
+(function buildRail(){
+  let html="";
+  RAIL.forEach((n,i)=>{
+    html += '<div class="railNode" data-rail="'+i+'">'+
+      '<div class="railDot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+n.svg+'</svg></div>'+
+      '<div class="railLabel">'+n.label+'</div></div>';
+  });
+  document.getElementById("railNodes").innerHTML = html;
+})();
+
+(function buildMobileRail(){
+  let html="";
+  RAIL.forEach((n,i)=>{
+    html += '<div class="mNode" data-mrail="'+i+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+n.svg+'</svg></div>';
+  });
+  document.getElementById("mNodes").insertAdjacentHTML("beforeend", html);
+})();
+
+function renderRail(idx){
+  document.querySelectorAll('.railNode').forEach((node,i)=>{
+    node.classList.toggle('done', i < idx);
+    node.classList.toggle('active', i === idx);
+  });
+  let capped = Math.min(idx, RAIL.length-1);
+  document.getElementById("railFill").style.height = (capped*64) + "px";
+
+  let mNodes = document.querySelectorAll('.mNode');
+  mNodes.forEach((node,i)=>{
+    node.classList.toggle('done', i < idx);
+    node.classList.toggle('active', i === idx);
+  });
+  let track = document.querySelector('.mNodes');
+  if(track && mNodes.length){
+    let span = track.clientWidth - 36;
+    let frac = capped / (RAIL.length - 1);
+    document.getElementById("mFill").style.width = (span * frac) + "px";
+  }
+}
+window.addEventListener("resize", function(){ renderRail(current); });
+
+const steps = document.querySelectorAll('[data-step]');
+const TOTAL_INPUT_STEPS = 8;
+let current = 0;
+
+function showStep(idx){
+  steps.forEach((s,i)=> s.classList.toggle('active', i===idx));
+  current = idx;
+  renderRail(idx);
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+function back(fromIdx){ showStep(fromIdx-1); }
+function next(fromIdx){ if(!validateStep(fromIdx)) return; showStep(fromIdx+1); onEnter(fromIdx+1); }
+function autoNext(stepIdx){ setTimeout(function(){ if(current===stepIdx) next(stepIdx); }, 280); }
+function onEnter(idx){ if(idx===4) renderPlans(); if(idx===7) refreshMorningSlot(); if(idx===8) generateQuote(); }
+
+function validateStep(idx){
+  if(idx===0){
+    let name=document.getElementById("clientName").value.trim();
+    let phone=document.getElementById("clientPhone").value.replace(/\D/g,'');
+    if(!name){ showPopup("Please enter your name."); return false; }
+    if(phone.length!==10){ showPopup("Please enter a valid 10-digit phone number."); return false; }
+    return true;
+  }
+  if(idx===1){ if(distance<=0){ showPopup("Please select your delivery location from the suggestions."); return false; } return true; }
+  if(idx===2){ if(!selectedGoal){ showPopup("Please choose a goal."); return false; } return true; }
+  if(idx===3){ computeRecommendation(); return true; }
+  if(idx===4){ if(!selectedPlan){ showPopup("Please choose a plan."); return false; } return true; }
+  if(idx===5){ let any=["breakfast","lunch","dinner","snack","juice1","juice2"].some(id=>document.getElementById(id).checked); if(!any){ showPopup("Please select at least one meal."); return false; } return true; }
+  if(idx===6){ if(!document.querySelector('input[name="duration"]:checked')){ showPopup("Please choose a duration."); return false; } return true; }
+  if(idx===7){ return validateSlots(); }
+  return true;
+}
+
+function selectGoal(card, goal){
+  invalidateQuote();
+  document.querySelectorAll('.goalCard').forEach(c=>c.classList.remove('active'));
+  card.classList.add('active');
+  selectedGoal = goal;
+  autoNext(2);
+}
+function skipBody(){
+  document.getElementById("age").value="";
+  document.getElementById("heightFt").value="";
+  document.getElementById("heightIn").value="";
+  document.getElementById("weight").value="";
+  bmiValue=0; computeRecommendation(); showStep(4); onEnter(4);
+}
+function computeRecommendation(){
+  let ft=parseFloat(document.getElementById("heightFt").value)||0;
+  let inch=parseFloat(document.getElementById("heightIn").value)||0;
+  let w=parseFloat(document.getElementById("weight").value)||0;
+  let totalInches=ft*12+inch;
+  if(totalInches>0 && w>0){ let m=totalInches*0.0254; bmiValue=w/(m*m); recommendedPlan=recommendByBMI(selectedGoal,bmiValue); }
+  else{ bmiValue=0; recommendedPlan=GOAL_PLANS[selectedGoal][0]; }
+}
+function renderPlans(){
+  if(!recommendedPlan) computeRecommendation();
+  let order=[recommendedPlan];
+  GOAL_PLANS[selectedGoal].forEach(p=>{ if(!order.includes(p)) order.push(p); });
+  Object.keys(PLANS).forEach(p=>{ if(!order.includes(p)) order.push(p); });
+  let html="";
+  order.forEach(p=>{
+    let inGoal = GOAL_PLANS[selectedGoal].includes(p);
+    let isSelected = (p===recommendedPlan);
+    html += '<div class="plan-card'+(isSelected?' active':'')+'" onclick="selectPlan(this,\''+p+'\')">'+
+            (inGoal?'<div class="recBadge">&#9733; Recommended</div>':'')+
+            '<img src="'+PLANS[p].img+'" alt="'+PLANS[p].name+'"></div>';
+  });
+  document.getElementById("planList").innerHTML = html;
+  selectedPlan = recommendedPlan;
+}
+function selectPlan(card, plan){
+  invalidateQuote();
+  document.querySelectorAll(".plan-card").forEach(c=>c.classList.remove("active"));
+  card.classList.add("active");
+  selectedPlan = plan;
+  autoNext(4);
+}
+
+function bindTiles(){
+  document.querySelectorAll('.tile input').forEach(inp=>{
+    inp.addEventListener('change', function(){
+      if(this.type==='radio'){
+        document.querySelectorAll('input[name="'+this.name+'"]').forEach(r=>{ r.closest('.tile').classList.toggle('on', r.checked); });
+      }else{ this.closest('.tile').classList.toggle('on', this.checked); }
+    });
+  });
+  document.querySelectorAll('input[name="duration"]').forEach(r=>{ r.addEventListener('change', function(){ invalidateQuote(); autoNext(6); }); });
+  ["breakfast","lunch","dinner","snack","juice1","juice2","morning","afternoon","evening"].forEach(id=>{
+    let el=document.getElementById(id); if(el) el.addEventListener("change", invalidateQuote);
+  });
+}
+
+let autocomplete;
+function initAutocomplete(){
+  const input=document.getElementById("location");
+  autocomplete=new google.maps.places.Autocomplete(input,{ componentRestrictions:{country:"in"}, locationBias:{ center:{lat:17.385044,lng:78.486671}, radius:50000 } });
+  autocomplete.addListener("place_changed", function(){ const place=autocomplete.getPlace(); if(place && place.geometry) calculateDistance(place.geometry.location); });
+}
+function calculateDistance(destination){
+  const service=new google.maps.DistanceMatrixService();
+  service.getDistanceMatrix({ origins:[KITCHEN], destinations:[destination], travelMode:"DRIVING" }, function(response,status){
+    if(status!=="OK"){ return; }
+    const element=response.rows[0].elements[0];
+    distance=element.distance.value/1000;
+    if(distance>20){ showPopup("Delivery location is more than 20 km away. This may affect delivery timing and meal plan availability."); }
+  });
+}
+function useCurrentLocation(){
+  const spinner=document.getElementById("locationSpinner");
+  spinner.style.display="block";
+  if(!navigator.geolocation){ spinner.style.display="none"; alert("Geolocation not supported"); return; }
+  navigator.geolocation.getCurrentPosition(function(position){
+    let lat=position.coords.latitude, lng=position.coords.longitude;
+    const latlng={lat:lat,lng:lng};
+    const geocoder=new google.maps.Geocoder();
+    geocoder.geocode({ location:latlng }, function(results,status){
+      spinner.style.display="none";
+      if(status==="OK" && results[0]){ document.getElementById("location").value=results[0].formatted_address; calculateDistance(latlng); }
+      else{ alert("Unable to determine address from location."); }
+    });
+  }, function(){ spinner.style.display="none"; alert("Unable to fetch current location. Please allow location permission."); });
+}
+document.getElementById("location").addEventListener("input", function(){ distance=0; invalidateQuote(); });
+
+function refreshMorningSlot(){
+  let breakfast=document.getElementById("breakfast").checked;
+  let morningLabel=document.getElementById("morningLabel");
+  let morning=document.getElementById("morning");
+  if(!breakfast){ morningLabel.style.display="none"; morning.checked=false; morningLabel.classList.remove("on"); }
+  else{ morningLabel.style.display="flex"; }
+}
+function validateSlots(){
+  let morning=document.getElementById("morning").checked;
+  let afternoon=document.getElementById("afternoon").checked;
+  let evening=document.getElementById("evening").checked;
+  let breakfast=document.getElementById("breakfast").checked;
+  let lunch=document.getElementById("lunch").checked;
+  let dinner=document.getElementById("dinner").checked;
+  let snack=document.getElementById("snack").checked;
+  let slotCount=(morning?1:0)+(afternoon?1:0)+(evening?1:0);
+  if(slotCount===0){ showPopup("Please choose at least one delivery slot."); return false; }
+  if(morning && !afternoon && !evening && (lunch||dinner||snack)){ showPopup("Lunch, Dinner or Snack require Afternoon or Evening delivery."); return false; }
+  let mealCount=(breakfast?1:0)+(lunch?1:0)+(dinner?1:0);
+  if(mealCount===1 && slotCount>1){ showPopup("Only one meal selected. Please choose only one delivery slot."); return false; }
+  return true;
+}
+document.getElementById("clientName").addEventListener("input", invalidateQuote);
+document.getElementById("clientPhone").addEventListener("input", invalidateQuote);
+
+function invalidateQuote(){
+  document.getElementById("quoteResult").innerHTML="";
+  document.getElementById("quoteSummary").innerHTML="";
+  document.getElementById("bookBar").style.display="none";
+}
+function generateQuote(){
+  let name=document.getElementById("clientName").value.trim();
+  let phone=document.getElementById("clientPhone").value.replace(/\D/g,'');
+  let age=document.getElementById("age").value.trim();
+
+  let durationElement=document.querySelector('input[name="duration"]:checked');
+  let duration=durationElement.value;
+  let durationText={ d:"2 Day Trial", w:"1 Week", m:"26 Days", q:"3 Months" }[duration];
+
+  let prefix=selectedPlan+"_", dur=duration+"_";
+  let breakfast=document.getElementById("breakfast").checked;
+  let lunch=document.getElementById("lunch").checked;
+  let dinner=document.getElementById("dinner").checked;
+  let snack=document.getElementById("snack").checked;
+  let juice1=document.getElementById("juice1").checked;
+  let juice2=document.getElementById("juice2").checked;
+  let morning=document.getElementById("morning").checked;
+  let afternoon=document.getElementById("afternoon").checked;
+  let evening=document.getElementById("evening").checked;
+
+  let foodPerDay=0;
+  if(breakfast) foodPerDay+=getPrice(prefix+dur+"breakfast");
+  let mealCount=0;
+  if(lunch) mealCount++;
+  if(dinner) mealCount++;
+  if(mealCount==1) foodPerDay+=getPrice(prefix+dur+"lunch");
+  if(mealCount==2) foodPerDay+=getPrice(prefix+dur+"combo")*2;
+  if(snack)  foodPerDay+=getPrice(prefix+dur+"snack");
+  if(juice1) foodPerDay+=getPrice(prefix+dur+"juice1");
+  if(juice2) foodPerDay+=getPrice(prefix+dur+"juice2")*2;
+
+  let days=2;
+  if(duration=="w") days=6;
+  if(duration=="m") days=26;
+  if(duration=="q") days=78;
+
+  let foodTotal=foodPerDay*days;
+  let trips=0;
+  if(morning) trips++;
+  if(afternoon) trips++;
+  if(evening) trips++;
+  let roundedDistance=Math.round(distance);
+  let deliveryPerTrip=roundedDistance*getPrice("delivery");
+  let deliveryTotal=deliveryPerTrip*trips*days;
+  let gst=foodTotal*(getPrice("gst")/100);
+  let total=foodTotal+gst+deliveryTotal;
+
+  let meals=[];
+  if(breakfast) meals.push("Breakfast");
+  if(lunch) meals.push("Lunch");
+  if(dinner) meals.push("Dinner");
+  if(snack) meals.push("Snack");
+  if(juice1) meals.push("1 Juice");
+  if(juice2) meals.push("2 Juices");
+  let slots=[];
+  if(morning) slots.push("Morning");
+  if(afternoon) slots.push("Afternoon");
+  if(evening) slots.push("Evening");
+
+  let planText=PLANS[selectedPlan].name;
+  let ft=document.getElementById("heightFt").value;
+  let inch=document.getElementById("heightIn").value;
+  let heightText=(ft||inch)?((ft||0)+"ft "+(inch||0)+"in"):"";
+
+  fetch(PRICING_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      name:name, phone:phone, age:age,
+      plan:planText, goal:GOAL_NAME[selectedGoal],
+      height:heightText, weight:document.getElementById("weight").value,
+      bmi: bmiValue ? bmiValue.toFixed(1) : "",
+      recommended: PLANS[recommendedPlan] ? PLANS[recommendedPlan].name : "",
+      meals:meals.join(", "), duration:durationText, slots:slots.join(", "),
+      location:document.getElementById("location").value, distance:roundedDistance, price:total
+    })
+  });
+
+  document.getElementById("quoteResult").innerHTML =
+    "<div class='resultCard'>"+
+      "<div class='resultTick'>&#10003;</div>"+
+      "<div class='resultEyebrow'>ESTIMATED TOTAL</div>"+
+      "<div class='resultPrice'>&#8377;"+total.toFixed(0)+"</div>"+
+      "<div class='resultNote'>Including delivery charges &amp; taxes</div>"+
+      "<div class='resultPlan'>"+planText+" &middot; "+durationText+"</div>"+
+    "</div>";
+
+  document.getElementById("quoteSummary").innerHTML =
+    "<div class='summaryBox'>"+
+      row("Plan",planText)+ row("Goal",GOAL_NAME[selectedGoal])+
+      row("Meals",meals.join(", "))+ row("Duration",durationText)+
+      row("Slots",slots.join(", "))+ row("Delivery",roundedDistance+" km")+
+    "</div>";
+
+  document.getElementById("bookBar").style.display="block";
+}
+function row(label,value){ return "<div class='row'><span>"+label+"</span><span>"+(value||"-")+"</span></div>"; }
+
+function bookNow(){
+  /* mark this lead as Booked in the backend (read later in leads.html) */
+  let bookedPhone=document.getElementById("clientPhone").value.replace(/\D/g,'');
+  fetch(PRICING_URL + "?action=markBooked", {
+    method:"POST", keepalive:true,
+    body: JSON.stringify({ phone: bookedPhone })
+  });
+
+  let durationElement=document.querySelector('input[name="duration"]:checked');
+  let duration=durationElement.value;
+  let durationText={ d:"2 Day Trial", w:"1 Week", m:"26 Days", q:"3 Months" }[duration];
+  let planText=PLANS[selectedPlan].name;
+  let clientName=document.getElementById("clientName").value.trim();
+  let message="Hello Friska Wellness,%0A%0A"+"My name is "+clientName+".%0A"+
+    "I have opted for the "+planText+" plan for "+durationText+".%0A%0A"+
+    "I would like to proceed with the subscription.%0A"+
+    "Please share the weekly menu and payment details.%0A%0AThank you.";
+  window.open("https://wa.me/"+WHATSAPP_NUMBER+"?text="+message,"_blank");
+}
+function toggleMenu(){ let m=document.getElementById("headerMenu"); m.style.display=(m.style.display==="block")?"none":"block"; }
+document.addEventListener("click", function(e){
+  let menu=document.getElementById("headerMenu"), button=document.querySelector(".menuButton");
+  if(!menu.contains(e.target) && !button.contains(e.target)){ menu.style.display="none"; }
+});
+function openWeeklyMenu(){ window.open("https://friskawellnessfoods.github.io/weekly-choice/menu.html","_blank"); }
+function contactSupport(){ let message="Hello Friska Wellness,%0A%0AI would like to know more about the meal plans."; window.open("https://wa.me/"+SUPPORT_NUMBER+"?text="+message,"_blank"); }
+function showPopup(message){ let p=document.getElementById("toastPopup"); document.getElementById("toastMessage").innerText=message; p.style.display="block"; setTimeout(()=>{ p.style.display="none"; },2500); }
+
+bindTiles();
+showStep(0);
+
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCqVJgCfV0C1KBF0u1Jc02p_RHE7K7g1V8&libraries=places&callback=initAutocomplete" async defer></script>
+
+</body>
+</html>
