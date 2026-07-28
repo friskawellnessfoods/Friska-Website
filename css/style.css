@@ -306,6 +306,60 @@ footer{padding:0 0 32px;}
 }
 .footer-bottom .social a:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
 
+
+/* ---------- First-visit modal ---------- */
+.fv-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(10,26,110,0.45);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
+}
+.fv-overlay.show{opacity:1;pointer-events:auto;}
+.fv-modal{
+  position:relative;width:100%;max-width:440px;
+  background:var(--white);border-radius:24px;padding:34px 30px 28px;
+  box-shadow:0 30px 70px rgba(10,26,110,0.35);
+  transform:translateY(16px) scale(.97);transition:transform .3s ease;
+  text-align:center;
+}
+.fv-overlay.show .fv-modal{transform:translateY(0) scale(1);}
+.fv-close{
+  position:absolute;top:14px;right:14px;
+  width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--bg);color:var(--muted);font-size:19px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s ease,color .2s ease;
+}
+.fv-close:hover{background:#e6ebf5;color:var(--navy);}
+.fv-modal .eyebrow{margin-bottom:14px;}
+.fv-modal h3{font-size:25px;line-height:1.2;}
+.fv-modal p{margin-top:12px;font-size:15px;color:var(--muted);line-height:1.65;}
+.fv-points{
+  list-style:none;margin:20px 0 0;padding:0;
+  display:flex;flex-direction:column;gap:9px;text-align:left;
+}
+.fv-points li{
+  display:flex;align-items:center;gap:11px;
+  background:var(--bg);border-radius:12px;padding:11px 14px;
+  font-family:var(--display);font-size:13.5px;font-weight:600;color:var(--navy);
+}
+.fv-points li b{
+  width:22px;height:22px;border-radius:50%;flex-shrink:0;
+  background:var(--accent-soft);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+}
+.fv-modal .btn{width:100%;margin-top:22px;}
+.fv-skip{
+  display:block;width:100%;margin-top:14px;
+  background:none;border:none;cursor:pointer;
+  font-size:13px;color:var(--muted);text-decoration:underline;padding:4px;
+}
+.fv-skip:hover{color:var(--navy);}
+@media (max-width:520px){
+  .fv-modal{padding:30px 22px 24px;border-radius:20px;}
+  .fv-modal h3{font-size:22px;}
+}
+
 /* ---------- Floating WhatsApp ---------- */
 .float-wa{
   position:fixed;right:22px;bottom:22px;z-index:60;
