@@ -83,6 +83,8 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
 .btn-outline:hover{border-color:#cfd5e6;transform:translateY(-2px);box-shadow:0 6px 16px rgba(20,33,62,0.08);}
 .btn-accent{background:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(16,185,129,0.28);}
 .btn-accent:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(16,185,129,0.36);}
+.cta-inner .btn-wa-ghost{background:rgba(255,255,255,0.16);color:#fff;border:1.5px solid rgba(255,255,255,0.4);box-shadow:none;}
+.cta-inner .btn-wa-ghost:hover{background:rgba(255,255,255,0.26);box-shadow:none;}
 
 .nav-toggle{display:none;background:none;border:0;cursor:pointer;padding:6px;}
 .nav-toggle span{display:block;width:24px;height:2px;background:var(--navy);margin:5px 0;border-radius:2px;}
@@ -181,6 +183,28 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
 .why-card figcaption{
   position:absolute;left:20px;right:20px;bottom:18px;z-index:2;
   font-family:var(--display);font-size:21px;font-weight:700;color:#fff;line-height:1.2;
+}
+
+/* ---------- Plan builder promo ---------- */
+.planner{padding:0 0 90px;}
+.planner-inner{
+  display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:center;
+  background:var(--white);border-radius:24px;padding:40px 36px;
+  box-shadow:0 20px 50px rgba(20,33,62,0.08);
+}
+.planner-inner h2{font-size:clamp(26px,3vw,36px);margin-top:13px;}
+.planner-inner > div > p{margin-top:14px;color:var(--muted);font-size:16px;line-height:1.7;}
+.planner-inner .btn{margin-top:24px;}
+.planner-steps{list-style:none;margin:0;padding:0;display:grid;gap:12px;}
+.planner-steps li{
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg);border-radius:14px;padding:14px 18px;
+  font-family:var(--display);font-size:14.5px;font-weight:600;color:var(--navy);
+}
+.planner-steps li span{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:var(--accent-soft);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
 }
 
 /* ---------- Tiers ---------- */
@@ -328,6 +352,7 @@ footer{padding:0 0 32px;}
   .hero-visual{max-width:400px;margin:0 auto;}
   .why-qa{grid-template-columns:1fr;gap:22px;padding:30px 26px;}
   .why-cards{grid-template-columns:1fr;}
+  .planner-inner{grid-template-columns:1fr;gap:26px;padding:32px 26px;}
   .tier-grid{grid-template-columns:repeat(2,1fr);}
   .gallery-grid{grid-template-columns:1fr 1fr;grid-template-rows:210px 210px 210px;}
   .testi-grid{grid-template-columns:1fr;}
