@@ -113,8 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '<li><b>2</b>Pick your meals and slots</li>' +
           '<li><b>3</b>Get your price instantly</li>' +
         '</ul>' +
-        '<a class="btn btn-accent" href="plan/index.html">Choose Your Meal Plan</a>' +
-        '<button class="fv-skip">I\'ll look around first</button>' +
+        '<a class="btn btn-primary" href="plan/index.html">Choose Your Meal Plan</a>' +
       '</div>';
 
     document.body.appendChild(overlay);
@@ -142,7 +141,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     overlay.querySelector('.fv-close').addEventListener('click', close);
-    overlay.querySelector('.fv-skip').addEventListener('click', close);
     overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
     cta.addEventListener('click', markSeen);
     document.addEventListener('keydown', onKey);
