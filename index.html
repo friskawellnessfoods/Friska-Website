@@ -37,19 +37,29 @@
         <a class="btn btn-primary" href="https://wa.me/918400964170" target="_blank" rel="noopener">Book a Trial Meal</a>
         <a class="btn btn-outline" href="about.html">Our Story</a>
       </div>
-      <div class="hero-note"><span class="stars">★★★★★</span> Trusted by health-conscious Hyderabad, one tiffin at a time</div>
+      <div class="hero-badges">
+        <div class="badge"><span class="ico"></span>Zero preservatives</div>
+        <div class="badge"><span class="ico"></span>Chef-designed plates</div>
+        <div class="badge"><span class="ico"></span>Delivered fresh, daily</div>
+      </div>
     </div>
-    <div class="tiffin">
-      <div class="tier"><img src="https://static.wixstatic.com/media/d30046_a9aac880bee746c19bd0ddc9a4362870~mv2.jpg" alt="Fresh Friska meal"></div>
-      <div class="tier"><img src="https://static.wixstatic.com/media/d30046_c9fd6cc568fe4551ae3647e67e7e624d~mv2.jpg" alt="Friska balanced meal"></div>
-      <div class="tier"><img src="https://static.wixstatic.com/media/d30046_dbe31a2d945c41d69b2fbd6275397689~mv2.jpg" alt="Friska daily delivery">
-        <span class="tag">Fresh, daily</span>
+    <div class="hero-visual">
+      <span class="hero-tag">Fresh today</span>
+      <div class="hero-frame">
+        <img src="https://static.wixstatic.com/media/d30046_a9aac880bee746c19bd0ddc9a4362870~mv2.jpg" alt="Fresh Friska meal">
+      </div>
+      <div class="hero-float">
+        <div class="thumb"><img src="https://static.wixstatic.com/media/d30046_c9fd6cc568fe4551ae3647e67e7e624d~mv2.jpg" alt=""></div>
+        <div>
+          <strong>Balanced plates</strong>
+          <span>Portion &amp; calorie controlled</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="tiers" id="why">
+<section class="tiers" id="why" data-reveal>
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Why Friska</span>
@@ -81,7 +91,7 @@
   </div>
 </section>
 
-<section class="gallery">
+<section class="gallery" data-reveal>
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">From the kitchen</span>
@@ -96,7 +106,35 @@
   </div>
 </section>
 
-<section class="cta-band" id="contact">
+<section class="testimonials" data-reveal>
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">What clients say</span>
+      <h2>Placeholder testimonials — swap for real reviews.</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p>"[Placeholder quote — replace with an actual customer review]"</p>
+        <div class="who">— Customer name, Hyderabad</div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p>"[Placeholder quote — replace with an actual customer review]"</p>
+        <div class="who">— Customer name, Secunderabad</div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p>"[Placeholder quote — replace with an actual customer review]"</p>
+        <div class="who">— Customer name, Hyderabad</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-band" id="contact" data-reveal>
+  <span class="cta-ring"></span>
+  <span class="cta-ring"></span>
   <div class="wrap">
     <div>
       <span class="eyebrow" style="color:var(--gold)">Book a trial meal</span>
@@ -143,6 +181,8 @@
     </div>
   </div>
 </footer>
+
+<a class="float-wa" href="https://wa.me/918400964170" target="_blank" rel="noopener" aria-label="WhatsApp us">WA</a>
 
 <script src="js/main.js"></script>
 <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
