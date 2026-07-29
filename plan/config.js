@@ -6,4 +6,4 @@
    /exec link below and every page that loads config.js updates.
    ============================================================ */
 
-var API_URL = "https://script.google.com/macros/s/AKfycbxKo3VgVUhhXvYVqZ61GeaSmY6c4_l6Vrz5ivChOtvq363SUaffCqfH3OKHRUtI950/exec";
+var API_URL = "https://script.google.com/macros/s/AKfycbzHnowCDuJ5s0lEMapCV8LQKDmsz0FDZfq87FMcIXnNwHWxc_M7bw6vJa62aBrjBqE/exec";
