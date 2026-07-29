@@ -4,9 +4,18 @@ document.addEventListener('DOMContentLoaded', function () {
   var toggle = document.querySelector('.nav-toggle');
   var nav = document.querySelector('.main-nav');
   if (toggle && nav) {
-    toggle.addEventListener('click', function () { nav.classList.toggle('open'); });
+    var setNav = function (open) {
+      nav.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      document.body.style.overflow = open ? 'hidden' : '';
+    };
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.addEventListener('click', function () { setNav(!nav.classList.contains('open')); });
     nav.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', function () { nav.classList.remove('open'); });
+      a.addEventListener('click', function () { setNav(false); });
+    });
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 900 && nav.classList.contains('open')) setNav(false);
     });
   }
 
@@ -21,6 +30,38 @@ document.addEventListener('DOMContentLoaded', function () {
     revealEls.forEach(function (el) { io.observe(el); });
   } else {
     revealEls.forEach(function (el) { el.classList.add('in'); });
+  }
+
+
+  /* ---------- Hero logo shrink on scroll ---------- */
+  /* Big hero logo scales down and fades as you scroll; the small header logo
+     fades in to take over. Tune FADE_OVER (px of scroll) and MIN_SCALE. */
+  var heroLogo = document.querySelector('.hero-logo');
+  var headLogo = document.querySelector('.logo-mark');
+  var FADE_OVER = window.innerWidth < 680 ? 200 : 320;
+  var MIN_SCALE = 0.42;
+
+  if (heroLogo && headLogo) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      headLogo.classList.remove('hidden');
+    } else {
+      headLogo.classList.add('hidden');
+      var ticking = false;
+
+      var onScroll = function () {
+        var p = Math.min(1, Math.max(0, window.scrollY / FADE_OVER));
+        heroLogo.style.transform = 'scale(' + (1 - p * (1 - MIN_SCALE)).toFixed(3) + ')';
+        heroLogo.style.opacity = (1 - p).toFixed(3);
+        headLogo.classList.toggle('hidden', p < 0.6);
+        ticking = false;
+      };
+
+      window.addEventListener('scroll', function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+      }, { passive: true });
+
+      onScroll();
+    }
   }
 
   /* ---------- Hero carousel ---------- */
@@ -149,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ---------- Google reviews ---------- */
   /* Set REVIEWS_API to your Apps Script web app URL (same one plan/config.js uses).
      Leave it blank and the section simply hides itself. */
-  var REVIEWS_API = 'https://script.google.com/macros/s/AKfycbzHnowCDuJ5s0lEMapCV8LQKDmsz0FDZfq87FMcIXnNwHWxc_M7bw6vJa62aBrjBqE/exec';
+  var REVIEWS_API = '';
   var REVIEW_CHARS = 190;
 
   var rvBox = document.getElementById('reviews');
