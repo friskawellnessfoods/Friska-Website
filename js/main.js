@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ---------- Google reviews ---------- */
   /* Set REVIEWS_API to your Apps Script web app URL (same one plan/config.js uses).
      Leave it blank and the section simply hides itself. */
-  var REVIEWS_API = '';
+  var REVIEWS_API = 'https://script.google.com/macros/s/AKfycbzHnowCDuJ5s0lEMapCV8LQKDmsz0FDZfq87FMcIXnNwHWxc_M7bw6vJa62aBrjBqE/exec';
   var REVIEW_CHARS = 190;
 
   var rvBox = document.getElementById('reviews');
