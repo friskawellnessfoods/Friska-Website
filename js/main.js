@@ -67,6 +67,65 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+
+
+  /* ---------- Carousel ratio ----------
+     Match the frame to the real proportions of the first hero image so there are
+     no white bands. Assumes the slides share a ratio, which they normally do. */
+  var carEl = document.querySelector('.carousel');
+  if (carEl) {
+    var first = carEl.querySelector('.carousel-slide img');
+    var setRatio = function () {
+      if (first.naturalWidth && first.naturalHeight) {
+        carEl.style.aspectRatio = first.naturalWidth + ' / ' + first.naturalHeight;
+      }
+    };
+    if (first.complete) setRatio();
+    else first.addEventListener('load', setRatio);
+  }
+
+  /* ---------- Deferred images ----------
+     Anything with data-src instead of src is fetched only after the page has
+     finished its first paint, so the visible hero image gets the full bandwidth.
+     Hover images load on first hover instead. */
+  var deferred = document.querySelectorAll('img[data-src]');
+  if (deferred.length) {
+    var swap = function (img) {
+      if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
+    };
+
+    /* gallery hover images: only when the user actually hovers */
+    document.querySelectorAll('.gallery-grid figure').forEach(function (fig) {
+      var hover = fig.querySelector('img[data-src]');
+      if (!hover) return;
+      var once = function () {
+        swap(hover);
+        fig.removeEventListener('mouseenter', once);
+        fig.removeEventListener('touchstart', once);
+      };
+      fig.addEventListener('mouseenter', once);
+      fig.addEventListener('touchstart', once, { passive: true });
+    });
+
+    /* carousel slides: load after the page is idle, one at a time */
+    var slidesToLoad = Array.prototype.filter.call(
+      document.querySelectorAll('.carousel-slide img[data-src]'),
+      function (i) { return true; }
+    );
+    var loadNext = function () {
+      var img = slidesToLoad.shift();
+      if (!img) return;
+      img.onload = img.onerror = function () { setTimeout(loadNext, 120); };
+      swap(img);
+    };
+    var kick = function () {
+      if ('requestIdleCallback' in window) requestIdleCallback(loadNext, { timeout: 2500 });
+      else setTimeout(loadNext, 900);
+    };
+    if (document.readyState === 'complete') kick();
+    else window.addEventListener('load', kick);
+  }
+
   /* ---------- Hero carousel ---------- */
   var carousel = document.querySelector('.carousel');
   if (carousel) {
@@ -86,6 +145,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var dots = dotsWrap.querySelectorAll('button');
 
     function go(n) {
+      var target = slides[(n + slides.length) % slides.length];
+      var img = target.querySelector('img[data-src]');
+      if (img) { img.src = img.dataset.src; delete img.dataset.src; }
       slides[current].classList.remove('active');
       if (dots[current]) dots[current].classList.remove('active');
       current = (n + slides.length) % slides.length;
@@ -191,8 +253,9 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   /* ---------- Google reviews ---------- */
-  /* Set REVIEWS_API to your Apps Script web app URL (same one plan/config.js uses).
-     Leave it blank and the section simply hides itself. */
+  /* Apps Script web app that serves the cached Google reviews.
+     Same deployment plan/config.js points at. If you ever redeploy the script to a
+     NEW URL, update it here too or the reviews section will quietly disappear. */
   var REVIEWS_API = 'https://script.google.com/macros/s/AKfycbzHnowCDuJ5s0lEMapCV8LQKDmsz0FDZfq87FMcIXnNwHWxc_M7bw6vJa62aBrjBqE/exec';
   var REVIEW_CHARS = 190;
 
