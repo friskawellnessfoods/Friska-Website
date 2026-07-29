@@ -125,10 +125,11 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
   position:relative;border-radius:24px;overflow:hidden;aspect-ratio:4/5;
   box-shadow:0 20px 50px rgba(20,33,62,0.14);z-index:1;background:var(--white);
 }
+/* graphics carry their own text, so fit the whole thing rather than cropping */
 .carousel-track{position:absolute;inset:0;}
 .carousel-slide{position:absolute;inset:0;opacity:0;transition:opacity .7s ease;}
 .carousel-slide.active{opacity:1;}
-.carousel-slide img{width:100%;height:100%;object-fit:cover;}
+.carousel-slide img{width:100%;height:100%;object-fit:contain;}
 
 .carousel-btn{
   position:absolute;top:50%;transform:translateY(-50%);z-index:4;
@@ -188,12 +189,15 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
   position:relative;margin:0;border-radius:20px;overflow:hidden;aspect-ratio:1/1;
   background:var(--white);box-shadow:0 8px 24px rgba(20,33,62,0.08);
 }
-.why-card img{width:100%;height:100%;object-fit:cover;transition:transform .55s ease;}
-.why-card:hover img{transform:scale(1.07);}
-.why-card::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, rgba(10,26,110,0.82), transparent 60%);}
+.why-card img{width:100%;height:100%;object-fit:contain;}
+.why-card::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to top, rgba(10,26,110,0.55), transparent 42%);
+}
 .why-card figcaption{
   position:absolute;left:20px;right:20px;bottom:18px;z-index:2;
   font-family:var(--display);font-size:21px;font-weight:700;color:#fff;line-height:1.2;
+  text-shadow:0 1px 5px rgba(6,18,60,0.7);
 }
 
 /* ---------- Plan builder promo ---------- */
@@ -223,12 +227,12 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
 .tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
 .tier-item{
   position:relative;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  min-height:230px;
+  display:flex;flex-direction:column;justify-content:center;
+  aspect-ratio:3/4;
   background:var(--white);border-radius:20px;padding:28px 24px;
-  border:1.5px solid transparent;
+  border:1.5px solid var(--line);
   box-shadow:0 8px 24px rgba(20,33,62,0.10);
-  transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+  transition:transform .3s ease, box-shadow .3s ease;
 }
 .tier-item:hover{
   transform:translateY(-6px);
@@ -236,39 +240,28 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
   border-color:var(--line);
 }
 
-/* image shows by default; fades away on hover so the text is easy to read */
-.tier-media{position:absolute;inset:0;opacity:1;transition:opacity .4s ease, transform .6s ease;}
-.tier-media img{width:100%;height:100%;object-fit:cover;}
-.tier-media::after{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(to top,
-    rgba(10,26,110,0.78) 0%,
-    rgba(10,26,110,0.42) 45%,
-    rgba(10,26,110,0.14) 100%);
-}
-.tier-item:hover .tier-media{opacity:0;transform:scale(1.04);}
+/* The tier graphics contain their own headings, so show them whole and keep our
+   text out of the way until hover. */
+.tier-media{position:absolute;inset:0;opacity:1;transition:opacity .4s ease;}
+.tier-media img{width:100%;height:100%;object-fit:contain;}
 
-.tier-body{position:relative;z-index:2;}
+.tier-body{
+  position:relative;z-index:2;
+  opacity:0;transition:opacity .35s ease;
+}
+.tier-item:hover .tier-media{opacity:0;}
+.tier-item:hover .tier-body{opacity:1;}
+
 .tier-num{
   display:inline-block;font-family:var(--display);font-size:11.5px;font-weight:700;letter-spacing:.4px;
-  background:rgba(255,255,255,0.22);color:#fff;padding:5px 11px;border-radius:99px;
-  transition:background .4s ease, color .4s ease;
+  background:#eaeefb;color:var(--navy);padding:5px 11px;border-radius:99px;
 }
-.tier-item h3{
-  font-size:18px;margin-top:14px;color:#fff;
-  text-shadow:0 1px 4px rgba(6,18,60,0.55);
-  transition:color .4s ease, text-shadow .4s ease;
-}
-.tier-item p{
-  margin-top:10px;font-size:14px;color:#fff;
-  text-shadow:0 1px 4px rgba(6,18,60,0.6);
-  transition:color .4s ease, text-shadow .4s ease;
-}
-.tier-item:hover .tier-num{background:#eaeefb;color:var(--navy);}
-.tier-item:hover h3{color:var(--navy);text-shadow:none;}
-.tier-item:hover p{color:var(--muted);text-shadow:none;}
+.tier-item h3{font-size:18px;margin-top:14px;color:var(--navy);}
+.tier-item p{margin-top:10px;font-size:14px;color:var(--muted);}
 
 /* ---------- Gallery ---------- */
+/* Banners are finished graphics with their own wording, so no crop and no caption
+   overlay — the artwork speaks for itself. */
 .gallery{padding:0 0 90px;}
 .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
 .gallery-grid figure{
@@ -279,17 +272,13 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
 }
 .gallery-grid figure:hover{transform:translateY(-6px);box-shadow:0 20px 44px rgba(20,33,62,0.16);}
 .g-img{
-  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
-  transition:opacity .5s ease, transform .7s ease;
+  position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  transition:opacity .5s ease;
 }
 .g-hover{opacity:0;}
 .gallery-grid figure:hover .g-base{opacity:0;}
-.gallery-grid figure:hover .g-hover{opacity:1;transform:scale(1.05);}
-.gallery-grid figcaption{
-  position:absolute;bottom:0;left:0;right:0;z-index:2;padding:26px 20px 18px;
-  font-family:var(--display);font-size:20px;font-weight:700;color:#fff;
-  background:linear-gradient(to top, rgba(10,26,110,0.85), transparent);
-}
+.gallery-grid figure:hover .g-hover{opacity:1;}
+.gallery-grid figcaption{display:none;}
 
 /* ---------- Google reviews ---------- */
 .testimonials{padding:0 0 90px;}
@@ -702,7 +691,7 @@ footer{padding:0 0 32px;}
     position:static;max-width:none;margin-top:12px;
     padding:13px 16px;box-shadow:0 8px 20px rgba(20,33,62,0.10);
   }
-  .carousel{aspect-ratio:1/1;}
+  .carousel{aspect-ratio:4/5;}
   .carousel-btn{width:34px;height:34px;}
 
   .why,.tiers{padding:56px 0;}
@@ -716,23 +705,27 @@ footer{padding:0 0 32px;}
   .why-answer p{font-size:15px;}
   .why-cards{margin-top:20px;gap:14px;}
   .why-card figcaption{font-size:18px;left:16px;right:16px;bottom:14px;}
+  .why-card{aspect-ratio:1/1;}
 
   .planner-inner{padding:26px 20px;border-radius:18px;}
   .planner-inner .btn{width:100%;}
 
+  /* No hover on touch, so stack: full graphic on top, our text underneath. */
   .tier-grid{grid-template-columns:1fr;gap:14px;}
-  .tier-item{padding:22px 20px;border-radius:16px;}
-  /* no hover on touch — image stays visible with the text over it */
-  .tier-item:hover{transform:none;box-shadow:0 8px 24px rgba(20,33,62,0.10);border-color:transparent;}
-  .tier-item:hover .tier-media{opacity:1;transform:none;}
-  .tier-item:hover .tier-num{background:rgba(255,255,255,0.22);color:#fff;}
-  .tier-item:hover h3{color:#fff;text-shadow:0 1px 4px rgba(6,18,60,0.55);}
-  .tier-item:hover p{color:#fff;text-shadow:0 1px 4px rgba(6,18,60,0.6);}
+  .tier-item{
+    display:block;aspect-ratio:auto;
+    padding:0 0 20px;border-radius:16px;overflow:hidden;
+  }
+  .tier-media{position:static;opacity:1;}
+  .tier-media img{width:100%;height:auto;aspect-ratio:3/4;object-fit:contain;}
+  .tier-body{opacity:1;padding:18px 20px 0;}
+  .tier-item:hover{transform:none;box-shadow:0 8px 24px rgba(20,33,62,0.10);}
+  .tier-item:hover .tier-media{opacity:1;}
 
+  /* keep the banners portrait on phones, same as desktop */
   .gallery-grid{grid-template-columns:1fr;gap:14px;}
-  .gallery-grid figure{aspect-ratio:4/3;}
+  .gallery-grid figure{aspect-ratio:3/4;}
   .gallery-grid figure:hover{transform:none;}
-  .gallery-grid figcaption{font-size:18px;padding:22px 16px 14px;}
 
   .rv-summary{padding:16px 18px;gap:12px;border-radius:16px;}
   .rv-score{font-size:28px;}
