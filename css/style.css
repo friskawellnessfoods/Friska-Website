@@ -56,9 +56,9 @@ p{margin:0;}
 .site-header .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;}
 .logo{
   font-family:var(--display);font-size:20px;font-weight:800;
-  text-decoration:none;color:var(--navy);display:flex;align-items:center;gap:9px;
+  text-decoration:none;color:var(--navy);display:flex;align-items:center;gap:11px;
 }
-.logo .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);}
+.logo-mark{height:38px;width:auto;object-fit:contain;flex-shrink:0;}
 nav.main-nav{display:flex;align-items:center;gap:32px;}
 nav.main-nav a{
   text-decoration:none;font-family:var(--display);font-size:14.5px;font-weight:600;
@@ -491,6 +491,8 @@ footer{padding:0 0 32px;}
   .cta-inner{padding:38px 30px;}
 }
 @media (max-width:680px){
+  .logo{font-size:17px;gap:9px;}
+  .logo-mark{height:32px;}
   nav.main-nav{
     position:fixed;inset:72px 0 0 0;background:var(--bg);
     flex-direction:column;padding:32px 24px;gap:24px;
