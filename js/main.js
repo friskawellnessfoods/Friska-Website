@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+  /* '' on root pages, '../' on pages inside a subfolder (set data-root on <body>) */
+  var ROOT = document.body.getAttribute('data-root') || '';
+
   /* ---------- Mobile nav ---------- */
   var toggle = document.querySelector('.nav-toggle');
   var nav = document.querySelector('.main-nav');
@@ -154,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function () {
           '<li><b>2</b>Pick your meals and slots</li>' +
           '<li><b>3</b>Get your price instantly</li>' +
         '</ul>' +
-        '<a class="btn btn-primary" href="plan/index.html">Choose Your Meal Plan</a>' +
+        '<a class="btn btn-primary" href="' + ROOT + 'plan/index.html">Choose Your Meal Plan</a>' +
       '</div>';
 
     document.body.appendChild(overlay);
@@ -190,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
   /* ---------- Google reviews ---------- */
   /* Set REVIEWS_API to your Apps Script web app URL (same one plan/config.js uses).
      Leave it blank and the section simply hides itself. */
-  var REVIEWS_API = 'https://script.google.com/macros/s/AKfycbzHnowCDuJ5s0lEMapCV8LQKDmsz0FDZfq87FMcIXnNwHWxc_M7bw6vJa62aBrjBqE/exec';
+  var REVIEWS_API = '';
   var REVIEW_CHARS = 190;
 
   var rvBox = document.getElementById('reviews');
@@ -378,5 +381,52 @@ document.addEventListener('DOMContentLoaded', function () {
     buildDots();
     start();
   }
+
+  /* ---------- Share buttons ---------- */
+  var shareBox = document.querySelector('.share');
+  if (shareBox) {
+    var url = (document.querySelector('link[rel="canonical"]') || {}).href || location.href;
+    var title = document.title.split('|')[0].trim();
+    var enc = encodeURIComponent;
+
+    var targets = {
+      wa: 'https://wa.me/?text=' + enc(title + ' \u2014 ' + url),
+      fb: 'https://www.facebook.com/sharer/sharer.php?u=' + enc(url),
+      x:  'https://twitter.com/intent/tweet?text=' + enc(title) + '&url=' + enc(url),
+      li: 'https://www.linkedin.com/sharing/share-offsite/?url=' + enc(url)
+    };
+
+    shareBox.querySelectorAll('[data-share]').forEach(function (el) {
+      var k = el.getAttribute('data-share');
+      if (targets[k]) { el.href = targets[k]; return; }
+      if (k === 'copy') {
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          var done = function () {
+            var note = shareBox.querySelector('.share-copied');
+            if (!note) return;
+            note.classList.add('show');
+            setTimeout(function () { note.classList.remove('show'); }, 1800);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(done);
+          } else {
+            var t = document.createElement('textarea');
+            t.value = url; document.body.appendChild(t); t.select();
+            try { document.execCommand('copy'); } catch (err) {}
+            t.remove(); done();
+          }
+        });
+      }
+      if (k === 'native' && navigator.share) {
+        el.style.display = 'flex';
+        el.addEventListener('click', function (e) {
+          e.preventDefault();
+          navigator.share({ title: title, url: url }).catch(function () {});
+        });
+      }
+    });
+  }
+
 
 });
