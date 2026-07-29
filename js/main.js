@@ -146,4 +146,196 @@ document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('keydown', onKey);
   }
 
+  /* ---------- Google reviews ---------- */
+  /* Set REVIEWS_API to your Apps Script web app URL (same one plan/config.js uses).
+     Leave it blank and the section simply hides itself. */
+  var REVIEWS_API = 'https://script.google.com/macros/s/AKfycbzHnowCDuJ5s0lEMapCV8LQKDmsz0FDZfq87FMcIXnNwHWxc_M7bw6vJa62aBrjBqE/exec';
+  var REVIEW_CHARS = 190;
+
+  var rvBox = document.getElementById('reviews');
+  if (rvBox) {
+    if (!REVIEWS_API) {
+      hideReviews();
+    } else {
+      rvBox.innerHTML = '<div class="rv-state">Loading reviews\u2026</div>';
+      fetch(REVIEWS_API + '?action=reviews')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (!d || !d.reviews || !d.reviews.length) { hideReviews(); return; }
+          renderReviews(d);
+        })
+        .catch(function () { hideReviews(); });
+    }
+  }
+
+  function hideReviews() {
+    var sec = rvBox && rvBox.closest('.testimonials');
+    if (sec) sec.style.display = 'none';
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function stars(n) {
+    var full = Math.round(Number(n) || 0), out = '';
+    for (var i = 1; i <= 5; i++) {
+      out += i <= full ? '\u2605' : '<span class="off">\u2605</span>';
+    }
+    return out;
+  }
+
+  function initials(name) {
+    var p = String(name || '').trim().split(/\s+/);
+    return ((p[0] || '')[0] || '?').toUpperCase() + ((p[1] || '')[0] || '').toUpperCase();
+  }
+
+  var GOOGLE_G = '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<path fill="#4285F4" d="M23 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7c2.2-2 3.4-5 3.4-8.6z"/>' +
+    '<path fill="#34A853" d="M12 24c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.3 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.8v3C3.7 21.4 7.6 24 12 24z"/>' +
+    '<path fill="#FBBC05" d="M5.6 14.7a7.2 7.2 0 0 1 0-4.6v-3H1.8a12 12 0 0 0 0 10.6l3.8-3z"/>' +
+    '<path fill="#EA4335" d="M12 4.8c1.7 0 3.2.6 4.4 1.7l3.3-3.3C17.7 1.2 15.1 0 12 0 7.6 0 3.7 2.6 1.8 6.1l3.8 3c.9-2.7 3.4-4.3 6.4-4.3z"/></svg>';
+
+  function renderReviews(d) {
+    var html = '';
+
+    html += '<div class="rv-summary">' +
+      '<div><div class="rv-score">' + (Number(d.rating) || 0).toFixed(1) + '</div></div>' +
+      '<div>' +
+        '<div class="rv-stars">' + stars(d.rating) + '</div>' +
+        '<div class="rv-meta">' + (d.total || 0) + ' Google reviews</div>' +
+      '</div>' +
+      '<div class="rv-nav">' +
+        (d.mapsUrl ? '<a class="rv-link" href="' + esc(d.mapsUrl) + '" target="_blank" rel="noopener">See all on Google \u2192</a>' : '') +
+        '<div class="rv-arrows">' +
+          '<button class="rv-arrow" data-dir="-1" aria-label="Previous review">\u2039</button>' +
+          '<button class="rv-arrow" data-dir="1" aria-label="Next review">\u203A</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+    html += '<div class="rv-track">';
+    d.reviews.forEach(function (v) {
+      var text = String(v.text || '');
+      var long = text.length > REVIEW_CHARS;
+      var shown = long ? text.slice(0, REVIEW_CHARS).trim() + '\u2026' : text;
+
+      var avatar = v.photo
+        ? '<img class="rv-avatar" src="' + esc(v.photo) + '" alt="" loading="lazy" referrerpolicy="no-referrer">'
+        : '<div class="rv-avatar">' + esc(initials(v.author)) + '</div>';
+
+      html += '<div class="rv-card">' +
+        '<div class="rv-head">' + avatar +
+          '<div class="rv-who">' +
+            '<div class="rv-name">' + esc(v.author || 'Google user') + '</div>' +
+            '<div class="rv-when">' + esc(v.when || '') + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="rv-stars">' + stars(v.rating) + '</div>' +
+        '<p class="rv-text" data-full="' + esc(text) + '" data-short="' + esc(shown) + '">' + esc(shown) + '</p>' +
+        (long ? '<button class="rv-more">Read more</button>' : '') +
+        '<div class="rv-badge">' + GOOGLE_G + 'Posted on Google</div>' +
+      '</div>';
+    });
+    html += '</div><div class="rv-dots"></div>';
+
+    rvBox.innerHTML = html;
+
+    rvBox.querySelectorAll('.rv-more').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var p = btn.previousElementSibling;
+        var open = btn.textContent === 'Read less';
+        p.textContent = open ? p.dataset.short : p.dataset.full;
+        btn.textContent = open ? 'Read more' : 'Read less';
+      });
+    });
+
+    initReviewCarousel();
+  }
+
+  function initReviewCarousel() {
+    var track = rvBox.querySelector('.rv-track');
+    var cards = track.querySelectorAll('.rv-card');
+    var dotsWrap = rvBox.querySelector('.rv-dots');
+    var arrows = rvBox.querySelectorAll('.rv-arrow');
+    if (!cards.length) return;
+
+    var timer = null;
+    var DELAY = 6000;
+
+    function step() {
+      if (cards.length < 2) return track.clientWidth;
+      return cards[1].offsetLeft - cards[0].offsetLeft;
+    }
+    function perView() {
+      return Math.max(1, Math.round(track.clientWidth / step()));
+    }
+    function pages() {
+      return Math.max(1, cards.length - perView() + 1);
+    }
+    function index() {
+      return Math.round(track.scrollLeft / step());
+    }
+
+    function buildDots() {
+      var n = pages();
+      dotsWrap.innerHTML = '';
+      if (n < 2) return;
+      for (var i = 0; i < n; i++) {
+        var b = document.createElement('button');
+        b.setAttribute('aria-label', 'Go to review ' + (i + 1));
+        b.addEventListener('click', (function (k) {
+          return function () { track.scrollTo({ left: k * step(), behavior: 'smooth' }); stop(); };
+        })(i));
+        dotsWrap.appendChild(b);
+      }
+      sync();
+    }
+
+    function sync() {
+      var i = index();
+      dotsWrap.querySelectorAll('button').forEach(function (b, k) {
+        b.classList.toggle('active', k === i);
+      });
+      arrows.forEach(function (a) {
+        var dir = Number(a.dataset.dir);
+        a.disabled = dir < 0 ? track.scrollLeft < 6
+                             : track.scrollLeft > track.scrollWidth - track.clientWidth - 6;
+      });
+    }
+
+    arrows.forEach(function (a) {
+      a.addEventListener('click', function () {
+        track.scrollBy({ left: Number(a.dataset.dir) * step(), behavior: 'smooth' });
+        stop();
+      });
+    });
+
+    var raf;
+    track.addEventListener('scroll', function () {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(sync);
+    });
+    window.addEventListener('resize', buildDots);
+
+    function auto() {
+      if (index() >= pages() - 1) track.scrollTo({ left: 0, behavior: 'smooth' });
+      else track.scrollBy({ left: step(), behavior: 'smooth' });
+    }
+    function start() {
+      if (cards.length > perView() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        timer = setInterval(auto, DELAY);
+      }
+    }
+    function stop() { clearInterval(timer); timer = null; }
+
+    track.addEventListener('mouseenter', stop);
+    track.addEventListener('touchstart', stop, { passive: true });
+
+    buildDots();
+    start();
+  }
+
 });
