@@ -224,26 +224,36 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
 .tier-item{
   position:relative;overflow:hidden;
   background:var(--white);border-radius:20px;padding:28px 24px;
-  border:1.5px solid var(--line);
-  box-shadow:0 4px 14px rgba(20,33,62,0.05);
+  border:1.5px solid transparent;
+  box-shadow:0 8px 24px rgba(20,33,62,0.10);
   transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
-.tier-item:hover{transform:translateY(-6px);box-shadow:0 16px 36px rgba(20,33,62,0.14);border-color:transparent;}
-.tier-media{position:absolute;inset:0;opacity:0;transition:opacity .4s ease, transform .55s ease;transform:scale(1.06);}
+.tier-item:hover{
+  transform:translateY(-6px);
+  box-shadow:0 16px 36px rgba(20,33,62,0.14);
+  border-color:var(--line);
+}
+
+/* image shows by default; fades away on hover so the text is easy to read */
+.tier-media{position:absolute;inset:0;opacity:1;transition:opacity .4s ease, transform .6s ease;}
 .tier-media img{width:100%;height:100%;object-fit:cover;}
-.tier-media::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, rgba(10,26,110,0.92), rgba(10,26,110,0.55));}
-.tier-item:hover .tier-media{opacity:1;transform:scale(1);}
+.tier-media::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to top, rgba(10,26,110,0.92), rgba(10,26,110,0.58));
+}
+.tier-item:hover .tier-media{opacity:0;transform:scale(1.04);}
+
 .tier-body{position:relative;z-index:2;}
 .tier-num{
   display:inline-block;font-family:var(--display);font-size:11.5px;font-weight:700;letter-spacing:.4px;
-  background:#eaeefb;color:var(--navy);padding:5px 11px;border-radius:99px;
+  background:rgba(255,255,255,0.22);color:#fff;padding:5px 11px;border-radius:99px;
   transition:background .4s ease, color .4s ease;
 }
-.tier-item h3{font-size:18px;margin-top:14px;transition:color .4s ease;}
-.tier-item p{margin-top:10px;font-size:14px;color:var(--muted);transition:color .4s ease;}
-.tier-item:hover .tier-num{background:rgba(255,255,255,0.2);color:#fff;}
-.tier-item:hover h3{color:#fff;}
-.tier-item:hover p{color:rgba(255,255,255,0.85);}
+.tier-item h3{font-size:18px;margin-top:14px;color:#fff;transition:color .4s ease;}
+.tier-item p{margin-top:10px;font-size:14px;color:rgba(255,255,255,0.88);transition:color .4s ease;}
+.tier-item:hover .tier-num{background:#eaeefb;color:var(--navy);}
+.tier-item:hover h3{color:var(--navy);}
+.tier-item:hover p{color:var(--muted);}
 
 /* ---------- Gallery ---------- */
 .gallery{padding:0 0 90px;}
@@ -576,9 +586,12 @@ footer{padding:0 0 32px;}
 
   .tier-grid{grid-template-columns:1fr;gap:14px;}
   .tier-item{padding:22px 20px;border-radius:16px;}
-  /* hover reveal is pointless on touch — show the image as a soft backdrop instead */
-  .tier-media{opacity:0;}
-  .tier-item:hover{transform:none;}
+  /* no hover on touch — image stays visible with the text over it */
+  .tier-item:hover{transform:none;box-shadow:0 8px 24px rgba(20,33,62,0.10);border-color:transparent;}
+  .tier-item:hover .tier-media{opacity:1;transform:none;}
+  .tier-item:hover .tier-num{background:rgba(255,255,255,0.22);color:#fff;}
+  .tier-item:hover h3{color:#fff;}
+  .tier-item:hover p{color:rgba(255,255,255,0.88);}
 
   .gallery-grid{grid-template-columns:1fr;gap:14px;}
   .gallery-grid figure{aspect-ratio:4/3;}
