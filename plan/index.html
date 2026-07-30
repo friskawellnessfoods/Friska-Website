@@ -280,18 +280,26 @@ padding:18px 12px; cursor:pointer; transition:all .15s ease; text-align:center;
 .skipLink{ display:block; width:100%; margin-top:16px; background:transparent; border:none; color:#aab; font-size:12px; text-decoration:underline; cursor:pointer; padding:4px; }
 
 .resultCard{
-background:linear-gradient(140deg,var(--navy) 0%,#1c318f 60%,#13a06f 140%);
-border-radius:22px; padding:30px 22px; text-align:center; color:white;
-box-shadow:0 16px 36px rgba(10,26,110,0.28);
+background:white;
+border:1.5px solid #e2e7f1;
+border-left:4px solid var(--navy);
+border-radius:14px;
+padding:18px 20px;
+margin-top:16px;
+box-shadow:0 4px 14px rgba(20,33,62,0.06);
 }
-.resultTick{ width:56px; height:56px; border-radius:50%; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; margin:0 auto 14px; font-size:27px; }
-.resultEyebrow{ font-size:12px; letter-spacing:1.6px; opacity:.85; font-weight:700; }
-.resultPrice{ font-size:44px; font-weight:800; margin:6px 0 2px; }
-.resultNote{ font-size:13px; opacity:.85; }
-.resultPlan{ display:inline-block; margin-top:14px; background:rgba(255,255,255,0.18); padding:7px 16px; border-radius:99px; font-size:13.5px; font-weight:600; }
-.trialLine{ margin-top:14px; padding-top:14px; border-top:1px dashed rgba(255,255,255,0.35); font-size:15px; font-weight:700; color:#c9f7e4; }
-.trialOpt{ display:flex; align-items:center; justify-content:center; gap:9px; margin-top:12px; font-size:13.5px; font-weight:600; cursor:pointer; }
-.trialOpt input{ width:18px; height:18px; accent-color:var(--accent); flex:0 0 auto; }
+.resultTop{ display:flex; align-items:center; gap:12px; }
+.resultTick{ width:34px; height:34px; border-radius:50%; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:16px; flex:none; }
+.resultMeta{ flex:1; min-width:0; }
+.resultEyebrow{ font-size:11px; letter-spacing:1px; font-weight:700; color:var(--muted); text-transform:uppercase; }
+.resultPlan{ font-size:14.5px; font-weight:700; color:var(--navy); margin-top:1px; }
+.priceRow{ display:flex; align-items:baseline; justify-content:space-between; padding:12px 0; border-bottom:1px solid #eef1f7; }
+.priceRow:last-of-type{ border-bottom:none; }
+.priceLabel{ font-size:13px; font-weight:600; color:var(--muted); }
+.priceValue{ font-size:22px; font-weight:800; color:var(--navy); }
+.resultNote{ font-size:12px; color:var(--muted); margin-top:2px; }
+.trialOpt{ display:flex; align-items:center; gap:8px; margin:2px 0 2px; font-size:13px; font-weight:600; color:var(--navy); cursor:pointer; }
+.trialOpt input{ width:17px; height:17px; accent-color:var(--accent); flex:0 0 auto; }
 
 .summaryBox{ background:white; border-radius:18px; padding:16px 18px; margin-top:16px; box-shadow:0 4px 14px rgba(20,33,62,0.06); font-size:14px; }
 .summaryBox .row{ display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid #f0f2f7; }
@@ -302,7 +310,8 @@ box-shadow:0 16px 36px rgba(10,26,110,0.28);
 .toastPopup{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; padding:16px 22px; border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.18); font-size:15px; font-weight:500; color:#333; z-index:9999; display:none; max-width:280px; text-align:center; }
 
 .bookBar{ position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,0.96); backdrop-filter:blur(8px); padding:14px 18px; border-top:1px solid #eee; box-shadow:0 -3px 12px rgba(0,0,0,0.07); display:none; z-index:50; }
-.bookBar button{ display:block; max-width:340px; width:100%; margin:0 auto; padding:16px; border-radius:14px; border:none; background:#25D366; color:white; font-size:17px; font-weight:700; cursor:pointer; box-shadow:0 6px 16px rgba(37,211,102,0.32); }
+.bookBar button{ display:block; max-width:340px; width:100%; margin:0 auto; padding:16px; border-radius:14px; border:none; background:var(--navy); color:white; font-size:17px; font-weight:700; cursor:pointer; box-shadow:0 6px 16px rgba(10,26,110,0.32); }
+.bookBar button:active{ background:var(--navy-deep); }
 
 @media(min-width:920px){
 .stepRail{ display:block; width:218px; position:sticky; top:96px; }
@@ -353,10 +362,10 @@ box-shadow:0 16px 36px rgba(10,26,110,0.28);
 <div class="stepTitle">Welcome to Friska</div>
 <div class="stepSub">Let's start with a few details so we can prepare your plan.</div>
 
-<label class="fieldLabel">Your name</label>
-<input type="text" id="clientName" placeholder="Enter your name">
 <label class="fieldLabel">Phone number</label>
 <input type="tel" id="clientPhone" placeholder="10-digit mobile number" maxlength="10">
+<label class="fieldLabel">Your name</label>
+<input type="text" id="clientName" placeholder="Enter your name">
 
 <div class="navRow"><button class="btn btnPrimary" onclick="next(0)">Continue</button></div>
 </div>
@@ -366,12 +375,18 @@ box-shadow:0 16px 36px rgba(10,26,110,0.28);
 <div class="stepTitle">Delivery location</div>
 <div class="stepSub">Tell us where we'll be delivering. This helps us check timing and delivery charges.</div>
 
-<div class="locWrap">
+<div class="locWrap" id="locWrapBox">
 <input id="location" type="text" placeholder="Enter delivery location">
 <div id="locationSpinner"></div>
 <button type="button" class="locBtn" onclick="useCurrentLocation()">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="#0a1a6e" stroke-width="2"/><circle cx="12" cy="12" r="2.5" fill="#0a1a6e"/></svg>
 </button>
+</div>
+
+<div class="addonBox" id="savedLocationBox" style="display:none;">
+<div class="addonHead">&#128205; Using your saved location</div>
+<div id="savedLocationText" style="font-size:14px;color:var(--muted);margin-top:6px;line-height:1.5;"></div>
+<button type="button" class="skipLink" style="margin:8px 0 0;" onclick="changeLocation()">Change location</button>
 </div>
 
 <div class="navRow"><button class="btn btnGhost" onclick="back(1)">&#8592;</button><button class="btn btnPrimary" onclick="next(1)">Continue</button></div>
@@ -464,8 +479,8 @@ box-shadow:0 16px 36px rgba(10,26,110,0.28);
 <div class="stepEyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Done</div>
 <div class="stepTitle">You're all set</div>
 <div class="stepSub">Here's your personalised plan and estimated pricing.</div>
-<div id="quoteResult"></div>
 <div id="quoteSummary"></div>
+<div id="quoteResult"></div>
 <div class="navRow"><button class="btn btnGhost" onclick="back(8)">&#8592;</button></div>
 </div>
 
@@ -507,6 +522,9 @@ let selectedPlan="", selectedGoal="", recommendedPlan="", bmiValue=0, distance=0
 let lastQuote=null;
 let seafoodQty=0;
 let seafoodMax=0;
+let mapsLink="";
+let returningLead=null;
+let phoneLookedUp="";
 fetch(PRICING_URL).then(r=>r.json()).then(d=>{ pricing=d; updateSeafoodPrice(); });
 function getPrice(key){ if(!pricing[key]) return 0; return Number(pricing[key]); }
 function updateSeafoodPrice(){
@@ -688,14 +706,19 @@ let autocomplete;
 function initAutocomplete(){
   const input=document.getElementById("location");
   autocomplete=new google.maps.places.Autocomplete(input,{ componentRestrictions:{country:"in"}, locationBias:{ center:{lat:17.385044,lng:78.486671}, radius:50000 } });
-  autocomplete.addListener("place_changed", function(){ const place=autocomplete.getPlace(); if(place && place.geometry) calculateDistance(place.geometry.location); });
+  autocomplete.addListener("place_changed", function(){ const place=autocomplete.getPlace(); if(place && place.geometry){ calculateDistance(place.geometry.location, place.geometry.location.lat(), place.geometry.location.lng()); } });
 }
-function calculateDistance(destination){
+function calculateDistance(destination, lat, lng){
   const service=new google.maps.DistanceMatrixService();
   service.getDistanceMatrix({ origins:[KITCHEN], destinations:[destination], travelMode:"DRIVING" }, function(response,status){
     if(status!=="OK"){ return; }
     const element=response.rows[0].elements[0];
     distance=element.distance.value/1000;
+    if(isFinite(lat) && isFinite(lng) && (lat!==0 || lng!==0)){
+      mapsLink="https://www.google.com/maps?q="+lat+","+lng;
+    } else {
+      mapsLink="";
+    }
     if(distance>20){ showPopup("Delivery location is more than 20 km away. This may affect delivery timing and meal plan availability."); }
   });
 }
@@ -709,12 +732,12 @@ function useCurrentLocation(){
     const geocoder=new google.maps.Geocoder();
     geocoder.geocode({ location:latlng }, function(results,status){
       spinner.style.display="none";
-      if(status==="OK" && results[0]){ document.getElementById("location").value=results[0].formatted_address; calculateDistance(latlng); }
+      if(status==="OK" && results[0]){ document.getElementById("location").value=results[0].formatted_address; calculateDistance(latlng, lat, lng); }
       else{ alert("Unable to determine address from location."); }
     });
   }, function(){ spinner.style.display="none"; alert("Unable to fetch current location. Please allow location permission."); });
 }
-document.getElementById("location").addEventListener("input", function(){ distance=0; invalidateQuote(); });
+document.getElementById("location").addEventListener("input", function(){ distance=0; mapsLink=""; invalidateQuote(); });
 
 function refreshMorningSlot(){
   let breakfast=document.getElementById("breakfast").checked;
@@ -739,7 +762,49 @@ function validateSlots(){
   return true;
 }
 document.getElementById("clientName").addEventListener("input", invalidateQuote);
-document.getElementById("clientPhone").addEventListener("input", invalidateQuote);
+document.getElementById("clientPhone").addEventListener("input", function(){
+  invalidateQuote();
+  let phone=this.value.replace(/\D/g,'');
+  if(phone.length===10 && phone!==phoneLookedUp){
+    phoneLookedUp=phone;
+    lookupLead(phone);
+  }
+});
+
+function lookupLead(phone){
+  if(!PRICING_URL) return;
+  fetch(PRICING_URL+"?action=leadByPhone&phone="+phone)
+    .then(r=>r.json())
+    .then(d=>{
+      if(!d || !d.found) return;
+      returningLead=d.lead;
+      if(returningLead.name) document.getElementById("clientName").value=returningLead.name;
+      if(returningLead.age) document.getElementById("age").value=returningLead.age;
+      if(returningLead.height){
+        let m=/(\d+)\s*ft\s*(\d+)?/i.exec(returningLead.height);
+        if(m){ document.getElementById("heightFt").value=m[1]; document.getElementById("heightIn").value=m[2]||0; }
+      }
+      if(returningLead.weight) document.getElementById("weight").value=returningLead.weight;
+      let displayLoc = returningLead.locationText || returningLead.location;
+      if(displayLoc && Number(returningLead.distance)>0){
+        distance=Number(returningLead.distance);
+        mapsLink=returningLead.mapsLink||"";
+        document.getElementById("location").value=displayLoc;
+        document.getElementById("savedLocationText").innerHTML=displayLoc+(mapsLink?" &middot; <a href='"+mapsLink+"' target='_blank'>View on map</a>":"");
+        document.getElementById("savedLocationBox").style.display="block";
+        document.getElementById("locWrapBox").style.display="none";
+      }
+      showPopup("Welcome back! We've filled in your saved details.");
+    })
+    .catch(()=>{});
+}
+function changeLocation(){
+  distance=0; mapsLink="";
+  document.getElementById("location").value="";
+  document.getElementById("savedLocationBox").style.display="none";
+  document.getElementById("locWrapBox").style.display="block";
+  invalidateQuote();
+}
 
 function invalidateQuote(){
   document.getElementById("quoteResult").innerHTML="";
@@ -821,6 +886,7 @@ function generateQuote(){
   let ft=document.getElementById("heightFt").value;
   let inch=document.getElementById("heightIn").value;
   let heightText=(ft||inch)?((ft||0)+"ft "+(inch||0)+"in"):"";
+  let locationText=document.getElementById("location").value;
 
   fetch(PRICING_URL,{
     method:"POST",
@@ -831,21 +897,43 @@ function generateQuote(){
       bmi: bmiValue ? bmiValue.toFixed(1) : "",
       recommended: PLANS[recommendedPlan] ? PLANS[recommendedPlan].name : "",
       meals:meals.join(", "), addons:addons, duration:durationText, slots:slots.join(", "),
-      location:document.getElementById("location").value, distance:roundedDistance, price:total
+      location:locationText, locationText:locationText, distance:roundedDistance, price:total,
+      mapsLink:mapsLink
     })
   });
 
+  let priceBlock;
+  if(duration!=="d"){
+    priceBlock =
+      "<div class='priceRow'>"+
+        "<div class='priceLabel'>2-Day Trial</div>"+
+        "<div class='priceValue'>&#8377;"+trialTotal.toFixed(0)+"</div>"+
+      "</div>"+
+      "<label class='trialOpt'><input type='checkbox' id='startTrial'> Start my 2-day trial first (from tomorrow)</label>"+
+      "<div class='priceRow'>"+
+        "<div class='priceLabel'>Full Plan &middot; "+durationText+"</div>"+
+        "<div class='priceValue'>&#8377;"+total.toFixed(0)+"</div>"+
+      "</div>"+
+      "<div class='resultNote'>Prices include delivery &amp; taxes</div>";
+  } else {
+    priceBlock =
+      "<div class='priceRow'>"+
+        "<div class='priceLabel'>"+durationText+"</div>"+
+        "<div class='priceValue'>&#8377;"+total.toFixed(0)+"</div>"+
+      "</div>"+
+      "<div class='resultNote'>Prices include delivery &amp; taxes</div>";
+  }
+
   document.getElementById("quoteResult").innerHTML =
     "<div class='resultCard'>"+
-      "<div class='resultTick'>&#10003;</div>"+
-      "<div class='resultEyebrow'>ESTIMATED TOTAL</div>"+
-      "<div class='resultPrice'>&#8377;"+total.toFixed(0)+"</div>"+
-      "<div class='resultNote'>Including delivery charges &amp; taxes</div>"+
-      "<div class='resultPlan'>"+planText+" &middot; "+durationText+"</div>"+
-      (duration!=="d" ? (
-        "<div class='trialLine'>Or start with a 2-Day Trial: &#8377;"+trialTotal.toFixed(0)+"</div>"+
-        "<label class='trialOpt'><input type='checkbox' id='startTrial'> Start my 2-day trial first (from tomorrow)</label>"
-      ) : "")+
+      "<div class='resultTop'>"+
+        "<div class='resultTick'>&#10003;</div>"+
+        "<div class='resultMeta'>"+
+          "<div class='resultEyebrow'>Estimated pricing</div>"+
+          "<div class='resultPlan'>"+planText+"</div>"+
+        "</div>"+
+      "</div>"+
+      priceBlock+
     "</div>";
 
   document.getElementById("quoteSummary").innerHTML =
