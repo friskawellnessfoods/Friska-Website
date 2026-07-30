@@ -50,8 +50,16 @@ p{margin:0;}
 /* ---------- Header ---------- */
 .site-header{
   position:sticky;top:0;z-index:30;
-  background:rgba(255,255,255,0.92);backdrop-filter:blur(8px);
   border-bottom:1px solid #eef1f7;
+}
+/* The blur lives on a pseudo-element, NOT on .site-header itself.
+   backdrop-filter on an element makes it a containing block for its
+   position:fixed children, which would trap the mobile nav inside the
+   72px header instead of letting it cover the screen. */
+.site-header::before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(8px);
 }
 .site-header .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;}
 .logo{
@@ -280,6 +288,18 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
 .gallery-grid figure:hover .g-base{opacity:0;}
 .gallery-grid figure:hover .g-hover{opacity:1;}
 .gallery-grid figcaption{display:none;}
+
+/* Tap toggles the pair on touch screens, where :hover sticks after a tap
+   and needs a second "hard" tap to clear. */
+.gallery-grid figure.flipped .g-base{opacity:0;}
+.gallery-grid figure.flipped .g-hover{opacity:1;}
+@media (hover: none){
+  .gallery-grid figure{cursor:pointer;}
+  .gallery-grid figure:hover .g-base{opacity:1;}
+  .gallery-grid figure:hover .g-hover{opacity:0;}
+  .gallery-grid figure.flipped .g-base{opacity:0;}
+  .gallery-grid figure.flipped .g-hover{opacity:1;}
+}
 
 /* ---------- Google reviews ---------- */
 .testimonials{padding:0 0 90px;}
@@ -653,7 +673,7 @@ footer{padding:0 0 32px;}
 @media (max-width:900px){
   .site-header .wrap{height:66px;}
   nav.main-nav{
-    position:fixed;inset:66px 0 0 0;background:var(--bg);
+    position:fixed;inset:66px 0 0 0;z-index:40;background:var(--bg);
     flex-direction:column;align-items:flex-start;
     padding:30px 22px;gap:6px;
     overflow-y:auto;
