@@ -94,17 +94,17 @@ document.addEventListener('DOMContentLoaded', function () {
       if (img.dataset.src) { img.src = img.dataset.src; delete img.dataset.src; }
     };
 
-    /* gallery hover images: only when the user actually hovers */
+    /* gallery second image: load on first hover or first tap */
     document.querySelectorAll('.gallery-grid figure').forEach(function (fig) {
       var hover = fig.querySelector('img[data-src]');
       if (!hover) return;
       var once = function () {
         swap(hover);
         fig.removeEventListener('mouseenter', once);
-        fig.removeEventListener('touchstart', once);
+        fig.removeEventListener('pointerdown', once);
       };
       fig.addEventListener('mouseenter', once);
-      fig.addEventListener('touchstart', once, { passive: true });
+      fig.addEventListener('pointerdown', once);
     });
 
     /* carousel slides: load after the page is idle, one at a time */
@@ -490,6 +490,19 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
+
+  /* ---------- Tap to flip the gallery banners ----------
+     On touch screens :hover latches after a tap, so the second image only
+     appears after an awkward extra press. Each tap toggles instead. */
+  var noHover = window.matchMedia('(hover: none)').matches;
+  document.querySelectorAll('.gallery-grid figure').forEach(function (fig) {
+    fig.addEventListener('click', function () {
+      if (!noHover) return;
+      var hidden = fig.querySelector('img[data-src]');
+      if (hidden) { hidden.src = hidden.dataset.src; delete hidden.dataset.src; }
+      fig.classList.toggle('flipped');
+    });
+  });
 
 
 });
