@@ -245,6 +245,14 @@ padding:18px 12px; cursor:pointer; transition:all .15s ease; text-align:center;
 .tileCheck{ position:absolute; top:9px; right:9px; width:22px; height:22px; border-radius:50%; background:var(--ta); color:white; display:none; align-items:center; justify-content:center; font-size:13px; }
 .tile.on .tileCheck{ display:flex; }
 
+.addonRow{ display:flex; align-items:center; gap:12px; margin-top:14px; padding:14px 16px; border:1.5px solid #e2e7f1; border-radius:16px; cursor:pointer; background:#fbfcfe; transition:all .15s ease; }
+.addonRow.on{ border-color:var(--accent); background:var(--accent-soft); }
+.addonRow input{ width:20px; height:20px; accent-color:var(--accent); flex:0 0 auto; }
+.addonMain{ flex:1; display:flex; flex-direction:column; }
+.addonTitle{ font-weight:700; color:var(--navy); font-size:15px; }
+.addonSub{ font-size:12px; color:var(--muted); }
+.addonPrice{ font-weight:800; color:var(--accent); font-size:14px; white-space:nowrap; }
+
 .locWrap{ position:relative; margin-top:10px; }
 .locWrap input{ padding-right:54px; }
 .locBtn{ position:absolute; right:8px; top:50%; transform:translateY(-50%); border:none; background:transparent; cursor:pointer; padding:8px; }
@@ -268,6 +276,9 @@ box-shadow:0 16px 36px rgba(10,26,110,0.28);
 .resultPrice{ font-size:44px; font-weight:800; margin:6px 0 2px; }
 .resultNote{ font-size:13px; opacity:.85; }
 .resultPlan{ display:inline-block; margin-top:14px; background:rgba(255,255,255,0.18); padding:7px 16px; border-radius:99px; font-size:13.5px; font-weight:600; }
+.trialLine{ margin-top:14px; padding-top:14px; border-top:1px dashed rgba(255,255,255,0.35); font-size:15px; font-weight:700; color:#c9f7e4; }
+.trialOpt{ display:flex; align-items:center; justify-content:center; gap:9px; margin-top:12px; font-size:13.5px; font-weight:600; cursor:pointer; }
+.trialOpt input{ width:18px; height:18px; accent-color:var(--accent); flex:0 0 auto; }
 
 .summaryBox{ background:white; border-radius:18px; padding:16px 18px; margin-top:16px; box-shadow:0 4px 14px rgba(20,33,62,0.06); font-size:14px; }
 .summaryBox .row{ display:flex; justify-content:space-between; gap:14px; padding:8px 0; border-bottom:1px solid #f0f2f7; }
@@ -401,6 +412,11 @@ box-shadow:0 16px 36px rgba(10,26,110,0.28);
 <label class="tile" style="--ta:#3B82F6;--tint:#E8F1FE;"><input type="checkbox" id="dinner"><div class="tileIcon">&#127858;</div><div class="tileLabel">Dinner</div><div class="tileCheck">&#10003;</div></label>
 <label class="tile" style="--ta:#14B8A6;--tint:#E5F6F4;"><input type="checkbox" id="juice2"><div class="tileIcon">&#129380;</div><div class="tileLabel">2 Juices</div><div class="tileCheck">&#10003;</div></label>
 </div>
+<label class="addonRow" id="seafoodRow">
+<input type="checkbox" id="seafood">
+<div class="addonMain"><span class="addonTitle">&#129424; Add Seafood</span><span class="addonSub">Premium seafood option</span></div>
+<div class="addonPrice" id="seafoodPrice">+&#8377;90/day</div>
+</label>
 <div class="navRow"><button class="btn btnGhost" onclick="back(5)">&#8592;</button><button class="btn btnPrimary" onclick="next(5)">Continue</button></div>
 </div>
 
@@ -473,8 +489,10 @@ function recommendByBMI(goal, bmi){
 }
 
 let selectedPlan="", selectedGoal="", recommendedPlan="", bmiValue=0, distance=0, pricing={};
-fetch(PRICING_URL).then(r=>r.json()).then(d=>{ pricing=d; });
+let lastQuote=null;
+fetch(PRICING_URL).then(r=>r.json()).then(d=>{ pricing=d; updateSeafoodPrice(); });
 function getPrice(key){ if(!pricing[key]) return 0; return Number(pricing[key]); }
+function updateSeafoodPrice(){ let el=document.getElementById("seafoodPrice"); if(el) el.innerHTML="+&#8377;"+(getPrice("seafood")||0)+"/day"; }
 
 const RAIL = [
   { label:"Your details", svg:'<circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/>' },
@@ -539,7 +557,7 @@ function showStep(idx){
 function back(fromIdx){ showStep(fromIdx-1); }
 function next(fromIdx){ if(!validateStep(fromIdx)) return; showStep(fromIdx+1); onEnter(fromIdx+1); }
 function autoNext(stepIdx){ setTimeout(function(){ if(current===stepIdx) next(stepIdx); }, 280); }
-function onEnter(idx){ if(idx===4) renderPlans(); if(idx===7) refreshMorningSlot(); if(idx===8) generateQuote(); }
+function onEnter(idx){ if(idx===4) renderPlans(); if(idx===5) updateSeafoodPrice(); if(idx===7) refreshMorningSlot(); if(idx===8) generateQuote(); }
 
 function validateStep(idx){
   if(idx===0){
@@ -614,9 +632,11 @@ function bindTiles(){
     });
   });
   document.querySelectorAll('input[name="duration"]').forEach(r=>{ r.addEventListener('change', function(){ invalidateQuote(); autoNext(6); }); });
-  ["breakfast","lunch","dinner","snack","juice1","juice2","morning","afternoon","evening"].forEach(id=>{
+  ["breakfast","lunch","dinner","snack","juice1","juice2","seafood","morning","afternoon","evening"].forEach(id=>{
     let el=document.getElementById(id); if(el) el.addEventListener("change", invalidateQuote);
   });
+  let sf=document.getElementById("seafood");
+  if(sf) sf.addEventListener("change", function(){ this.closest(".addonRow").classList.toggle("on", this.checked); });
 }
 
 let autocomplete;
@@ -697,20 +717,25 @@ function generateQuote(){
   let snack=document.getElementById("snack").checked;
   let juice1=document.getElementById("juice1").checked;
   let juice2=document.getElementById("juice2").checked;
+  let seafood=document.getElementById("seafood").checked;
   let morning=document.getElementById("morning").checked;
   let afternoon=document.getElementById("afternoon").checked;
   let evening=document.getElementById("evening").checked;
 
-  let foodPerDay=0;
-  if(breakfast) foodPerDay+=getPrice(prefix+dur+"breakfast");
-  let mealCount=0;
-  if(lunch) mealCount++;
-  if(dinner) mealCount++;
-  if(mealCount==1) foodPerDay+=getPrice(prefix+dur+"lunch");
-  if(mealCount==2) foodPerDay+=getPrice(prefix+dur+"combo")*2;
-  if(snack)  foodPerDay+=getPrice(prefix+dur+"snack");
-  if(juice1) foodPerDay+=getPrice(prefix+dur+"juice1");
-  if(juice2) foodPerDay+=getPrice(prefix+dur+"juice2")*2;
+  /* per-day food cost for a given duration key (d_/w_/m_/q_); seafood is a flat per-day add-on */
+  function foodPerDayFor(durKey){
+    let f=0;
+    if(breakfast) f+=getPrice(prefix+durKey+"breakfast");
+    let mc=(lunch?1:0)+(dinner?1:0);
+    if(mc==1) f+=getPrice(prefix+durKey+"lunch");
+    if(mc==2) f+=getPrice(prefix+durKey+"combo")*2;
+    if(snack)  f+=getPrice(prefix+durKey+"snack");
+    if(juice1) f+=getPrice(prefix+durKey+"juice1");
+    if(juice2) f+=getPrice(prefix+durKey+"juice2")*2;
+    if(seafood) f+=getPrice("seafood");
+    return f;
+  }
+  let foodPerDay=foodPerDayFor(dur);
 
   let days=2;
   if(duration=="w") days=6;
@@ -728,6 +753,13 @@ function generateQuote(){
   let gst=foodTotal*(getPrice("gst")/100);
   let total=foodTotal+gst+deliveryTotal;
 
+  /* ---- 2-Day Trial price for the SAME selection (uses d_ prices) ---- */
+  let trialDays=2;
+  let trialFoodTotal=foodPerDayFor("d_")*trialDays;
+  let trialDelivery=deliveryPerTrip*trips*trialDays;
+  let trialGst=trialFoodTotal*(getPrice("gst")/100);
+  let trialTotal=trialFoodTotal+trialGst+trialDelivery;
+
   let meals=[];
   if(breakfast) meals.push("Breakfast");
   if(lunch) meals.push("Lunch");
@@ -735,6 +767,7 @@ function generateQuote(){
   if(snack) meals.push("Snack");
   if(juice1) meals.push("1 Juice");
   if(juice2) meals.push("2 Juices");
+  let addons = seafood ? "Seafood" : "";
   let slots=[];
   if(morning) slots.push("Morning");
   if(afternoon) slots.push("Afternoon");
@@ -753,7 +786,7 @@ function generateQuote(){
       height:heightText, weight:document.getElementById("weight").value,
       bmi: bmiValue ? bmiValue.toFixed(1) : "",
       recommended: PLANS[recommendedPlan] ? PLANS[recommendedPlan].name : "",
-      meals:meals.join(", "), duration:durationText, slots:slots.join(", "),
+      meals:meals.join(", "), addons:addons, duration:durationText, slots:slots.join(", "),
       location:document.getElementById("location").value, distance:roundedDistance, price:total
     })
   });
@@ -765,14 +798,24 @@ function generateQuote(){
       "<div class='resultPrice'>&#8377;"+total.toFixed(0)+"</div>"+
       "<div class='resultNote'>Including delivery charges &amp; taxes</div>"+
       "<div class='resultPlan'>"+planText+" &middot; "+durationText+"</div>"+
+      (duration!=="d" ? (
+        "<div class='trialLine'>Or start with a 2-Day Trial: &#8377;"+trialTotal.toFixed(0)+"</div>"+
+        "<label class='trialOpt'><input type='checkbox' id='startTrial'> Start my 2-day trial first (from tomorrow)</label>"
+      ) : "")+
     "</div>";
 
   document.getElementById("quoteSummary").innerHTML =
     "<div class='summaryBox'>"+
       row("Plan",planText)+ row("Goal",GOAL_NAME[selectedGoal])+
-      row("Meals",meals.join(", "))+ row("Duration",durationText)+
+      row("Meals",meals.join(", "))+
+      (seafood ? row("Add-on","Seafood (+&#8377;"+getPrice("seafood")+"/day)") : "")+
+      row("Duration",durationText)+
       row("Slots",slots.join(", "))+ row("Delivery",roundedDistance+" km")+
     "</div>";
+
+  lastQuote={ planText:planText, durationText:durationText, duration:duration,
+    meals:meals.join(", "), addons:addons, slots:slots.join(", "),
+    total:total.toFixed(0), trialTotal:trialTotal.toFixed(0), name:name };
 
   document.getElementById("bookBar").style.display="block";
 }
@@ -786,15 +829,28 @@ function bookNow(){
     body: JSON.stringify({ phone: bookedPhone })
   });
 
-  let durationElement=document.querySelector('input[name="duration"]:checked');
-  let duration=durationElement.value;
-  let durationText={ d:"2 Day Trial", w:"1 Week", m:"26 Days", q:"3 Months" }[duration];
-  let planText=PLANS[selectedPlan].name;
-  let clientName=document.getElementById("clientName").value.trim();
-  let message="Hello Friska Wellness,%0A%0A"+"My name is "+clientName+".%0A"+
-    "I have opted for the "+planText+" plan for "+durationText+".%0A%0A"+
-    "I would like to proceed with the subscription.%0A"+
-    "Please share the weekly menu and payment details.%0A%0AThank you.";
+  let q=lastQuote;
+  if(!q){ showPopup("Please generate a quote first."); return; }
+  let clientName=q.name || document.getElementById("clientName").value.trim();
+  let trialEl=document.getElementById("startTrial");
+  let wantTrial=trialEl && trialEl.checked;
+  let addonLine = q.addons ? ("Add-on: "+q.addons+".%0A") : "";
+
+  let message;
+  if(wantTrial){
+    let t=new Date(Date.now()+86400000);
+    let tomorrow=t.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});
+    message="Hello Friska Wellness,%0A%0A"+"My name is "+clientName+".%0A"+
+      "I have opted for the "+q.planText+" plan.%0A"+
+      "I would like to START WITH THE 2-DAY TRIAL from tomorrow ("+tomorrow+").%0A"+
+      "Meals: "+q.meals+".%0A"+addonLine+"%0A"+
+      "Please confirm my trial and share the menu & payment details.%0A%0AThank you.";
+  } else {
+    message="Hello Friska Wellness,%0A%0A"+"My name is "+clientName+".%0A"+
+      "I have opted for the "+q.planText+" plan for "+q.durationText+".%0A"+addonLine+"%0A"+
+      "I would like to proceed with the subscription.%0A"+
+      "Please share the weekly menu and payment details.%0A%0AThank you.";
+  }
   window.open("https://wa.me/"+WHATSAPP_NUMBER+"?text="+message,"_blank");
 }
 function toggleMenu(){ let m=document.getElementById("headerMenu"); m.style.display=(m.style.display==="block")?"none":"block"; }
