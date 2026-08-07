@@ -947,16 +947,27 @@ function generateQuote(){
 }
 function row(label,value){ return "<div class='row'><span>"+label+"</span><span>"+(value||"-")+"</span></div>"; }
 
-function bookNow(){
-  /* mark this lead as Booked in the backend (read later in leads.html) */
-  let bookedPhone=document.getElementById("clientPhone").value.replace(/\D/g,'');
+function markBookedRetry(phone, attempt){
+  if(attempt>3) { console.error("markBooked failed after 3 retries"); return; }
   fetch(PRICING_URL + "?action=markBooked", {
     method:"POST", keepalive:true,
-    body: JSON.stringify({ phone: bookedPhone })
+    body: JSON.stringify({ phone: phone })
+  }).then(r=>r.json()).then(d=>{
+    console.log("✓ Marked as booked:", phone);
+  }).catch(err=>{
+    console.warn("markBooked attempt "+(attempt+1)+" failed:", err);
+    setTimeout(()=>markBookedRetry(phone, attempt+1), 1500);
   });
+}
 
+function bookNow(){
   let q=lastQuote;
   if(!q){ showPopup("Please generate a quote first."); return; }
+  
+  /* mark this lead as Booked in the backend (read later in leads.html) */
+  let bookedPhone=document.getElementById("clientPhone").value.replace(/\D/g,'');
+  markBookedRetry(bookedPhone, 0);
+
   let clientName=q.name || document.getElementById("clientName").value.trim();
   let trialEl=document.getElementById("startTrial");
   let wantTrial=trialEl && trialEl.checked;
