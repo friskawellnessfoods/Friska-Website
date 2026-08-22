@@ -20,6 +20,9 @@
 <meta name="twitter:image" content="https://friskawellness.com/assets/hero-1.jpg">
 
 <link rel="icon" href="assets/logo.png">
+
+<!-- start the first hero image downloading immediately -->
+<link rel="preload" as="image" href="assets/hero-1.jpg" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -69,6 +72,7 @@
       <a href="plan/index.html">Choose Your Plan</a>
       <a href="blog.html">Blog</a>
       <a href="index.html#contact">Contact</a>
+      <a class="nav-login" href="client/index.html">Client Login</a>
     </nav>
     <div class="header-cta">
       <a class="btn btn-primary" href="plan/index.html">Book a Trial Meal</a>
@@ -80,7 +84,7 @@
 <section class="hero">
   <div class="wrap">
     <div>
-      <img src="assets/logo.png" alt="Friska Wellness" class="hero-logo">
+      <img src="assets/logo.png" alt="Friska Wellness" class="hero-logo" width="600" height="600" fetchpriority="high">
       <h1>Eat healthy.<br>Feel <em>happy.</em><br>Every single day.</h1>
       <p class="lede">Internationally trained chefs cook your meals fresh, balance every plate for nutrition and portion, and get it to your door — no preservatives, no compromise on taste.</p>
       <div class="hero-cta">
@@ -99,10 +103,10 @@
 
       <div class="carousel">
         <div class="carousel-track">
-          <div class="carousel-slide active"><img src="assets/hero-1.jpg" alt="Friska meals packed fresh"></div>
-          <div class="carousel-slide"><img src="assets/hero-2.jpg" alt="Chef preparing a Friska plate"></div>
-          <div class="carousel-slide"><img src="assets/hero-3.jpg" alt="Balanced Friska meal box"></div>
-          <div class="carousel-slide"><img src="assets/hero-4.jpg" alt="Friska daily delivery"></div>
+          <div class="carousel-slide active"><img src="assets/hero-1.jpg" alt="Friska meals packed fresh" width="1000" height="1250" fetchpriority="high" decoding="async"></div>
+          <div class="carousel-slide"><img data-src="assets/hero-2.jpg" alt="Chef preparing a Friska plate" width="1000" height="1250" decoding="async"></div>
+          <div class="carousel-slide"><img data-src="assets/hero-3.jpg" alt="Balanced Friska meal box" width="1000" height="1250" decoding="async"></div>
+          <div class="carousel-slide"><img data-src="assets/hero-4.jpg" alt="Friska daily delivery" width="1000" height="1250" decoding="async"></div>
         </div>
         <button class="carousel-btn prev" aria-label="Previous image">&#8249;</button>
         <button class="carousel-btn next" aria-label="Next image">&#8250;</button>
@@ -110,7 +114,7 @@
       </div>
 
       <div class="hero-float">
-        <div class="thumb"><img src="assets/float-thumb.jpg" alt=""></div>
+        <div class="thumb"><img src="assets/float-thumb.jpg" alt="" width="200" height="200" loading="lazy" decoding="async"></div>
         <div>
           <strong>Balanced plates</strong>
           <span>Portion &amp; calorie controlled</span>
@@ -134,15 +138,15 @@
 
     <div class="why-cards">
       <figure class="why-card">
-        <img src="assets/why-1.jpg" alt="Friska wrap">
+        <img src="assets/why-1.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Friska wrap">
         <figcaption>yum in every bite!</figcaption>
       </figure>
       <figure class="why-card">
-        <img src="assets/why-2.jpg" alt="Friska delivery packaging">
+        <img src="assets/why-2.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Friska delivery packaging">
         <figcaption>fresh, daily deliveries</figcaption>
       </figure>
       <figure class="why-card">
-        <img src="assets/why-3.jpg" alt="Friska meal box">
+        <img src="assets/why-3.jpg" width="800" height="800" loading="lazy" decoding="async" alt="Friska meal box">
         <figcaption>magic in every meal!</figcaption>
       </figure>
     </div>
@@ -177,7 +181,7 @@
     </div>
     <div class="tier-grid">
       <div class="tier-item">
-        <div class="tier-media"><img src="assets/tier-1.jpg" alt=""></div>
+        <div class="tier-media"><img src="assets/tier-1.jpg" alt="" width="700" height="900" loading="lazy" decoding="async"></div>
         <div class="tier-body">
           <span class="tier-num">Tier 01</span>
           <h3>Chef-crafted</h3>
@@ -185,7 +189,7 @@
         </div>
       </div>
       <div class="tier-item">
-        <div class="tier-media"><img src="assets/tier-2.jpg" alt=""></div>
+        <div class="tier-media"><img src="assets/tier-2.jpg" alt="" width="700" height="900" loading="lazy" decoding="async"></div>
         <div class="tier-body">
           <span class="tier-num">Tier 02</span>
           <h3>Portion &amp; calorie control</h3>
@@ -193,7 +197,7 @@
         </div>
       </div>
       <div class="tier-item">
-        <div class="tier-media"><img src="assets/tier-3.jpg" alt=""></div>
+        <div class="tier-media"><img src="assets/tier-3.jpg" alt="" width="700" height="900" loading="lazy" decoding="async"></div>
         <div class="tier-body">
           <span class="tier-num">Tier 03</span>
           <h3>Zero preservatives</h3>
@@ -201,7 +205,7 @@
         </div>
       </div>
       <div class="tier-item">
-        <div class="tier-media"><img src="assets/tier-4.jpg" alt=""></div>
+        <div class="tier-media"><img src="assets/tier-4.jpg" alt="" width="700" height="900" loading="lazy" decoding="async"></div>
         <div class="tier-body">
           <span class="tier-num">Tier 04</span>
           <h3>Freshly prepared</h3>
@@ -219,18 +223,18 @@
     </div>
     <div class="gallery-grid">
       <figure>
-        <img class="g-img g-base" src="assets/gallery-1.jpg" alt="Stay fit">
-        <img class="g-img g-hover" src="assets/gallery-1-hover.jpg" alt="" aria-hidden="true">
+        <img class="g-img g-base" src="assets/gallery-1.jpg" width="900" height="1100" loading="lazy" decoding="async" alt="Stay fit">
+        <img class="g-img g-hover" data-src="assets/gallery-1-hover.jpg" width="900" height="1100" decoding="async" alt="" aria-hidden="true">
         <figcaption>Stay Fit</figcaption>
       </figure>
       <figure>
-        <img class="g-img g-base" src="assets/gallery-2.jpg" alt="Be happy">
-        <img class="g-img g-hover" src="assets/gallery-2-hover.jpg" alt="" aria-hidden="true">
+        <img class="g-img g-base" src="assets/gallery-2.jpg" width="900" height="1100" loading="lazy" decoding="async" alt="Be happy">
+        <img class="g-img g-hover" data-src="assets/gallery-2-hover.jpg" width="900" height="1100" decoding="async" alt="" aria-hidden="true">
         <figcaption>Be Happy</figcaption>
       </figure>
       <figure>
-        <img class="g-img g-base" src="assets/gallery-3.jpg" alt="Get results">
-        <img class="g-img g-hover" src="assets/gallery-3-hover.jpg" alt="" aria-hidden="true">
+        <img class="g-img g-base" src="assets/gallery-3.jpg" width="900" height="1100" loading="lazy" decoding="async" alt="Get results">
+        <img class="g-img g-hover" data-src="assets/gallery-3-hover.jpg" width="900" height="1100" decoding="async" alt="" aria-hidden="true">
         <figcaption>Get Results</figcaption>
       </figure>
     </div>
@@ -279,6 +283,7 @@
         <a href="about.html">About</a>
         <a href="plan/index.html">Choose Your Plan</a>
         <a href="blog.html">Blog</a>
+        <a href="client/index.html">Client Login</a>
       </div>
       <div>
         <h4>Policies</h4>
