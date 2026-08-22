@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="config.js"></script>
+  
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+body{
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+margin:0;
+padding:20px;
+background:#f3f4f6;
+color:#222;
+}
+
+h2{
+margin-bottom:18px;
+font-size:24px;
+}
+
+.card{
+background:white;
+padding:18px;
+border-radius:14px;
+margin-bottom:18px;
+box-shadow:0 4px 14px rgba(0,0,0,0.08);
+}
+
+.date-row{
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+margin-bottom:10px;
+}
+
+.date-field{
+flex:1;
+min-width:140px;
+}
+
+.date-field label{
+display:block;
+font-size:14px;
+margin-bottom:4px;
+font-weight:500;
+}
+
+.date-field input{
+width:100%;
+padding:10px;
+border-radius:10px;
+border:1px solid #d0d0d0;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:#1976d2;
+color:white;
+font-weight:600;
+font-size:16px;
+cursor:pointer;
+transition:all 0.15s ease;
+}
+
+button:active{
+transform:scale(0.97);
+background:#1565c0;
+}
+button.loading{
+opacity:0.7;
+pointer-events:none;
+position:relative;
+}
+
+button.loading::after{
+content:"";
+width:16px;
+height:16px;
+border:2px solid #fff;
+border-top:2px solid transparent;
+border-radius:50%;
+position:absolute;
+right:14px;
+top:50%;
+transform:translateY(-50%);
+animation:spinBtn 0.7s linear infinite;
+}
+
+@keyframes spinBtn{
+to{transform:translateY(-50%) rotate(360deg);}
+}
+.order-date{
+font-size:20px;
+font-weight:700;
+margin-bottom:10px;
+}
+
+.slot{
+font-size:16px;
+margin-bottom:4px;
+}
+
+.dish{
+margin-left:8px;
+font-size:15px;
+color:#444;
+}
+
+.empty{
+color:#888;
+font-style:italic;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>My Orders</h2>
+
+<div class="card">
+
+<div class="date-row">
+
+<div class="date-field">
+<label>Start Date</label>
+<input type="date" id="start">
+</div>
+
+<div class="date-field">
+<label>End Date</label>
+<input type="date" id="end">
+</div>
+
+</div>
+
+<button id="loadBtn" onclick="loadOrders()">Load Orders</button>
+
+</div>
+<div id="results"></div>
+<script>
+
+
+const params=new URLSearchParams(location.search);
+const phone=params.get("phone");
+  
+function setDefaultWeek(){
+
+const today = new Date();
+
+const start = new Date(today);
+start.setDate(today.getDate() - today.getDay() + 1); // Monday
+
+const end = new Date(start);
+end.setDate(start.getDate() + 6); // Sunday
+
+document.getElementById("start").value =
+start.toISOString().split("T")[0];
+
+document.getElementById("end").value =
+end.toISOString().split("T")[0];
+
+}
+async function loadOrders(){
+
+const btn=document.getElementById("loadBtn");
+btn.classList.add("loading");
+btn.disabled=true;
+
+try{
+
+const start=document.getElementById("start").value;
+const end=document.getElementById("end").value;
+
+const form=new URLSearchParams();
+form.append("action","getClientOrdersByDate");
+form.append("phone",phone);
+form.append("start",start);
+form.append("end",end);
+
+const res=await fetch(API_URL,{
+method:"POST",
+body:form
+});
+
+const data=await res.json();
+
+let html="";
+
+if(!data.orders || Object.keys(data.orders).length===0){
+
+document.getElementById("results").innerHTML=
+`<div class="card empty">No orders found for selected dates.</div>`;
+
+return;
+
+}
+
+const dates=Object.keys(data.orders).sort();
+
+for(const date of dates){
+
+html+=`<div class="card">
+<div class="order-date">${date}</div>`;
+
+for(const r of data.orders[date]){
+
+html+=`<div class="slot"><b>${r.slot}</b> - ${r.location}</div>`;
+
+["option1","option2","breakfast","snack","juice1","juice2"]
+.forEach(k=>{
+if(r[k]) html+=`<div class="dish">• ${r[k]}</div>`;
+});
+
+}
+
+html+="</div>";
+
+}
+
+document.getElementById("results").innerHTML=html;
+
+}
+catch(e){
+
+document.getElementById("results").innerHTML=
+`<div class="card empty">Error loading orders.</div>`;
+
+}
+
+btn.classList.remove("loading");
+btn.disabled=false;
+
+}
+window.addEventListener("load",()=>{
+
+setDefaultWeek();
+
+// wait a moment so inputs update
+setTimeout(()=>{
+loadOrders();
+},200);
+
+});
+</script>
+
+</body>
+</html>

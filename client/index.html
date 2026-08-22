@@ -1,0 +1,3444 @@
+<!DOCTYPE html>
+<head>
+  <base target="_top">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="config.js"></script>
+  <style>
+  :root{
+    --navy:#0a1a6e;
+    --navy-deep:#08155a;
+    --accent:#10b981;
+    --accent-soft:#e7f7f1;
+    --bg:#eef2f9;
+    --ink:#16213e;
+    --muted:#6b7596;
+    --line:#e2e7f1;
+    --radius:18px;
+    --shadow:0 14px 40px rgba(20,33,62,0.12);
+  }
+  
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    position: relative;
+    font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
+    overflow-x: hidden;
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  /* your photo, dimmed under a light wash */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(238,242,249,0.86), rgba(238,242,249,0.92)),
+      url("bg.webp");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
+  }
+  /* mint glow accent */
+  body::after {
+    content: "";
+    position: fixed;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: rgba(16,185,129,0.12);
+    filter: blur(70px);
+    bottom: -160px; right: -120px;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .nav-row { max-width: 420px; margin-left: auto; margin-right: auto; }
+  .btn.submit, .content > .btn { max-width: 420px; display: block; margin-left: auto; margin-right: auto; }
+  .app { width: 100%; max-width: 100%; padding: 0 0 16px; position: relative; z-index: 1; }
+  .wrapper { width: 100%; max-width: 620px; margin: 0 auto; }
+
+  /* NAVY HEADER BANNER */
+  .hero {
+    background: linear-gradient(135deg, var(--navy), #13278f);
+    padding: 22px 16px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(16,185,129,0.22);
+    filter: blur(50px);
+    bottom: -70px; left: -40px;
+  }
+  .hero::after {
+    content: "";
+    position: absolute;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.10);
+    filter: blur(44px);
+    top: -50px; right: -30px;
+  }
+  .hero-inner { position: relative; z-index: 1; }
+  .hero .logo {
+    max-width: 130px;
+    height: auto;
+    margin-bottom: 8px;
+    background: #fff;
+    padding: 8px 14px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  }
+  .hero h2 { font-size: 18px; font-weight: 700; color: #fff; margin: 4px 0 0; letter-spacing: .2px; }
+
+  /* content pulled up over the banner */
+  .content { padding: 0 14px; margin-top: -28px; position: relative; z-index: 2; }
+
+  h2 { font-size: 20px; font-weight: 700; margin: 0; text-align: center; color: var(--navy); }
+  h3 { font-size: 18px; margin-bottom: 14px; }
+  h4 { font-size: 15px; font-weight: 700; margin: 0; color: var(--navy); }
+
+  /* CARD */
+  .box {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(226,231,241,0.7);
+  }
+
+  /* FORM */
+  label { font-size: 12px; margin-bottom: 6px; display: block; font-weight: 600; color: #445; }
+
+  input[type="text"],
+  input#phone,
+  select {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: #fbfcfe;
+    color: var(--ink);
+    box-sizing: border-box;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+    font-family: inherit;
+  }
+  input[type="text"]:focus,
+  input#phone:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
+  }
+  #phone { font-size: 17px; letter-spacing: .3px; }
+  input[readonly] { background: #f4f6fa; color: #555; }
+  .box label:not(:first-child) { margin-top: 16px; }
+
+  /* BUTTONS */
+  .btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 15px;
+    border-radius: 13px;
+    border: none;
+    background: var(--navy);
+    color: #fff;
+    margin-top: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 6px 16px rgba(10,26,110,0.18);
+    transition: transform .08s ease, background .15s;
+  }
+  .btn:active { transform: scale(0.98); background: var(--navy-deep); }
+  .btn.secondary { background: #fff; color: var(--navy); border: 1.5px solid var(--line); box-shadow: none; }
+  .btn.secondary:active { background: #f1f4fb; }
+  /* Submit = emerald primary */
+  .btn.submit { background: var(--navy); box-shadow: 0 6px 16px rgba(10,26,110,0.18); }
+  .btn.submit:active { background: var(--navy-deep); }
+  .menu-btn{
+    background:var(--navy); color:white; border:none;
+    padding:10px 18px; font-weight:700; letter-spacing:1px;
+    cursor:pointer; margin-top:10px; border-radius:12px;
+  }
+
+  /* SECTION PANEL (tinted wrapper around each section) */
+  .sec-panel {
+    background: #f5f8fc;
+    border: 1px solid #eef2f8;
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  /* SECTION HEADER */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin: 0 0 10px;
+  }
+  .section-header h4 {
+    font-size: 15px; white-space: nowrap; flex-shrink: 0;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .section-controls { display: flex; gap: 6px; }
+  .section-controls select {
+    width: 108px !important; padding: 8px 9px !important;
+    font-size: 12.5px !important; border-radius: 10px; background: #fff;
+  }
+  @media (max-width: 480px) {
+    .section-controls select { width: 100px !important; font-size: 12px !important; }
+  }
+
+  /* lone h4 (no slot control) still needs spacing inside panel */
+  .sec-panel > h4 { margin-bottom: 10px; }
+
+  /* SWAP ARROW PILL */
+  .swap-arrow {
+    border: 1.5px solid #d8deea; background: #fff; color: var(--navy);
+    width: 26px; height: 26px; border-radius: 50%;
+    font-size: 13px; line-height: 1; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all .15s ease; flex: none; padding: 0;
+  }
+  .swap-arrow:active { transform: scale(0.9); }
+  .swap-arrow.active {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+    box-shadow: 0 3px 10px rgba(16,185,129,0.3);
+  }
+
+  /* PRESETS */
+  #presetBox { padding: 6px 16px; }
+  #presetBox details { margin: 0; }
+  #presetBox summary {
+    font-size: 15px; font-weight: 700; padding: 8px 0;
+    list-style: none; cursor: pointer; color: var(--navy);
+  }
+  #presetBox summary::-webkit-details-marker { display: none; }
+  #presetBox summary::after { content: "▾"; float: right; transition: 0.2s ease; color: var(--muted); }
+  #presetBox details[open] summary::after { transform: rotate(180deg); }
+  .preset-grid { padding-top: 8px; }
+  .preset-grid label {
+    font-weight: 500; color: var(--ink); font-size: 14px;
+    padding: 7px 0; display: flex; align-items: center;
+  }
+
+  /* DISH */
+  .dish {
+    background: #fff;
+    border: 1px solid #edf1f7;
+    border-radius: 11px;
+    padding: 9px 12px;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .dish:last-child { margin-bottom: 0; }
+  .dish-name { font-size: 14px; line-height: 1.3; flex: 1; padding-right: 10px; }
+
+  /* QTY */
+  .qty { display: flex; align-items: center; gap: 8px; }
+  .qty button {
+    width: 29px; height: 29px; font-size: 17px;
+    border-radius: 50%; border: none;
+    background: var(--navy); color: #fff; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s ease; cursor: pointer;
+  }
+  .qty button:active { transform: scale(0.9); background: var(--navy-deep); }
+  .qty span { min-width: 18px; text-align: center; font-size: 15px; font-weight: 700; color: var(--navy); }
+
+  input[type="checkbox"] { transform: scale(1.2); margin-right: 6px; accent-color: var(--accent); }
+
+  html, body { height: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+
+  /* DAY HEADER */
+  .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .day-text { flex: 1; text-align: center; }
+  .day-name {
+    font-size: 19px; font-weight: 700; cursor: pointer;
+    position: relative; display: inline-flex; align-items: center; gap: 6px; color: var(--navy);
+  }
+  .day-arrow { font-size: 11px; color: var(--accent); }
+  .day-dropdown {
+    display: none; position: absolute; background: #fff;
+    border-radius: 12px; box-shadow: 0 8px 22px rgba(20,33,62,0.12);
+    margin-top: 6px; z-index: 10; min-width: 170px; padding: 6px 0;
+    border: 1px solid var(--line);
+  }
+  .day-dropdown div { padding: 11px 18px; font-size: 14px; cursor: pointer; }
+  .day-dropdown div:hover { background: var(--accent-soft); color: var(--navy); }
+  .day-date { font-size: 12px; color: var(--muted); margin-top: 3px; font-weight: 500; }
+
+  .cancel-wrap {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; white-space: nowrap; font-weight: 600; color: var(--muted);
+  }
+
+  .nav-row { display: flex; gap: 10px; margin-top: 0; }
+  .nav-row .btn { flex: 1; margin-top: 0; }
+
+  /* protein colors */
+  .protein-chicken { color: #d32f2f; font-weight: 600; }
+  .protein-veg { color: #2e7d32; font-weight: 600; }
+  .protein-egg { color: #e69500; font-weight: 600; }
+  .protein-seafood { color: #1565c0; font-weight: 600; }
+
+  /* SUMMARY MODAL */
+  .modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,21,50,0.55); backdrop-filter: blur(4px);
+    justify-content: center; align-items: center; padding: 16px; z-index: 9999;
+  }
+  .modal-content {
+    background: #fff; border-radius: 20px;
+    width: 100%; max-width: 480px; max-height: 82vh;
+    box-shadow: 0 24px 60px rgba(10,26,110,0.28);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    padding: 0;
+  }
+  .modal-head { padding: 22px 24px 8px; }
+  .modal-scroll { padding: 4px 24px; overflow-y: auto; flex: 1; }
+  .modal-foot {
+    padding: 14px 24px 18px;
+    border-top: 1px solid var(--line);
+    display: flex; gap: 10px;
+    background: #fff;
+  }
+  .modal-foot .btn { margin-top: 0; }
+  .modal-content h3 { text-align: center; margin: 0 0 14px; font-weight: 700; }
+  .summary-day { margin-bottom: 18px; }
+  .summary-day h4 { margin-bottom: 8px; color: var(--navy); }
+  .summary-slot {
+    font-size: 13px; color: var(--accent); font-weight: 700;
+    margin: 8px 0 4px; text-transform: uppercase; letter-spacing: .4px;
+  }
+
+  .loader {
+    display: none; position: fixed; inset: 0;
+    background: rgba(255,255,255,0.6);
+    justify-content: center; align-items: center; z-index: 9999;
+  }
+  .spinner {
+    width: 40px; height: 40px; border: 4px solid #ddd;
+    border-top: 4px solid var(--navy); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .btn.loading { opacity: 0.7; pointer-events: none; position: relative; }
+  .btn.loading::after {
+    content: ""; width: 16px; height: 16px;
+    border: 2px solid #fff; border-top: 2px solid transparent;
+    border-radius: 50%; position: absolute; right: 14px; top: 50%;
+    transform: translateY(-50%); animation: spinBtn 0.6s linear infinite;
+  }
+  @keyframes spinBtn { to { transform: translateY(-50%) rotate(360deg); } }
+
+  .dish-locked { opacity: 0.45; }
+  .dish-locked .qty button { background: #ccc; cursor: not-allowed; }
+
+  /* UPGRADE MODAL */
+  #upgradeModal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(10,21,50,0.55); backdrop-filter: blur(4px);
+    justify-content: center; align-items: center; padding: 16px; z-index: 99999;
+  }
+  #upgradeModal .modal-content { position: relative; text-align: center; padding: 28px 24px 20px; }
+  #upgradeModal .modal-close {
+    position: absolute; top: 12px; right: 14px; font-size: 18px;
+    cursor: pointer; color: #888; background: none; border: none; line-height: 1;
+  }
+  #upgradeModal .modal-icon { font-size: 36px; margin-bottom: 12px; }
+  #upgradeModal p { font-size: 15px; color: #333; margin-bottom: 20px; line-height: 1.5; }
+
+  /* ===== LOGIN SCREEN ===== */
+  #loginScreen .content { margin-top: -28px; }
+  .login-title { font-size: 17px; font-weight: 700; color: var(--navy); text-align: center; margin: 0 0 4px; }
+  .login-sub { font-size: 13px; color: var(--muted); text-align: center; margin: 0 0 18px; line-height: 1.5; }
+  .auth-error {
+    display: none; margin-top: 12px; padding: 10px 12px;
+    background: #fdecec; border: 1px solid #f6c9c9; border-radius: 10px;
+    color: #b3261e; font-size: 13px; line-height: 1.45;
+  }
+  .pw-hint { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+  .pw-wrap { position: relative; }
+  .pw-toggle {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--muted); font-family: inherit;
+    font-size: 11.5px; font-weight: 700; cursor: pointer; padding: 4px 6px;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+  .link-line { text-align: center; font-size: 12.5px; color: var(--muted); margin-top: 16px; }
+  .link-line span { color: var(--navy); font-weight: 600; cursor: pointer; }
+  .link-line span:active { opacity: .6; }
+  .admin-note {
+    font-size: 11.5px; color: var(--accent); font-weight: 600;
+    text-align: center; margin-top: 12px; letter-spacing: .2px;
+  }
+
+  /* ===== APP SHELL ===== */
+  .app-hero { padding: 16px 16px 42px; text-align: left; }
+  .hero-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .hero-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .hero-brand img {
+    width: 42px; height: 42px; object-fit: contain; background: #fff;
+    border-radius: 10px; padding: 5px; flex: none;
+  }
+  .hero-user { min-width: 0; }
+  .hu-name {
+    color: #fff; font-size: 15.5px; font-weight: 700; line-height: 1.2;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 46vw;
+  }
+  .hu-meta {
+    color: rgba(255,255,255,0.72); font-size: 11.5px; font-weight: 500;
+    margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 46vw;
+  }
+  .logout-btn {
+    background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.28);
+    color: #fff; border-radius: 10px; padding: 8px 13px; font-size: 12.5px;
+    font-weight: 600; cursor: pointer; font-family: inherit; flex: none;
+  }
+  .logout-btn:active { background: rgba(255,255,255,0.24); }
+
+  /* ===== TABS ===== */
+  .tabbar {
+    display: flex; gap: 5px; background: #fff; border-radius: 15px; padding: 5px;
+    box-shadow: var(--shadow); border: 1px solid rgba(226,231,241,0.7);
+    margin: -26px auto 14px; position: relative; z-index: 3;
+    width: calc(100% - 28px); max-width: 592px;
+  }
+  .tabbar button {
+    flex: 1; border: none; background: transparent; color: var(--muted);
+    font-family: inherit; font-weight: 600; font-size: 13px; padding: 10px 4px;
+    border-radius: 11px; cursor: pointer; transition: background .15s, color .15s;
+    white-space: nowrap;
+  }
+  .tabbar button.active { background: var(--navy); color: #fff; box-shadow: 0 4px 12px rgba(10,26,110,0.18); }
+  @media (max-width: 380px) { .tabbar button { font-size: 12px; } }
+
+  #appShell .content { margin-top: 0; }
+  .frame-wrap { padding: 0 14px 16px; }
+  .tab-frame {
+    width: 100%; height: calc(100vh - 200px); min-height: 440px;
+    border: none; border-radius: 16px; background: #fff;
+    box-shadow: var(--shadow); display: block;
+  }
+
+  /* ===== CENTERED LOGIN CARD ===== */
+  #loginScreen {
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 28px 16px;
+  }
+  .login-card {
+    width: 100%; max-width: 400px; background: #fff;
+    border-radius: 20px; padding: 30px 26px 26px;
+    box-shadow: 0 24px 60px rgba(10,26,110,0.18);
+    border: 1px solid rgba(226,231,241,0.8);
+  }
+  .login-card .login-logo {
+    display: block; margin: 0 auto 20px; max-width: 148px; height: auto;
+  }
+  .login-card label { margin-top: 14px; }
+  .login-card label:first-of-type { margin-top: 0; }
+  @media (max-width: 400px) { .login-card { padding: 26px 20px 22px; border-radius: 18px; } }
+
+  /* ===== BOOT SPLASH ===== */
+  #bootSplash {
+    position: fixed; inset: 0; background: var(--bg);
+    display: none; align-items: center; justify-content: center; z-index: 99998;
+  }
+
+  /* ===== WEEKLY MENU TAB ===== */
+  .menu-day { margin-bottom: 14px; }
+  .menu-day-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px; margin-bottom: 10px; padding-bottom: 8px;
+    border-bottom: 1.5px solid var(--line);
+  }
+  .menu-day-name { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .menu-day-date { font-size: 12px; color: var(--muted); font-weight: 500; }
+  .menu-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px dashed #eef2f8; }
+  .menu-row:last-child { border-bottom: none; }
+  .menu-tag {
+    flex: none; width: 84px; font-size: 10.5px; font-weight: 700;
+    color: var(--accent); text-transform: uppercase; letter-spacing: .4px; padding-top: 3px;
+  }
+  .menu-items { flex: 1; font-size: 13.5px; line-height: 1.55; color: var(--ink); }
+  .menu-items div { padding: 1px 0; }
+  .menu-today {
+    display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 700;
+    background: var(--accent-soft); color: #0b7a5a; border-radius: 6px;
+    padding: 2px 7px; letter-spacing: .3px; text-transform: uppercase;
+  }
+
+  /* ===== HOME LAUNCHER ===== */
+  .home-wrap { padding: 0 14px 18px; }
+  .home-greet { text-align: center; margin: 2px 0 16px; }
+  .home-greet h3 { margin: 0 0 4px; font-size: 18px; font-weight: 700; color: var(--navy); }
+  .home-greet p { margin: 0; font-size: 13px; color: var(--muted); }
+
+  .home-grid {
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+  .home-card {
+    background: #fff; border: 1px solid rgba(226,231,241,0.9);
+    border-radius: 16px; padding: 18px 14px; text-align: center;
+    box-shadow: var(--shadow); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    transition: transform .1s ease, border-color .15s;
+    font-family: inherit;
+  }
+  .home-card:active { transform: scale(0.975); border-color: var(--accent); }
+  .home-card .hc-icon {
+    width: 46px; height: 46px; border-radius: 13px;
+    background: var(--accent-soft); color: var(--navy);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 4px;
+  }
+  .home-card .hc-title { font-size: 14.5px; font-weight: 700; color: var(--navy); }
+  .home-card .hc-desc { font-size: 11.5px; color: var(--muted); line-height: 1.45; }
+  .home-card.soon { opacity: .5; cursor: default; }
+  .home-card.soon:active { transform: none; border-color: rgba(226,231,241,0.9); }
+  .hc-soon {
+    font-size: 9.5px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
+    background: #eef1f7; color: var(--muted); border-radius: 5px; padding: 2px 6px; margin-top: 2px;
+  }
+
+  /* tab bar becomes scrollable as more sections are added */
+  .tabbar { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tabbar::-webkit-scrollbar { display: none; }
+  .tabbar button { flex: 0 0 auto; min-width: 0; padding: 10px 14px; }
+  .tabbar button.home-chip { color: var(--navy); font-size: 15px; padding: 10px 12px; }
+
+  /* ===== MENU DISH KIND LABEL ===== */
+  .menu-dish { padding: 2px 0; font-size: 13.5px; line-height: 1.55; }
+  .dish-kind {
+    display: inline-block; font-weight: 700; font-size: 11px;
+    letter-spacing: .3px; text-transform: uppercase;
+    margin-right: 7px; padding: 1px 7px; border-radius: 6px;
+    background: #eef1f7; color: var(--navy); vertical-align: 1px;
+  }
+  .dish-kind.k-chicken  { background: #fdeaea; color: #c62828; }
+  .dish-kind.k-veg      { background: #e8f5e9; color: #2e7d32; }
+  .dish-kind.k-egg      { background: #fff4e0; color: #b56a00; }
+  .dish-kind.k-seafood  { background: #e8f0fc; color: #1565c0; }
+
+  /* ===== FEEDBACK ===== */
+  #tab-feedback textarea {
+    width: 100%; padding: 12px 14px; font-size: 15px; border-radius: 12px;
+    border: 1.5px solid var(--line); background: #fbfcfe; color: var(--ink);
+    font-family: inherit; line-height: 1.5; resize: vertical; min-height: 130px;
+    box-sizing: border-box; transition: border-color .15s, box-shadow .15s, background .15s;
+  }
+  #tab-feedback textarea:focus {
+    outline: none; border-color: var(--accent); background: #fff;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
+  }
+  .fb-note { font-size: 11.5px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  .fb-msg {
+    display: none; margin-top: 12px; padding: 11px 13px; border-radius: 10px;
+    font-size: 13px; line-height: 1.45;
+  }
+  .fb-msg.err { display: block; background: #fdecec; border: 1px solid #f6c9c9; color: #b3261e; }
+  .fb-msg.ok  { display: block; background: var(--accent-soft); border: 1px solid #bfe8db; color: #0b7a5a; }
+  .fb-done { text-align: center; padding: 8px 4px 4px; }
+  .fb-done .fb-tick { font-size: 40px; margin-bottom: 8px; }
+  .fb-done h4 { margin: 0 0 6px; font-size: 16px; }
+  .fb-done p { margin: 0 0 16px; font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+  .wa-btn {
+    display: block; width: 100%; padding: 13px; border-radius: 13px; border: none;
+    background: #25D366; color: #fff; font-family: inherit; font-weight: 700; font-size: 15px;
+    text-align: center; text-decoration: none; cursor: pointer;
+    box-shadow: 0 6px 16px rgba(37,211,102,0.28);
+  }
+  .wa-btn:active { background: #1da851; }
+
+  /* ===== ORDER STATUS ===== */
+  .st-card { margin-bottom: 14px; }
+  .st-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px; margin-bottom: 16px; padding-bottom: 9px;
+    border-bottom: 1.5px solid var(--line);
+  }
+  .st-slot { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .st-loc { font-size: 11.5px; color: var(--muted); font-weight: 500; text-align: right; max-width: 55%; }
+
+  .stepper { display: flex; align-items: flex-start; }
+  .step { flex: 1; text-align: center; position: relative; min-width: 0; }
+  .step .sdot {
+    width: 38px; height: 38px; border-radius: 50%; margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; background: #eef1f7; color: #9aa6bb;
+    border: 2px solid #eef1f7; position: relative; z-index: 2;
+    transition: background .2s, color .2s, border-color .2s;
+  }
+  .step .slabel { font-size: 10.5px; font-weight: 600; color: var(--muted); line-height: 1.3; }
+  .step::before {
+    content: ""; position: absolute; top: 19px; left: -50%; width: 100%;
+    height: 2.5px; background: #eef1f7; z-index: 1;
+  }
+  .step:first-child::before { display: none; }
+  .step.done .sdot { background: var(--accent-soft); border-color: var(--accent); color: #0b7a5a; }
+  .step.done .slabel { color: #0b7a5a; }
+  .step.done::before { background: var(--accent); }
+  .step.current .sdot {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+    box-shadow: 0 0 0 5px rgba(16,185,129,0.16);
+  }
+  .step.current .slabel { color: var(--navy); font-weight: 700; }
+
+  .st-foot {
+    margin-top: 15px; padding-top: 12px; border-top: 1px dashed var(--line);
+    font-size: 12.5px; color: var(--muted); line-height: 1.6;
+  }
+  .st-agent {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin-top: 12px; padding: 11px 13px;
+    background: var(--accent-soft); border-radius: 12px;
+  }
+  .st-agent .aname { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .st-agent .arole { font-size: 11px; color: #0b7a5a; font-weight: 600; }
+  .st-call {
+    flex: none; background: var(--accent); color: #fff; border-radius: 10px;
+    padding: 9px 15px; font-size: 12.5px; font-weight: 700;
+    text-decoration: none; box-shadow: 0 4px 12px rgba(16,185,129,0.28);
+  }
+  .st-pending {
+    text-align: center; font-size: 13px; color: var(--muted);
+    padding: 6px 4px 0; line-height: 1.6;
+  }
+
+  .st-slotname { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+  .st-closed { text-align: center; padding: 12px 6px 4px; font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .st-closed-ic { font-size: 32px; margin-bottom: 8px; }
+
+  /* ===== USAGE CHECK ===== */
+  .us-hero { text-align: center; padding: 6px 4px 2px; }
+  .us-big { font-size: 46px; font-weight: 800; color: var(--navy); line-height: 1; }
+  .us-big.done { color: #b3261e; font-size: 30px; }
+  .us-cap { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 6px;
+    text-transform: uppercase; letter-spacing: .5px; }
+  .us-bar { height: 10px; border-radius: 99px; background: #eef1f7; overflow: hidden; margin: 18px 0 8px; }
+  .us-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg,var(--accent),#0b7a5a); transition: width .4s; }
+  .us-bar-lab { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); font-weight: 600; }
+  .us-kv { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0;
+    border-bottom: 1px solid #f0f2f7; font-size: 13.5px; }
+  .us-kv:last-child { border-bottom: none; }
+  .us-kv .k { color: var(--muted); }
+  .us-kv .v { font-weight: 600; text-align: right; }
+  .us-note { border-radius: 12px; padding: 12px 14px; font-size: 13px; line-height: 1.55; margin-top: 14px; }
+  .us-note.ok { background: var(--accent-soft); color: #0b7a5a; }
+  .us-note.warn { background: #fff6e6; border: 1px solid #f0d9a6; color: #8a6112; }
+  .us-note.end { background: #fdecec; border: 1px solid #f6c9c9; color: #b3261e; }
+
+  .st-agent { flex-wrap: wrap; }
+  .st-agent .aacts { display: flex; gap: 8px; flex: none; }
+  .st-wa {
+    flex: none; background: #25D366; color: #fff; border-radius: 10px;
+    padding: 9px 15px; font-size: 12.5px; font-weight: 700;
+    text-decoration: none; box-shadow: 0 4px 12px rgba(37,211,102,0.28);
+  }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+<!-- ============ LOGIN SCREEN ============ -->
+<div id="loginScreen">
+  <div class="login-card">
+      <img src="logo.png" class="login-logo" alt="Friska Wellness">
+
+      <div id="adminSearchWrap" style="display:none; position:relative;">
+        <label>Search Client (Admin)</label>
+        <input type="text" id="adminSearch" autocomplete="off"
+               placeholder="Type 2+ letters of name"
+               oninput="onAdminSearch(this.value)">
+        <div id="adminResults" style="
+          display:none; position:absolute; left:0; right:0; top:100%;
+          background:#fff; border:1px solid var(--line); border-radius:12px;
+          box-shadow:0 8px 22px rgba(20,33,62,0.12); margin-top:4px; z-index:30;
+          max-height:260px; overflow-y:auto; padding:4px 0;"></div>
+      </div>
+
+      <!-- step 1: phone -->
+      <div id="authStep1">
+        <div class="login-title">Sign in</div>
+        <div class="login-sub">Enter the mobile number registered with Friska.</div>
+
+        <label>Phone</label>
+        <input id="phone" inputmode="numeric" autocomplete="tel"
+               placeholder="10-digit mobile number"
+               onkeydown="if(event.key==='Enter'){authContinue(event)}">
+
+        <button class="btn" id="authContinueBtn" onclick="authContinue(event)">Continue</button>
+        <div class="admin-note" id="adminNote" style="display:none;">Admin mode — password not required</div>
+      </div>
+
+      <!-- step 2: password -->
+      <div id="authStep2" style="display:none;">
+        <div class="login-title" id="authTitle">Welcome back</div>
+        <div class="login-sub" id="authSub">Enter your password to continue.</div>
+
+        <label id="pwLabel">Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="password" autocomplete="current-password"
+                 onkeydown="if(event.key==='Enter'){authSubmit(event)}">
+          <button class="pw-toggle" onclick="togglePw('password', this)">Show</button>
+        </div>
+        <div class="pw-hint" id="pwHint" style="display:none;">Minimum 8 characters.</div>
+
+        <div id="confirmWrap" style="display:none;">
+          <label style="margin-top:16px;">Confirm Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="password2" autocomplete="new-password"
+                   onkeydown="if(event.key==='Enter'){authSubmit(event)}">
+            <button class="pw-toggle" onclick="togglePw('password2', this)">Show</button>
+          </div>
+        </div>
+
+        <button class="btn" id="authSubmitBtn" onclick="authSubmit(event)">Sign In</button>
+
+        <div class="link-line">
+          <span onclick="authBack()">Use a different number</span>
+        </div>
+        <div class="link-line" id="forgotLine">
+          Forgot your password? <span onclick="openForgotModal()">Get help</span>
+        </div>
+      </div>
+
+      <div class="auth-error" id="authError"></div>
+
+  </div>
+</div>
+
+<!-- ============ APP SHELL ============ -->
+<div id="appShell" style="display:none;">
+
+  <div class="hero app-hero">
+    <div class="hero-inner">
+      <div class="hero-top">
+        <div class="hero-brand">
+          <img src="logo.png" alt="Friska">
+          <div class="hero-user">
+            <div class="hu-name" id="heroName">—</div>
+            <div class="hu-meta" id="heroMeta">Weekly Meal Selection</div>
+          </div>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">Log out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabbar" id="tabbar" style="display:none;"></div>
+
+  <!-- ---- HOME LAUNCHER ---- -->
+  <div id="tab-home" class="tabpanel">
+    <div class="home-wrap wrapper">
+      <div class="home-greet">
+        <h3>What would you like to do?</h3>
+        <p>Pick an option below.</p>
+      </div>
+      <div class="home-grid" id="homeGrid"></div>
+    </div>
+  </div>
+
+  <!-- ---- TAB: MENU ---- -->
+  <div id="tab-menu" class="tabpanel" style="display:none;">
+    <div class="content wrapper">
+      <div id="menuBody"></div>
+    </div>
+  </div>
+
+  <!-- ---- TAB: PAST SELECTIONS ---- -->
+  <div id="tab-past" class="tabpanel" style="display:none;">
+    <div class="frame-wrap wrapper">
+      <iframe id="pastFrame" class="tab-frame" title="Past Selections"></iframe>
+    </div>
+  </div>
+
+  <!-- ---- TAB: CHECK USAGE ---- -->
+  <div id="tab-usage" class="tabpanel" style="display:none;">
+    <div class="content wrapper">
+      <div id="usageBody"></div>
+    </div>
+  </div>
+
+  <!-- ---- TAB: ORDER STATUS ---- -->
+  <div id="tab-status" class="tabpanel" style="display:none;">
+    <div class="content wrapper">
+      <div id="statusBody"></div>
+    </div>
+  </div>
+
+  <!-- ---- TAB: FEEDBACK ---- -->
+  <div id="tab-feedback" class="tabpanel" style="display:none;">
+    <div class="content wrapper">
+      <div class="box" id="feedbackBox">
+
+        <div class="login-title" style="text-align:left;">Send us feedback</div>
+        <div class="login-sub" style="text-align:left; margin-bottom:16px;">
+          Tell us what went well or what we should fix.
+        </div>
+
+        <label>Type of feedback</label>
+        <select id="fbType" onchange="onFeedbackTypeChange()">
+          <option value="">Select a type…</option>
+        </select>
+
+        <label style="margin-top:16px;">Your feedback</label>
+        <textarea id="fbMessage" placeholder="Describe the issue or share your thoughts…"
+                  oninput="clearFeedbackMsg()"></textarea>
+        <div class="fb-note" id="fbNote">Choose a type and we will send it to the right team.</div>
+
+        <div class="fb-msg" id="fbMsg"></div>
+
+        <button class="btn" id="fbSubmitBtn" onclick="submitFeedback(event)">Submit Feedback</button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ---- TAB: ORDER ---- -->
+  <div id="tab-order" class="tabpanel">
+  <div class="content wrapper">
+
+<div class="box">
+  <label>Client Name</label>
+  <input type="text" id="clientName" readonly>
+
+  <label>Type</label>
+  <input type="text" id="clientType" readonly>
+
+  <label>Remarks</label>
+  <input type="text" id="clientRemarks" readonly
+         oninput="onRemarkInput(this.value)">
+  <div style="display:flex; gap:16px; margin-top:8px; align-items:center;">
+    <label style="display:flex; align-items:center; gap:6px; font-size:13px; margin:0; cursor:pointer;">
+      <input type="checkbox" id="rmDay" onchange="toggleRemarkMode('day', this)"> This Day Remark
+    </label>
+    <label style="display:flex; align-items:center; gap:6px; font-size:13px; margin:0; cursor:pointer;">
+      <input type="checkbox" id="rmPerm" onchange="toggleRemarkMode('permanent', this)"> Permanent Change
+    </label>
+  </div>
+</div>
+
+<div class="box" id="presetBox">
+
+  <details>
+    <summary style="font-weight:600; cursor:pointer;">Presets</summary>
+
+    <div class="preset-grid">
+
+      <label style="gap:8px;">
+        <select onchange="setOptionPreset('option1', this.value)"
+                style="padding:6px 10px; border-radius:8px; border:1.5px solid #e2e7f1; background:#fbfcfe; font-family:inherit;">
+          <option value="">—</option>
+          <option value="chicken">Chicken</option>
+          <option value="veg">Veg</option>
+          <option value="seafood">Seafood</option>
+          <option value="egg">Egg</option>
+        </select>
+        &nbsp;Option 1 Everyday
+      </label>
+
+      <label style="gap:8px;">
+        <select onchange="setOptionPreset('option2', this.value)"
+                style="padding:6px 10px; border-radius:8px; border:1.5px solid #e2e7f1; background:#fbfcfe; font-family:inherit;">
+          <option value="">—</option>
+          <option value="chicken">Chicken</option>
+          <option value="veg">Veg</option>
+          <option value="seafood">Seafood</option>
+          <option value="egg">Egg</option>
+        </select>
+        &nbsp;Option 2 Everyday
+      </label>
+
+      <label><input type="checkbox" onchange="togglePreset('juice','j1',this)"> Juice 1 Everyday</label>
+      <label><input type="checkbox" onchange="togglePreset('juice','j2',this)"> Juice 2 Everyday</label>
+
+      <label><input type="checkbox" onchange="togglePreset('breakfast','veg',this)"> Veg Breakfast Everyday</label>
+      <label><input type="checkbox" onchange="togglePreset('breakfast','breakfast',this)"> Breakfast Everyday (Egg)</label>
+      <label><input type="checkbox" onchange="togglePreset('meals','egg',this)"> One Egg Meal Everyday</label>
+      <label><input type="checkbox" onchange="togglePreset('snack','all',this)"> Snack Everyday</label>
+      <label><input type="checkbox" onchange="togglePreset('snack','veg',this)"> Veg Snack Everyday</label>
+
+    </div>
+
+  </details>
+
+</div>
+
+<div id="dayContainer"></div>
+</div>
+
+<div class="nav-row">
+  <button id="backBtn" class="btn secondary" onclick="prevDay()">Back</button>
+  <button id="nextBtn" class="btn secondary" onclick="nextDay(event)">Next Day</button>
+</div>
+  
+<button class="btn submit" onclick="handleSubmit(event)">Submit & Exit</button>
+  </div><!-- /tab-order -->
+
+</div><!-- /appShell -->
+</div><!-- /app -->
+
+<div id="bootSplash">
+  <div style="text-align:center;">
+    <img src="logo.png" alt="Friska" style="max-width:130px; height:auto; margin-bottom:18px;">
+    <div class="spinner" style="margin:0 auto;"></div>
+  </div>
+</div>
+
+<script>
+
+let CLIENT_LOCATION_1 = '';
+let CLIENT_LOCATION_2 = '';
+let CLIENT_DELIVERY = {};
+let MASTER_REMARK = '';
+let SLOT_DEFAULTS = null;   // {"Morning":"loc","Afternoon":"loc",...} or null
+/* ========= CONFIG ========= */
+const ADMIN_MODE = false;              // admin repo = true, client repo = false
+const CUTOFF_HOUR = 0;                // cutoff time (only used when cutoff is active)
+const CUTOFF_ENABLED = !ADMIN_MODE;   // admin = no cutoff, client = cutoff on
+
+let MASTER_CLIENTS = [];              // admin name search cache
+
+let MENU = {};
+let DATES = [];
+let VISIBLE_DATES = [];
+let STATE = {};
+let currentIndex = 0;
+
+/* ========= AUTH ========= */
+const AUTH_KEY = 'friska_auth_v1';
+let AUTH_NEEDS_SETUP = false;
+let AUTH_CLIENT_NAME = '';
+
+/* where password-reset requests go */
+const SUPPORT_WA = '918400964170';
+
+function $id(id){ return document.getElementById(id); }
+
+function authError(msg){
+  const el = $id('authError');
+  el.textContent = msg || '';
+  el.style.display = msg ? 'block' : 'none';
+}
+
+function saveAuth(phone, token){
+  try { localStorage.setItem(AUTH_KEY, JSON.stringify({ phone, token })); } catch(e){}
+}
+function clearAuth(){
+  try { localStorage.removeItem(AUTH_KEY); } catch(e){}
+}
+function readAuth(){
+  try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch(e){ return null; }
+}
+
+function togglePw(id, btn){
+  const el = $id(id);
+  const show = el.type === 'password';
+  el.type = show ? 'text' : 'password';
+  btn.textContent = show ? 'Hide' : 'Show';
+}
+
+async function apiPost(action, fields){
+  const p = new URLSearchParams();
+  p.append("action", action);
+  Object.keys(fields || {}).forEach(k => p.append(k, fields[k]));
+
+  const res = await fetch(API_URL, { method: "POST", body: p });
+  const text = await res.text();
+
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    // Apps Script returned HTML (sign-in page / error page) rather than JSON
+    const head = String(text || '').replace(/\s+/g, ' ').slice(0, 120);
+    throw new Error('Server did not return JSON (HTTP ' + res.status + '): ' + head);
+  }
+}
+
+/* ---- step 1: phone ---- */
+async function authContinue(ev){
+  authError('');
+  const btn = $id('authContinueBtn');
+  const phone = $id('phone').value.trim();
+
+  if (!phone) return authError('Enter your phone number.');
+
+  btn.classList.add("loading");
+
+  try {
+    // admin repo: no password, straight in
+    if (ADMIN_MODE) {
+      const d = await apiPost("getClient", { phone });
+      btn.classList.remove("loading");
+      if (!d || !d.client || !d.client.found) return authError('Client not found.');
+      if (d.client.status === 'inactive') {
+        $id('inactiveModal').style.display = 'flex';
+        return;
+      }
+      await bootClient(d.client, d.menu, phone);
+      return;
+    }
+
+    const r = await apiPost("authCheck", { phone });
+    btn.classList.remove("loading");
+
+    if (!r || !r.ok || !r.found) return authError('No account found for that number. Please contact Friska Wellness.');
+    if (r.status === 'inactive') { $id('inactiveModal').style.display = 'flex'; return; }
+
+    AUTH_NEEDS_SETUP = !!r.needsSetup;
+    AUTH_CLIENT_NAME = r.clientName || '';
+    showAuthStep2(AUTH_CLIENT_NAME);
+
+  } catch (e) {
+    btn.classList.remove("loading");
+    authError('Network error. Please try again.');
+  }
+}
+
+function showAuthStep2(name){
+  $id('authStep1').style.display = 'none';
+  $id('authStep2').style.display = 'block';
+
+  const first = String(name || '').trim().split(/\s+/)[0] || '';
+
+  if (AUTH_NEEDS_SETUP) {
+    $id('authTitle').textContent = first ? ('Welcome, ' + first) : 'Welcome';
+    $id('authSub').textContent = 'Create a password for your account. You will use it to sign in from now on.';
+    $id('pwLabel').textContent = 'Create Password';
+    $id('pwHint').style.display = 'block';
+    $id('confirmWrap').style.display = 'block';
+    $id('authSubmitBtn').textContent = 'Create Password & Continue';
+    $id('password').setAttribute('autocomplete', 'new-password');
+    $id('forgotLine').style.display = 'none';
+  } else {
+    $id('authTitle').textContent = first ? ('Welcome back, ' + first) : 'Welcome back';
+    $id('authSub').textContent = 'Enter your password to continue.';
+    $id('pwLabel').textContent = 'Password';
+    $id('pwHint').style.display = 'none';
+    $id('confirmWrap').style.display = 'none';
+    $id('authSubmitBtn').textContent = 'Sign In';
+    $id('password').setAttribute('autocomplete', 'current-password');
+    $id('forgotLine').style.display = 'block';
+  }
+
+  $id('password').value = '';
+  $id('password2').value = '';
+  setTimeout(() => $id('password').focus(), 60);
+}
+
+function authBack(){
+  authError('');
+  AUTH_NEEDS_SETUP = false;
+  $id('password').value = '';
+  $id('password2').value = '';
+  $id('authStep2').style.display = 'none';
+  $id('authStep1').style.display = 'block';
+  setTimeout(() => $id('phone').focus(), 60);
+}
+
+/* ---- step 2: password ---- */
+async function authSubmit(ev){
+  authError('');
+  const btn = $id('authSubmitBtn');
+  const phone = $id('phone').value.trim();
+  const pw  = $id('password').value;
+  const pw2 = $id('password2').value;
+
+  if (AUTH_NEEDS_SETUP) {
+    if (pw.length < 8) return authError('Password must be at least 8 characters.');
+    if (pw !== pw2)    return authError('The two passwords do not match.');
+  } else {
+    if (!pw) return authError('Enter your password.');
+  }
+
+  btn.classList.add("loading");
+
+  try {
+    const r = AUTH_NEEDS_SETUP
+      ? await apiPost("authSetPassword", { phone, password: pw })
+      : await apiPost("authLogin",       { phone, password: pw });
+
+    btn.classList.remove("loading");
+
+    if (!r || !r.ok) {
+      if (r && r.inactive) { $id('inactiveModal').style.display = 'flex'; return; }
+      if (r && r.needsSetup) { AUTH_NEEDS_SETUP = true; showAuthStep2(''); return authError('Please create a password first.'); }
+      if (r && /password/i.test(String(r.message || ''))) {
+        const fl = $id('forgotLine');
+        if (fl) fl.style.display = 'block';
+      }
+      return authError((r && r.message) || 'Sign in failed.');
+    }
+
+    saveAuth(phone, r.token);
+    $id('password').value = '';
+    $id('password2').value = '';
+    await bootClient(r.client, r.menu, phone);
+
+  } catch (e) {
+    btn.classList.remove("loading");
+    authError('Network error. Please try again.');
+  }
+}
+
+/* ---- silent re-login on this device ---- */
+function showSplash(on){
+  const el = $id('bootSplash');
+  if (el) el.style.display = on ? 'flex' : 'none';
+}
+
+let AUTO_LOGIN_ERROR = '';
+
+async function tryAutoLogin(){
+  AUTO_LOGIN_ERROR = '';
+
+  if (ADMIN_MODE) return false;
+
+  const a = readAuth();
+  if (!a || !a.phone || !a.token) return false;
+
+  let r;
+  try {
+    r = await apiPost("authToken", { phone: a.phone, token: a.token });
+  } catch (e) {
+    // network / non-JSON response: keep the saved session, it may work next time
+    AUTO_LOGIN_ERROR = e.message || String(e);
+    console.warn('auto-login transport error:', e);
+    return false;
+  }
+
+  // Old deployment: doPost falls through to {success:false} with no "ok" field.
+  if (!r || typeof r.ok === 'undefined') {
+    AUTO_LOGIN_ERROR = 'Backend did not recognise "authToken" — code.gs needs to be redeployed (Deploy > Manage deployments > Edit > New version).';
+    console.warn('auto-login:', AUTO_LOGIN_ERROR, r);
+    return false;   // do NOT clear the token: the backend is stale, not the session
+  }
+
+  if (r.ok !== true) {
+    // server explicitly rejected the token (expired, password changed, inactive)
+    AUTO_LOGIN_ERROR = r.inactive ? 'Account is inactive.' : 'Saved session expired — please sign in again.';
+    clearAuth();
+    return false;
+  }
+
+  try {
+    $id('phone').value = a.phone;
+    saveAuth(a.phone, r.token);        // roll the token forward
+    await bootClient(r.client, r.menu, a.phone);
+    return true;
+  } catch (e) {
+    AUTO_LOGIN_ERROR = 'Signed in, but the page failed to load: ' + (e.message || e);
+    console.error('auto-login boot error:', e);
+    return false;
+  }
+}
+
+function doLogout(){
+  clearAuth();
+  location.href = location.pathname;   // drop any query string, fresh start
+}
+
+// keep tabs on the same device in sync: signing out in one signs out the rest
+window.addEventListener('storage', function(ev){
+  if (ev.key !== AUTH_KEY) return;
+  if (!ev.newValue && $id('appShell') && $id('appShell').style.display !== 'none') {
+    location.href = location.pathname;
+  }
+});
+
+function openForgotModal(){
+
+  const phone = ($id('phone') || {}).value.trim();
+  const name  = AUTH_CLIENT_NAME || '';
+
+  const text =
+    'Friska Wellness \u2014 Password Reset Request\n' +
+    'Name: ' + (name || '(not provided)') + '\n' +
+    'Phone: ' + phone + '\n' +
+    'Issue: Forgot password\n\n' +
+    'Please reset my password so I can sign in again.';
+
+  // set as a real link href so the browser never blocks it as a popup
+  const link = $id('forgotWaBtn');
+  if (link) link.href = 'https://wa.me/' + SUPPORT_WA + '?text=' + encodeURIComponent(text);
+
+  const who = $id('forgotWho');
+  if (who) who.textContent = name ? (name + ' \u00b7 ' + phone) : phone;
+
+  $id('forgotModal').style.display = 'flex';
+}
+
+/* best-effort log so you have a record even if the client never presses send */
+function logResetRequest(){
+  try {
+    const p = new URLSearchParams();
+    p.append('action', 'submitFeedback');
+    p.append('payload', JSON.stringify({
+      phone: ($id('phone') || {}).value.trim(),
+      name: AUTH_CLIENT_NAME || '',
+      type: 'Forgot Password',
+      message: 'Client requested a password reset from the sign-in screen.',
+      sentTo: SUPPORT_WA
+    }));
+    fetch(API_URL, { method: 'POST', body: p }).catch(()=>{});
+  } catch (e) {}
+
+  closeForgotModal();
+  authError('Reset requested. We will clear your password shortly \u2014 then sign in and create a new one.');
+}
+
+function closeForgotModal(){
+  const m = $id('forgotModal');
+  if (m) m.style.display = 'none';
+}
+
+/* ========= BOOT CLIENT INTO THE APP ========= */
+async function bootClient(client, menu, phone){
+
+  $id('phone').value = phone;
+
+  clientName.value = client.clientName || '';
+  const originalType = client.mealType || '';
+
+  const cleanedType = originalType
+    .replace(/\d+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  clientType.value = cleanedType;
+
+  clientRemarks.value = client.remarks || '';
+  MASTER_REMARK = client.remarks || '';
+  clientRemarks.readOnly = true;   // locked until a checkbox is ticked
+
+  // store original for backend
+  clientType.dataset.original = originalType;
+
+  CLIENT_LOCATION_1 = client.location1 || '';
+  CLIENT_LOCATION_2 = client.location2 || '';
+  CLIENT_DELIVERY = client.delivery || {};
+  SLOT_DEFAULTS = client.slotDefaults || null;
+
+  // menu comes back with the auth payload; fall back to a direct fetch
+  if (menu && Object.keys(menu).length) {
+    MENU = menu;
+  } else {
+    const menuRes = await fetch(`${API_URL}?action=getGlideMenu&t=${Date.now()}`, { cache: "no-store" });
+    MENU = await menuRes.json() || {};
+  }
+
+  DATES = Object.keys(MENU).sort();
+  applyCutoff();
+
+  showApp(client.clientName || '', cleanedType);
+
+  // Multi-slot + 2-location client with no saved defaults → force setup popup
+  const _slots = (CLIENT_DELIVERY.morning?1:0) + (CLIENT_DELIVERY.afternoon?1:0) + (CLIENT_DELIVERY.evening?1:0);
+  const _twoLocs = !!(CLIENT_LOCATION_1 && CLIENT_LOCATION_2);
+  if (_slots > 1 && _twoLocs && !SLOT_DEFAULTS) {
+    openDefaultsPopup();
+    return;   // popup will call finishLogin() after save
+  }
+
+  initState();
+  await restorePastSelections(phone);
+  renderCurrentDay();
+}
+
+/* ========= APP SHELL + TABS ========= */
+/* ========= NAVIGATION =========
+   Add a new section by adding one entry here and one <div id="tab-<id>">
+   panel in the markup. Set soon:true to show it greyed out as "coming soon". */
+const NAV_ITEMS = [
+  { id: 'order', label: 'Order',            icon: '🍱', desc: 'Choose your meals for the week' },
+  { id: 'menu',  label: 'Menu at Glance',   icon: '📋', desc: "See what's cooking each day" },
+  { id: 'past',  label: 'Past Selections',  icon: '🗂️', desc: 'Review your earlier orders' },
+  { id: 'status',   label: 'Order Status', icon: '🚚', desc: "Track today's delivery" },
+  { id: 'usage',    label: 'Check Usage',   icon: '📊', desc: 'Days left in your plan' },
+  { id: 'feedback', label: 'Feedback',     icon: '💬', desc: 'Tell us how we did' }
+];
+
+/* Feedback routing — each type goes to its own WhatsApp number (91 = India) */
+const FEEDBACK_TYPES = [
+  { id: 'food',     label: 'Food Related',     phone: '918688207049' },
+  { id: 'delivery', label: 'Delivery Related', phone: '919390097670' },
+  { id: 'other',    label: 'Any Other',        phone: '919390097670' }
+];
+
+function showApp(name, type){
+  $id('loginScreen').style.display = 'none';
+  $id('appShell').style.display = 'block';
+  $id('heroName').textContent = name || 'Welcome';
+  $id('heroMeta').textContent = type || 'Weekly Meal Selection';
+  renderNav();
+  showTab('home');
+  window.scrollTo(0, 0);
+}
+
+/* builds both the home cards and the top tab bar from NAV_ITEMS */
+function renderNav(){
+
+  const grid = $id('homeGrid');
+  if (grid) {
+    grid.innerHTML = NAV_ITEMS.map(it => {
+      const cls = 'home-card' + (it.soon ? ' soon' : '');
+      const click = it.soon ? '' : ' onclick="showTab(\'' + it.id + '\')"';
+      return '' +
+        '<button class="' + cls + '" type="button"' + click + '>' +
+          '<span class="hc-icon">' + it.icon + '</span>' +
+          '<span class="hc-title">' + esc(it.label) + '</span>' +
+          '<span class="hc-desc">' + esc(it.desc || '') + '</span>' +
+          (it.soon ? '<span class="hc-soon">Coming soon</span>' : '') +
+        '</button>';
+    }).join('');
+  }
+
+  const bar = $id('tabbar');
+  if (bar) {
+    bar.innerHTML =
+      '<button class="home-chip" type="button" title="Home" onclick="showTab(\'home\')">⌂</button>' +
+      NAV_ITEMS.filter(it => !it.soon).map(it =>
+        '<button type="button" id="tabbtn-' + it.id + '" onclick="showTab(\'' + it.id + '\')">' +
+          esc(it.label) +
+        '</button>'
+      ).join('');
+  }
+}
+
+function showTab(name){
+
+  const ids = ['home'].concat(NAV_ITEMS.map(it => it.id));
+
+  ids.forEach(t => {
+    const panel = $id('tab-' + t);
+    const btn   = $id('tabbtn-' + t);
+    if (panel) panel.style.display = (t === name) ? 'block' : 'none';
+    if (btn) btn.classList.toggle('active', t === name);
+  });
+
+  // the launcher shows the options as cards, so the tab bar is hidden there
+  const bar = $id('tabbar');
+  if (bar) bar.style.display = (name === 'home') ? 'none' : 'flex';
+
+  if (name === 'menu') renderMenuTab();
+
+  if (name === 'feedback') resetFeedbackForm();
+
+  if (name === 'status') loadClientStatus();
+
+  if (name === 'usage') loadClientUsage();
+
+  if (name === 'past') {
+    // always reload — the client may have just submitted
+    const f = $id('pastFrame');
+    const ph = $id('phone').value.trim();
+    if (f && ph) f.src = 'orders.html?phone=' + encodeURIComponent(ph);
+  }
+
+  window.scrollTo(0, 0);
+}
+
+/* ========= CHECK USAGE ========= */
+
+function prettyDate(ymd){
+  if (!ymd) return '';
+  const p = String(ymd).split('-');
+  if (p.length !== 3) return ymd;
+  const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+  return String(d.getDate()).padStart(2,'0') + ' ' +
+         d.toLocaleDateString('en-US',{ month:'short' }) + ' ' + d.getFullYear();
+}
+
+async function loadClientUsage(){
+
+  const host = $id('usageBody');
+  if (!host) return;
+
+  const phone = ($id('phone') || {}).value.trim();
+  if (!phone) { host.innerHTML = '<div class="box st-pending">Please sign in again.</div>'; return; }
+
+  host.innerHTML = '<div class="box st-pending">Checking your plan\u2026</div>';
+
+  let d;
+  try {
+    d = await apiPost('getClientUsageSummary', { phone: phone });
+  } catch (e) {
+    host.innerHTML =
+      '<div class="box st-pending">Could not load your plan usage.<br>' +
+      '<span style="font-size:12px;opacity:.75;">' + esc(e.message || e) + '</span></div>';
+    return;
+  }
+
+  if (!d || !d.ok) {
+    host.innerHTML =
+      '<div class="box st-pending">Could not load your plan usage.' +
+      (d && d.message ? '<br><span style="font-size:12px;opacity:.75;">' + esc(d.message) + '</span>' : '') +
+      '</div>';
+    return;
+  }
+
+  if (!d.hasBill) {
+    host.innerHTML =
+      '<div class="box st-pending" style="padding:26px 14px;">' +
+        '<div style="font-size:34px; margin-bottom:8px;">\u{1F9FE}</div>' +
+        'We could not find an active plan for your number.<br>' +
+        'Please contact Friska Wellness if this looks wrong.' +
+      '</div>';
+    return;
+  }
+
+  if (!d.end) {
+    host.innerHTML =
+      '<div class="box st-pending" style="padding:26px 14px;">' +
+        '<div style="font-size:34px; margin-bottom:8px;">\u{1F9FE}</div>' +
+        'Your latest plan has no end date recorded, so we cannot work out the days left.<br>' +
+        'Please contact Friska Wellness.' +
+      '</div>';
+    return;
+  }
+
+  const opted = d.optedDays || 0;
+  const used  = d.usedDays || 0;
+  const left  = d.daysLeft || 0;
+  const pct   = opted > 0 ? Math.min(100, Math.round((used / opted) * 100)) : 0;
+
+  const hero = d.complete
+    ? '<div class="us-big done">Plan finished</div>' +
+      '<div class="us-cap">Time to renew</div>'
+    : '<div class="us-big">' + left + '</div>' +
+      '<div class="us-cap">' + (left === 1 ? 'day left' : 'days left') + '</div>';
+
+  let note = '';
+  if (d.complete) {
+    note = '<div class="us-note end">You have used all ' + opted + ' days of this plan' +
+           (d.completionDate ? ', finishing on <b>' + esc(prettyDate(d.completionDate)) + '</b>' : '') +
+           '. Please renew to continue your meals.</div>';
+  } else if (left <= 3) {
+    note = '<div class="us-note warn">Only ' + left + ' ' + (left === 1 ? 'day' : 'days') +
+           ' remaining. Please renew soon so your meals continue without a break.</div>';
+  } else {
+    note = '<div class="us-note ok">Your plan is running. Paused days are not lost \u2014 ' +
+           'they simply extend your cycle.</div>';
+  }
+
+  let rows = '';
+  if (d.plan)  rows += '<div class="us-kv"><span class="k">Plan</span><span class="v">' + esc(d.plan) + '</span></div>';
+  rows += '<div class="us-kv"><span class="k">Cycle started</span><span class="v">' + esc(prettyDate(d.start)) + '</span></div>';
+  rows += '<div class="us-kv"><span class="k">Days used</span><span class="v">' + used + ' of ' + opted + '</span></div>';
+  if (d.pausedDays > 0)
+    rows += '<div class="us-kv"><span class="k">Days paused</span><span class="v">' + d.pausedDays + '</span></div>';
+  if (d.lastActive)
+    rows += '<div class="us-kv"><span class="k">Last delivery</span><span class="v">' + esc(prettyDate(d.lastActive)) + '</span></div>';
+
+  host.innerHTML =
+    '<div class="box">' +
+      '<div class="us-hero">' + hero + '</div>' +
+      '<div class="us-bar"><div class="us-fill" style="width:' + pct + '%;"></div></div>' +
+      '<div class="us-bar-lab"><span>' + used + ' used</span><span>' + opted + ' total</span></div>' +
+      note +
+    '</div>' +
+    '<div class="box">' + rows + '</div>' +
+    '<button class="btn secondary" onclick="loadClientUsage()">Refresh</button>';
+}
+
+/* ========= ORDER STATUS ========= */
+
+const STATUS_META = {
+  'Cooking':    { icon: '\u{1F373}', label: 'Cooking' },
+  'Packaging':  { icon: '\u{1F4E6}', label: 'Packing' },
+  'Dispatched': { icon: '\u{1F6F5}', label: 'On the way' }
+};
+
+async function loadClientStatus(){
+
+  const host = $id('statusBody');
+  if (!host) return;
+
+  const phone = ($id('phone') || {}).value.trim();
+  if (!phone) { host.innerHTML = '<div class="box st-pending">Please sign in again.</div>'; return; }
+
+  host.innerHTML = '<div class="box st-pending">Checking your order\u2026</div>';
+
+  let data;
+  try {
+    data = await apiPost('getClientStatus', { phone: phone, date: todayStr() });
+  } catch (e) {
+    host.innerHTML =
+      '<div class="box st-pending">Could not load your order status.<br>' +
+      '<span style="font-size:12px;opacity:.75;">' + esc(e.message || e) + '</span></div>';
+    return;
+  }
+
+  if (!data || !data.ok) {
+    host.innerHTML = '<div class="box st-pending">Could not load your order status.</div>';
+    return;
+  }
+
+  if (!data.entries || !data.entries.length) {
+    host.innerHTML =
+      '<div class="box st-pending" style="padding:26px 14px;">' +
+        '<div style="font-size:34px; margin-bottom:8px;">\u{1F4C5}</div>' +
+        'You have no delivery scheduled for today.' +
+      '</div>';
+    return;
+  }
+
+  const steps = data.steps || ['Cooking','Packaging','Dispatched'];
+
+  host.innerHTML = data.entries.map(en => {
+
+    const head =
+      '<div class="st-head">' +
+        '<div class="st-slot">' + esc(en.meal || en.slot || 'Delivery') +
+          (en.slot ? ' <span class="st-slotname">' + esc(en.slot) + '</span>' : '') +
+        '</div>' +
+        (en.location ? '<div class="st-loc">' + esc(en.location) + '</div>' : '') +
+      '</div>';
+
+    /* the slot's window has closed for today */
+    if (en.expired) {
+      return '<div class="box st-card">' + head +
+               '<div class="st-closed">' +
+                 '<div class="st-closed-ic">\u{1F319}</div>' +
+                 '<div>Today\u2019s ' + esc((en.meal || en.slot || '').toLowerCase()) +
+                 ' service is done.<br>Waiting for the kitchen to open tomorrow.</div>' +
+               '</div>' +
+             '</div>';
+    }
+
+    const idx = steps.indexOf(en.status);   // -1 = not started yet
+
+    const stepper = steps.map((s, i) => {
+      const meta = STATUS_META[s] || { icon: '\u2022', label: s };
+      let cls = 'step';
+      if (idx >= 0 && i < idx) cls += ' done';
+      if (idx >= 0 && i === idx) cls += ' current';
+      return '<div class="' + cls + '">' +
+               '<div class="sdot">' + meta.icon + '</div>' +
+               '<div class="slabel">' + esc(meta.label) + '</div>' +
+             '</div>';
+    }).join('');
+
+    let foot = '';
+    if (idx < 0) {
+      foot = '<div class="st-foot" style="text-align:center;">' +
+               'Your order is confirmed. We will update this as soon as cooking begins.' +
+             '</div>';
+    } else {
+      const t = en.updated ? String(en.updated).slice(11, 16) : '';
+      let line = esc((STATUS_META[en.status] || {}).label || en.status);
+      if (en.status === 'Dispatched') line = 'On the way to you';
+      foot = '<div class="st-foot" style="text-align:center;">' +
+               line + (t ? ' \u00b7 updated at ' + esc(t) : '') +
+             '</div>';
+    }
+
+    let agent = '';
+    if (en.agentPhone) {
+
+      const myName = ($id('clientName') || {}).value || '';
+      let ask = 'Hi, this is ' + myName + ' from Friska Wellness.\n' +
+                'How long will it take you to reach my location?';
+      if (en.location) ask += '\n\nLocation: ' + en.location;
+      if (en.mapLink)  ask += '\n' + en.mapLink;
+
+      const waHref = 'https://wa.me/91' + en.agentPhone + '?text=' + encodeURIComponent(ask);
+
+      agent =
+        '<div class="st-agent">' +
+          '<div>' +
+            '<div class="aname">' + esc(en.agentName || 'Delivery partner') + '</div>' +
+            '<div class="arole">Delivering your ' + esc((en.meal || '').toLowerCase() || 'order') + '</div>' +
+          '</div>' +
+          '<div class="aacts">' +
+            '<a class="st-wa" href="' + waHref + '" target="_blank" rel="noopener">WhatsApp</a>' +
+            '<a class="st-call" href="tel:' + esc(en.agentPhone) + '">Call</a>' +
+          '</div>' +
+        '</div>';
+    }
+
+    return '<div class="box st-card">' + head +
+             '<div class="stepper">' + stepper + '</div>' +
+             foot + agent +
+           '</div>';
+
+  }).join('') +
+  '<button class="btn secondary" onclick="loadClientStatus()">Refresh</button>';
+}
+
+/* ========= FEEDBACK ========= */
+
+function feedbackTypeById(id){
+  return FEEDBACK_TYPES.find(t => t.id === id) || null;
+}
+
+function resetFeedbackForm(){
+
+  const box = $id('feedbackBox');
+  if (!box) return;
+
+  // the form is replaced by a confirmation panel after sending — rebuild it on re-entry
+  if (box.dataset.sent === '1') {
+    location.hash = '';
+    box.dataset.sent = '';
+    buildFeedbackForm();
+    return;
+  }
+
+  const sel = $id('fbType');
+  if (sel && sel.options.length <= 1) {
+    sel.innerHTML = '<option value="">Select a type…</option>' +
+      FEEDBACK_TYPES.map(t => '<option value="' + t.id + '">' + esc(t.label) + '</option>').join('');
+  }
+
+  clearFeedbackMsg();
+}
+
+function buildFeedbackForm(){
+
+  const box = $id('feedbackBox');
+  if (!box) return;
+
+  box.innerHTML =
+    '<div class="login-title" style="text-align:left;">Send us feedback</div>' +
+    '<div class="login-sub" style="text-align:left; margin-bottom:16px;">' +
+      'Tell us what went well or what we should fix.' +
+    '</div>' +
+    '<label>Type of feedback</label>' +
+    '<select id="fbType" onchange="onFeedbackTypeChange()">' +
+      '<option value="">Select a type…</option>' +
+      FEEDBACK_TYPES.map(t => '<option value="' + t.id + '">' + esc(t.label) + '</option>').join('') +
+    '</select>' +
+    '<label style="margin-top:16px;">Your feedback</label>' +
+    '<textarea id="fbMessage" placeholder="Describe the issue or share your thoughts…" oninput="clearFeedbackMsg()"></textarea>' +
+    '<div class="fb-note" id="fbNote">Choose a type and we will send it to the right team.</div>' +
+    '<div class="fb-msg" id="fbMsg"></div>' +
+    '<button class="btn" id="fbSubmitBtn" onclick="submitFeedback(event)">Submit Feedback</button>';
+}
+
+function onFeedbackTypeChange(){
+  clearFeedbackMsg();
+  const t = feedbackTypeById(($id('fbType') || {}).value);
+  const note = $id('fbNote');
+  if (!note) return;
+  note.textContent = t
+    ? 'This goes to our ' + t.label.replace(/ Related$/, '').toLowerCase() + ' team on WhatsApp.'
+    : 'Choose a type and we will send it to the right team.';
+}
+
+function clearFeedbackMsg(){
+  const m = $id('fbMsg');
+  if (m) { m.textContent = ''; m.className = 'fb-msg'; }
+}
+
+function feedbackMsg(text, kind){
+  const m = $id('fbMsg');
+  if (!m) return;
+  m.textContent = text;
+  m.className = 'fb-msg ' + (kind || 'err');
+}
+
+function buildFeedbackText(typeLabel, message){
+  const name = ($id('clientName') || {}).value || '';
+  const phone = ($id('phone') || {}).value || '';
+  return 'Friska Wellness — Client Feedback\n' +
+         'Name: ' + name + '\n' +
+         'Phone: ' + phone + '\n' +
+         'Date: ' + todayStr() + '\n' +
+         'Type: ' + typeLabel + '\n\n' +
+         message;
+}
+
+async function submitFeedback(ev){
+
+  clearFeedbackMsg();
+
+  const sel = $id('fbType');
+  const ta  = $id('fbMessage');
+  const btn = $id('fbSubmitBtn');
+
+  const type = feedbackTypeById(sel ? sel.value : '');
+  const message = (ta ? ta.value : '').trim();
+
+  if (!type)    return feedbackMsg('Please choose a type of feedback.');
+  if (!message) return feedbackMsg('Please write your feedback before submitting.');
+
+  const phone = ($id('phone') || {}).value.trim();
+  const name  = ($id('clientName') || {}).value || '';
+  const text  = buildFeedbackText(type.label, message);
+  const waUrl = 'https://wa.me/' + type.phone + '?text=' + encodeURIComponent(text);
+
+  if (btn) btn.classList.add('loading');
+
+  let saved = false, saveErr = '';
+  try {
+    const p = new URLSearchParams();
+    p.append('action', 'submitFeedback');
+    p.append('payload', JSON.stringify({
+      phone: phone,
+      name: name,
+      type: type.label,
+      message: message,
+      sentTo: type.phone
+    }));
+
+    const res = await fetch(API_URL, { method: 'POST', body: p });
+    const txt = await res.text();
+
+    let r = null;
+    try { r = JSON.parse(txt); } catch (e) { r = null; }
+
+    if (r && r.ok) saved = true;
+    else saveErr = (r && r.message) ? r.message : 'could not be saved to our records';
+
+  } catch (e) {
+    saveErr = 'network error while saving';
+  }
+
+  if (btn) btn.classList.remove('loading');
+
+  // Try to open WhatsApp straight away. Browsers may block a popup opened after
+  // an await, so fall back to a button the client can tap.
+  let win = null;
+  try { win = window.open(waUrl, '_blank'); } catch (e) { win = null; }
+
+  showFeedbackDone(waUrl, saved, saveErr, !!win);
+}
+
+function showFeedbackDone(waUrl, saved, saveErr, opened){
+
+  const box = $id('feedbackBox');
+  if (!box) return;
+
+  box.dataset.sent = '1';
+
+  box.innerHTML =
+    '<div class="fb-done">' +
+      '<div class="fb-tick">✅</div>' +
+      '<h4>Thank you for your feedback</h4>' +
+      '<p>' +
+        (saved ? 'We have recorded it.' : 'We could not save it to our records (' + esc(saveErr) + '), but you can still send it on WhatsApp.') +
+        (opened ? ' WhatsApp should have opened in a new tab — press send there to deliver it.'
+                : ' Tap below to send it on WhatsApp.') +
+      '</p>' +
+      '<a class="wa-btn" href="' + waUrl + '" target="_blank" rel="noopener">Send on WhatsApp</a>' +
+      '<button class="btn secondary" style="margin-top:10px;" onclick="resetFeedbackForm()">Send another</button>' +
+    '</div>';
+}
+
+/* ========= WEEKLY MENU TAB (rendered from MENU, no extra request) ========= */
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* colour code the kind label: Chicken / Veg / Egg / Seafood, else neutral */
+function kindClass(kind){
+  const k = String(kind || '').toLowerCase();
+  if (k.indexOf('chicken') >= 0) return 'k-chicken';
+  if (k.indexOf('seafood') >= 0) return 'k-seafood';
+  if (k.indexOf('egg')     >= 0) return 'k-egg';
+  if (k.indexOf('veg')     >= 0) return 'k-veg';   // Veg, Veg Snack, Veg Breakfast
+  return '';
+}
+
+/* menu labels arrive as "Chicken: Grilled chicken" — split the kind off
+   and render it as a distinct heading badge before the dish name */
+function dishHTML(label){
+  const s = String(label == null ? '' : label);
+  const i = s.indexOf(':');
+
+  if (i < 0) return '<div class="menu-dish">' + esc(s) + '</div>';
+
+  const kind = s.slice(0, i).trim();
+  const dish = s.slice(i + 1).trim();
+
+  return '<div class="menu-dish">' +
+           '<span class="dish-kind ' + kindClass(kind) + '">' + esc(kind) + '</span>' +
+           esc(dish) +
+         '</div>';
+}
+
+function todayStr(){
+  const n = new Date();
+  return n.getFullYear() + '-' +
+    String(n.getMonth() + 1).padStart(2, '0') + '-' +
+    String(n.getDate()).padStart(2, '0');
+}
+
+function renderMenuTab(){
+
+  const host = $id('menuBody');
+  if (!host) return;
+
+  const dates = Object.keys(MENU || {}).sort();
+
+  if (!dates.length) {
+    host.innerHTML = '<div class="box" style="text-align:center; color:var(--muted); font-size:14px;">Menu is not available right now.</div>';
+    return;
+  }
+
+  const today = todayStr();
+
+  host.innerHTML = dates.map(date => {
+
+    const day = MENU[date] || {};
+    const dt  = new Date(date);
+
+    const dayName = dt.toLocaleDateString('en-US', { weekday: 'long' });
+    const nice =
+      String(dt.getDate()).padStart(2, '0') + '-' +
+      dt.toLocaleDateString('en-US', { month: 'short' }) + '-' +
+      dt.getFullYear();
+
+    const rows = [];
+
+    function row(tag, list, plain){
+      if (!list || !list.length) return;
+      rows.push(
+        '<div class="menu-row">' +
+          '<div class="menu-tag">' + esc(tag) + '</div>' +
+          '<div class="menu-items">' +
+            list.map(x => plain
+              ? '<div class="menu-dish">' + esc(x) + '</div>'
+              : dishHTML(x)).join('') +
+          '</div>' +
+        '</div>'
+      );
+    }
+
+    row('Breakfast', (day.breakfast || []).map(x => x.label));
+    row('Option 1',  (day.option1   || []).map(x => x.label));
+    row('Option 2',  (day.option2   || []).map(x => x.label));
+    row('Snack',     (day.snack     || []).map(x => x.label));
+    row('Juice 1',   (day.juice1    || []), true);
+    row('Juice 2',   (day.juice2    || []), true);
+
+    if (!rows.length) {
+      rows.push('<div class="menu-row"><div class="menu-items" style="color:var(--muted);">No menu published for this day.</div></div>');
+    }
+
+    return '' +
+      '<div class="box menu-day">' +
+        '<div class="menu-day-head">' +
+          '<div class="menu-day-name">' + esc(dayName) +
+            (date === today ? '<span class="menu-today">Today</span>' : '') +
+          '</div>' +
+          '<div class="menu-day-date">' + esc(nice) + '</div>' +
+        '</div>' +
+        rows.join('') +
+      '</div>';
+
+  }).join('');
+}
+
+function openMenu(){
+
+window.open("menu.html","_blank");
+
+}
+/* ========= CUTOFF ========= */
+function applyCutoff() {
+
+  if (!CUTOFF_ENABLED) {
+    VISIBLE_DATES = DATES.filter(d => MENU[d]);
+    currentIndex = 0;
+    return;
+  }
+
+  const now = new Date();
+  const today = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+
+  const todayStr =
+    today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+
+  const todayExists = DATES.includes(todayStr);
+
+  if (!todayExists) {
+    // Show only valid dates that exist in MENU
+    VISIBLE_DATES = DATES.filter(d => MENU[d]);
+    currentIndex = 0;
+    return;
+  }
+
+  let targetDate = new Date(today);
+  targetDate.setDate(today.getDate() + 1);
+
+  if (CUTOFF_HOUR > 0 && now.getHours() >= CUTOFF_HOUR) {
+    targetDate.setDate(targetDate.getDate() + 1);
+  }
+
+  const targetStr =
+    targetDate.getFullYear() + '-' +
+    String(targetDate.getMonth() + 1).padStart(2, '0') + '-' +
+    String(targetDate.getDate()).padStart(2, '0');
+
+  VISIBLE_DATES = DATES.filter(d => d >= targetStr && MENU[d]);
+
+  currentIndex = 0;
+}
+
+/* ========= STATE ========= */
+function initState(){
+  VISIBLE_DATES.forEach(date => {
+
+    STATE[date] = {
+      sections: {
+        breakfast: { items: {}, slot: 'Morning', location: '' },
+        option1:   { items: {}, slot: 'Afternoon', location: '', view: 'option1' },
+        option2:   { items: {}, slot: 'Evening', location: '', view: 'option2' },
+        snack:     { items: {}, slot: 'Afternoon', location: '' },
+        juice1:    { items: {}, slot: 'Afternoon', location: '' },
+        juice2:    { items: {}, slot: 'Evening', location: '' }
+      },
+      cancel: false,
+      remark: MASTER_REMARK,        // per-day remark, defaults to master
+      remarkMode: null              // null | 'day' | 'permanent'
+    };
+   // Default slots per client type (matches user spec)
+    const _d = CLIENT_DELIVERY || {};
+    const _n = (_d.morning?1:0) + (_d.afternoon?1:0) + (_d.evening?1:0);
+
+    // Breakfast + juice1 default: first slot the client has (morning if any)
+    const _morningSideSlot =
+      _d.morning ? 'Morning'
+      : _d.afternoon ? 'Afternoon'
+      : _d.evening ? 'Evening' : 'Afternoon';
+
+    // Meals (option1/option2/snack) + juice2 default: last non-morning slot
+    const _mealSideSlot =
+      _d.evening ? 'Evening'
+      : _d.afternoon ? 'Afternoon' : 'Afternoon';
+
+    // Single-slot override — everything goes to that one slot
+    let _bfSlot, _o1Slot, _o2Slot, _snSlot, _j1Slot, _j2Slot;
+    if (_n === 1) {
+      const _only = _d.morning ? 'Morning' : _d.afternoon ? 'Afternoon' : 'Evening';
+      _bfSlot = _only; _j1Slot = _only; _j2Slot = _only;
+      // hard rule protects options/snack: if only slot is Morning, they can't go there;
+      // enforceSlot on backend catches this, but we keep same value so UI stays consistent
+      _o1Slot = _only; _o2Slot = _only; _snSlot = _only;
+    } else if (_d.afternoon && _d.evening && !_d.morning) {
+      // afternoon+evening: option1 to afternoon, option2 to evening (per user spec)
+      _bfSlot = 'Afternoon'; _j1Slot = 'Afternoon';
+      _o1Slot = 'Afternoon'; _o2Slot = 'Evening';
+      _snSlot = 'Evening'; _j2Slot = 'Evening';
+    } else if (_d.morning && _d.afternoon && _d.evening) {
+      // all three: breakfast/juice1 morning, option1 afternoon, rest evening
+      _bfSlot = 'Morning'; _j1Slot = 'Morning';
+      _o1Slot = 'Afternoon'; _o2Slot = 'Evening';
+      _snSlot = 'Evening'; _j2Slot = 'Evening';
+    } else {
+      // morning + one other (afternoon or evening)
+      _bfSlot = _morningSideSlot; _j1Slot = _morningSideSlot;
+      _o1Slot = _mealSideSlot; _o2Slot = _mealSideSlot;
+      _snSlot = _mealSideSlot; _j2Slot = _mealSideSlot;
+    }
+
+    STATE[date].sections.breakfast.slot = _bfSlot;
+    STATE[date].sections.option1.slot   = _o1Slot;
+    STATE[date].sections.option2.slot   = _o2Slot;
+    STATE[date].sections.snack.slot     = _snSlot;
+    STATE[date].sections.juice1.slot    = _j1Slot;
+    STATE[date].sections.juice2.slot    = _j2Slot;
+
+    // Location default: use SLOT_DEFAULTS if set (multi-slot + 2-location clients), else location1
+    const _defLoc = CLIENT_LOCATION_1 || CLIENT_LOCATION_2 || '';
+    ['breakfast','option1','option2','snack','juice1','juice2'].forEach(sec => {
+      const secSlot = STATE[date].sections[sec].slot;
+      STATE[date].sections[sec].location =
+        (SLOT_DEFAULTS && SLOT_DEFAULTS[secSlot]) ? SLOT_DEFAULTS[secSlot] : _defLoc;
+    });
+
+    // Populate items
+    ['option1','option2','breakfast'].forEach(sec => {
+      if (!MENU[date][sec]) return;
+
+      MENU[date][sec].forEach(item => {
+        STATE[date].sections[sec].items[item.label] = {
+          qty: 0,
+          protein: item.protein,
+          optNo: sec === 'option1' ? 1 : (sec === 'option2' ? 2 : undefined)
+        };
+      });
+    });
+
+    // Each option card also holds an independent copy of the OTHER option's dishes
+    // (used when the card is swapped). These carry the other option's native optNo.
+    STATE[date].sections.option1.altItems = {};
+    STATE[date].sections.option2.altItems = {};
+    (MENU[date].option2 || []).forEach(item => {
+      STATE[date].sections.option1.altItems[item.label] =
+        { qty: 0, protein: item.protein, optNo: 2 };
+    });
+    (MENU[date].option1 || []).forEach(item => {
+      STATE[date].sections.option2.altItems[item.label] =
+        { qty: 0, protein: item.protein, optNo: 1 };
+    });
+
+    if (MENU[date].snack) {
+      MENU[date].snack.forEach(item => {
+        STATE[date].sections.snack.items[item.label] = {
+          qty: 0,
+          type: item.type,
+          label: item.label
+        };
+      });
+    }
+
+    if (MENU[date].juice1) {
+      MENU[date].juice1.forEach(j => {
+        STATE[date].sections.juice1.items[j] = { qty: 0 };
+      });
+    }
+
+    if (MENU[date].juice2) {
+      MENU[date].juice2.forEach(j => {
+        STATE[date].sections.juice2.items[j] = { qty: 0 };
+      });
+    }
+    
+  });
+}
+
+function hasAfternoonEveningSlots() {
+  return CLIENT_DELIVERY?.afternoon && CLIENT_DELIVERY?.evening;
+}
+function hasAfternoonEveningOnly() {
+  return (
+    !CLIENT_DELIVERY?.morning &&
+    CLIENT_DELIVERY?.afternoon &&
+    CLIENT_DELIVERY?.evening
+  );
+}
+
+function isMorningOnlyClient() {
+  return (
+    CLIENT_DELIVERY?.morning &&
+    !CLIENT_DELIVERY?.afternoon &&
+    !CLIENT_DELIVERY?.evening
+  );
+}
+
+function openUpgradeModal() {
+  document.getElementById('upgradeModal').style.display = 'flex';
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgradeModal').style.display = 'none';
+}
+/* ========= RENDER ========= */
+function renderCurrentDay(){
+  const date = VISIBLE_DATES[currentIndex];
+  const container = document.getElementById('dayContainer');
+
+  if (!date) {
+    container.innerHTML = '<div class="box">Ordering closed.</div>';
+    return;
+  }
+
+  const parsedDate = new Date(date);
+  
+
+
+  const dayName = parsedDate.toLocaleDateString('en-US', {
+    weekday: 'long'
+  });
+
+  const formattedDate =
+    String(parsedDate.getDate()).padStart(2, '0') + '-' +
+    parsedDate.toLocaleDateString('en-US', { month: 'short' }) + '-' +
+    parsedDate.getFullYear();
+
+
+  container.innerHTML = `
+    <div class="box">
+     
+    <div class="day-header">
+      <div class="day-text" style="position:relative;">
+        <div class="day-name" onclick="toggleDayDropdown(event)">
+          <span class="day-arrow">▼</span> ${dayName}
+        </div>
+
+        <div id="dayDropdown" class="day-dropdown">
+          ${VISIBLE_DATES.map((d,i)=>{
+            const dn = new Date(d).toLocaleDateString('en-US',{weekday:'long'});
+            return `<div onclick="jumpToDay(${i})">${dn}</div>`;
+          }).join('')}
+        </div>
+
+        <div class="day-date">${formattedDate}</div>
+      </div>
+    
+      <label class="cancel-wrap">
+        <input type="checkbox" ${STATE[date].cancel ? 'checked' : ''}
+          onchange="STATE['${date}'].cancel=this.checked">
+        Cancel This Day
+      </label>
+    </div>
+
+      ${currentIndex === 0 ? renderDefaultsSection() : ''}
+      ${renderBlock(date,'breakfast','Breakfast')}
+      ${renderBlock(date,'option1','Option 1')}
+      ${renderBlock(date,'option2','Option 2')}
+      ${renderBlock(date,'snack','Snack')}
+      ${renderBlock(date,'juice1','Juice 1')}
+      ${renderBlock(date,'juice2','Juice 2')}
+      
+     ${!hasAfternoonEveningSlots() ? `
+        <label>Location</label>
+        <select id="loc_${date}"
+          onchange="
+            STATE['${date}'].sections.option1.location=this.value;
+            STATE['${date}'].sections.option2.location=this.value;
+          ">
+      
+          ${CLIENT_LOCATION_1 ? `
+            <option value="${CLIENT_LOCATION_1}"
+              ${STATE[date].sections.option1.location === CLIENT_LOCATION_1 ? 'selected' : ''}>
+              ${CLIENT_LOCATION_1}
+            </option>
+          ` : ''}
+      
+          ${CLIENT_LOCATION_2 ? `
+            <option value="${CLIENT_LOCATION_2}"
+              ${STATE[date].sections.option1.location === CLIENT_LOCATION_2 ? 'selected' : ''}>
+              ${CLIENT_LOCATION_2}
+            </option>
+          ` : ''}
+      
+        </select>
+      ` : ``}
+
+    </div>
+  `;
+
+  backBtn.style.display = currentIndex > 0 ? 'block' : 'none';
+  nextBtn.style.display = currentIndex < VISIBLE_DATES.length - 1 ? 'block' : 'none';
+
+  // sync remarks box to this day's remark + lock state
+  const rb = document.getElementById('clientRemarks');
+  const dstate = STATE[date];
+  if (rb && dstate) {
+    rb.value = dstate.remark != null ? dstate.remark : MASTER_REMARK;
+    const dayCb = document.getElementById('rmDay');
+    const permCb = document.getElementById('rmPerm');
+    // a permanent change stays unlocked across days; a this-day edit is per-day
+    if (dstate.remarkMode === 'day') {
+      rb.readOnly = false;
+      if (dayCb) dayCb.checked = true;
+      if (permCb) permCb.checked = false;
+    } else if (dstate.remarkMode === 'permanent') {
+      rb.readOnly = false;
+      if (permCb) permCb.checked = true;
+      if (dayCb) dayCb.checked = false;
+    } else {
+      rb.readOnly = true;
+      if (dayCb) dayCb.checked = false;
+      if (permCb) permCb.checked = false;
+    }
+  }
+}
+
+
+function renderBlock(date, slot, title) {
+  const section = STATE[date].sections[slot];
+  const items = section?.items;
+  if (!items || !Object.keys(items).length) return '';
+
+  const totalDeliverySlots =
+    (CLIENT_DELIVERY?.morning ? 1 : 0) +
+    (CLIENT_DELIVERY?.afternoon ? 1 : 0) +
+    (CLIENT_DELIVERY?.evening ? 1 : 0);
+
+  const singleSlotLabel =
+    CLIENT_DELIVERY?.morning && totalDeliverySlots === 1 ? 'Morning' :
+    CLIENT_DELIVERY?.afternoon && totalDeliverySlots === 1 ? 'Afternoon' :
+    CLIENT_DELIVERY?.evening && totalDeliverySlots === 1 ? 'Evening' : '';
+
+  const nonMorningSlot =
+    CLIENT_DELIVERY?.afternoon ? 'Afternoon' :
+    CLIENT_DELIVERY?.evening ? 'Evening' : '';
+
+ const hasTwoLocations = !!(CLIENT_LOCATION_1 && CLIENT_LOCATION_2);
+
+  const _totalSlots =
+    (CLIENT_DELIVERY?.morning ? 1 : 0) +
+    (CLIENT_DELIVERY?.afternoon ? 1 : 0) +
+    (CLIENT_DELIVERY?.evening ? 1 : 0);
+
+  // Per-section location dropdown: only for multi-slot clients with 2 locations
+  // Single-slot clients get the common location dropdown below
+  const showLocationControl = hasTwoLocations && _totalSlots > 1;
+  // ✅ Set default location safely BEFORE rendering
+  if (hasAfternoonEveningSlots() && !section.location) {
+    if (slot === 'option1' && CLIENT_LOCATION_1) {
+      section.location = CLIENT_LOCATION_1;
+    }
+    if (slot === 'option2' && CLIENT_LOCATION_2) {
+      section.location = CLIENT_LOCATION_2;
+    }
+  }
+
+  const staticBox = (label) =>
+    `<div style="
+      min-width:104px;
+      padding:9px 10px;
+      font-size:13px;
+      font-weight:600;
+      border-radius:10px;
+      border:1.5px solid #e2e7f1;
+      background:#f4f6fa;
+      color:#445;
+      text-align:center;
+      pointer-events:none;
+      user-select:none;
+    ">${label}</div>`;
+
+  let slotControlHTML = '';
+
+  // Build valid slots list for this section
+  // Rule: option1/option2/snack cannot be Morning; everything else allows all delivery slots
+  const _isMealish = (slot === 'option1' || slot === 'option2' || slot === 'snack');
+  const _validSlots = [];
+  if (CLIENT_DELIVERY?.morning && !_isMealish)   _validSlots.push('Morning');
+  if (CLIENT_DELIVERY?.afternoon)                _validSlots.push('Afternoon');
+  if (CLIENT_DELIVERY?.evening)                  _validSlots.push('Evening');
+
+  if (_validSlots.length === 1) {
+    slotControlHTML = staticBox(_validSlots[0]);
+  } else if (_validSlots.length > 1) {
+    slotControlHTML = `
+      <select id="slot_${date}_${slot}"
+        onchange="updateSectionSlot('${date}','${slot}',this.value)">
+        ${_validSlots.map(s =>
+          `<option value="${s}" ${section.slot === s ? 'selected' : ''}>${s}</option>`
+        ).join('')}
+      </select>`;
+  }
+
+  let headerHTML = '';
+
+  if (slotControlHTML) {
+    headerHTML = `
+      <div class="section-header">
+        <h4 class="section-title">${title}</h4>
+        <div class="section-controls">
+          ${slotControlHTML}
+          ${showLocationControl ? `
+            <select id="loc_${date}_${slot}"
+              onchange="updateSectionLocation('${date}','${slot}',this.value)">
+              ${CLIENT_LOCATION_1 ? `
+                <option value="${CLIENT_LOCATION_1}"
+                  ${section.location === CLIENT_LOCATION_1 ||
+                    (!section.location && (slot === 'option1' || slot === 'breakfast')) ? 'selected' : ''}>
+                  ${CLIENT_LOCATION_1}
+                </option>` : ''}
+              ${CLIENT_LOCATION_2 ? `
+                <option value="${CLIENT_LOCATION_2}"
+                  ${section.location === CLIENT_LOCATION_2 ||
+                    (!section.location && slot === 'option2') ? 'selected' : ''}>
+                  ${CLIENT_LOCATION_2}
+                </option>` : ''}
+            </select>` : ''}
+        </div>
+      </div>`;
+  } else {
+    headerHTML = `<h4>${title}</h4>`;
+  }
+
+  const isLocked =
+    isMorningOnlyClient() &&
+    (slot === 'option1' || slot === 'option2' || slot === 'snack');
+
+  const isOptionCard = (slot === 'option1' || slot === 'option2');
+  const showingOther = isOptionCard && (section.view && section.view !== slot);
+
+  // render from THIS card's own store: items (own) or altItems (swapped) — never the other card's state
+  const renderItems = showingOther ? section.altItems : section.items;
+
+  // heading reflects what's shown
+  if (isOptionCard) {
+    const shownTitle = showingOther
+      ? (slot === 'option1' ? 'Option 2' : 'Option 1')
+      : (slot === 'option1' ? 'Option 1' : 'Option 2');
+    headerHTML = headerHTML
+      .replace(/<h4 class="section-title">[^<]*<\/h4>/, `<h4 class="section-title">${shownTitle}</h4>`)
+      .replace(/<h4>[^<]*<\/h4>/, `<h4>${shownTitle}</h4>`);
+  }
+
+  // arrow toggle (option cards, multi-slot only)
+  let arrowHTML = '';
+  if (isOptionCard && hasAfternoonEveningSlots()) {
+    arrowHTML = `
+      <button class="swap-arrow ${showingOther ? 'active' : ''}"
+        onclick="toggleOptionView('${date}','${slot}')"
+        title="Show the other option's dishes">⇅</button>`;
+  }
+  headerHTML = headerHTML.replace(
+    /<h4 class="section-title">([^<]*)<\/h4>/,
+    `<h4 class="section-title">$1 ${arrowHTML}</h4>`
+  );
+  if (arrowHTML && !headerHTML.includes('swap-arrow')) {
+    headerHTML = headerHTML.replace(/<h4>([^<]*)<\/h4>/, `<h4>$1 ${arrowHTML}</h4>`);
+  }
+
+  // span ID keyed by the CARD slot + view, so swapped opt1 and real opt2 never collide
+  const idTag = slot + (showingOther ? '_alt' : '');
+
+ return `<div class="sec-panel">` + headerHTML +
+    Object.keys(renderItems).map(label => `
+      <div class="dish ${isLocked ? 'dish-locked' : ''}">
+        <div class="dish-name ${getProteinClass(slot, renderItems[label])}">
+          ${label}
+        </div>
+        <div class="qty">
+          <button onclick="${isLocked ? 'openUpgradeModal()' : `changeQty('${date}','${slot}','${label}',-1,${showingOther})`}">−</button>
+          <span id="${btoa(date+idTag+label)}">${renderItems[label].qty}</span>
+          <button onclick="${isLocked ? 'openUpgradeModal()' : `changeQty('${date}','${slot}','${label}',1,${showingOther})`}">+</button>
+        </div>
+      </div>
+    `).join('') + `</div>`;
+}
+
+
+
+function changeQty(d, cardSlot, label, delta, isAlt){
+  const section = STATE[d].sections[cardSlot];
+  const store = isAlt ? section.altItems : section.items;
+  const obj = store[label];
+  obj.qty = Math.max(0, obj.qty + delta);
+
+  // this card's slot drives the row's slot for everything picked in it
+  obj.slotFrom = section.slot;
+
+  const idTag = cardSlot + (isAlt ? '_alt' : '');
+  const span = document.getElementById(btoa(d + idTag + label));
+  if (span) span.innerText = obj.qty;
+}
+function updateSectionSlot(date, section, value) {
+  const sec = STATE[date].sections[section];
+  sec.slot = value;
+  // if this client has slot-defaults, refresh THIS section's location for the new slot (this day only)
+  if (SLOT_DEFAULTS && SLOT_DEFAULTS[value]) {
+    sec.location = SLOT_DEFAULTS[value];
+  }
+  // re-stamp slotFrom on any already-picked items so backend matches the new slot
+  ['items', 'altItems'].forEach(store => {
+    if (!sec[store]) return;
+    Object.values(sec[store]).forEach(it => {
+      if (it && it.qty > 0) it.slotFrom = value;
+    });
+  });
+  renderCurrentDay();
+}
+function updateSectionLocation(date, section, value) {
+  STATE[date].sections[section].location = value;
+}
+function nextDay(){
+
+  if (currentIndex < VISIBLE_DATES.length - 1) {
+    currentIndex++;
+    renderCurrentDay();
+
+    const daySection = document.getElementById("dayContainer");
+    if (daySection) {
+      daySection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+}
+
+function toggleOptionView(date, cardSlot){
+  const sec = STATE[date].sections[cardSlot];
+  sec.view = (sec.view === cardSlot)
+    ? (cardSlot === 'option1' ? 'option2' : 'option1')
+    : cardSlot;
+  renderCurrentDay();
+}
+
+function prevDay(){
+
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderCurrentDay();
+
+    const daySection = document.getElementById("dayContainer");
+    if (daySection) {
+      daySection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+}
+
+function hasSelectionForDate(date) {
+
+  const day = STATE[date];
+  if (!day) return false;
+
+  if (day.cancel) return true;
+
+  const sections = day.sections;
+
+  for (let sec in sections) {
+    const stores = [sections[sec].items || {}, sections[sec].altItems || {}];
+    for (const items of stores) {
+      for (let key in items) {
+        if (items[key].qty > 0) return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+/* ========= SUBMIT ========= */
+async function saveCurrentDay(btn) {
+
+  if (btn) btn.classList.add("loading");
+
+  const phone = document.getElementById('phone').value.trim();
+  if (!phone) {
+    if (btn) btn.classList.remove("loading");
+    alert('Phone missing');
+    return { success: false };
+  }
+
+  const date = VISIBLE_DATES[currentIndex];
+
+  // 🔴 IMPORTANT FIX — Skip backend if nothing selected
+  if (!hasSelectionForDate(date)) {
+    if (btn) btn.classList.remove("loading");
+    return { success: true };
+  }
+
+  const payload = {
+    phone,
+    remarks: clientRemarks.dataset.original || clientRemarks.value || '',
+    days: [{
+      date,
+      sections: STATE[date].sections,
+      cancel: STATE[date].cancel
+    }]
+  };
+
+  const params = new URLSearchParams();
+  params.append("action", "submitOrder");
+  params.append("payload", JSON.stringify(payload));
+
+  try {
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: params
+    });
+
+    const result = await res.json();
+
+    if (btn) btn.classList.remove("loading");
+    return result;
+
+  } catch (error) {
+
+    if (btn) btn.classList.remove("loading");
+    alert("Network error");
+    return { success: false };
+  }
+}
+
+  async function handleSubmit(event) {
+
+  const btn = event.target;
+
+  // 🔒 Prevent double click
+  if (btn.dataset.locked === "true") return;
+
+  btn.dataset.locked = "true";
+  btn.disabled = true;
+  btn.classList.add("loading");
+
+  const phone = document.getElementById('phone').value.trim();
+  if (!phone) {
+    btn.disabled = false;
+    btn.dataset.locked = "false";
+    btn.classList.remove("loading");
+    return alert("Phone missing");
+  }
+
+  const allDays = [];
+
+  VISIBLE_DATES.forEach(date => {
+    if (!hasSelectionForDate(date)) return;
+
+    allDays.push({
+      date,
+      sections: STATE[date].sections,
+      cancel: STATE[date].cancel,
+      remark: STATE[date].remark != null ? STATE[date].remark : MASTER_REMARK
+    });
+  });
+
+  if (!allDays.length) {
+    btn.disabled = false;
+    btn.dataset.locked = "false";
+    btn.classList.remove("loading");
+    return alert("No selections made.");
+  }
+
+ const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const submissionTimestamp =
+      now.getFullYear() + '-' +
+      pad(now.getMonth()+1) + '-' +
+      pad(now.getDate()) + ' ' +
+      pad(now.getHours()) + ':' +
+      pad(now.getMinutes()) + ':' +
+      pad(now.getSeconds());
+  
+    const payload = {
+      phone,
+      remarks: clientRemarks.value || '',
+      submissionTimestamp,
+      days: allDays
+    };
+
+  const params = new URLSearchParams();
+  params.append("action", "submitOrder");
+  params.append("payload", JSON.stringify(payload));
+
+  try {
+    await fetch(API_URL, {
+      method: "POST",
+      body: params
+    });
+
+    generateSummary();
+
+  } catch (err) {
+    alert("Network error. Please try again.");
+  }
+
+  btn.classList.remove("loading");
+
+  // ⏳ Keep disabled for 60 seconds
+  let countdown = 30;
+    btn.textContent = `Wait ${countdown}s`;
+  
+    const timer = setInterval(() => {
+      countdown--;
+      btn.textContent = countdown > 0 ? `Wait ${countdown}s` : 'Submit & Exit';
+      if (countdown <= 0) {
+        clearInterval(timer);
+        btn.disabled = false;
+        btn.dataset.locked = "false";
+      }
+    }, 1000);
+}
+
+
+
+function getProteinClass(slot, item) {
+
+  // Only apply to Option 1 & Option 2
+  if (slot !== 'option1' && slot !== 'option2') {
+    return '';
+  }
+
+  if (!item || !item.protein) return '';
+
+  const p = item.protein.toLowerCase();
+
+  if (p.includes('chicken')) return 'protein-chicken';
+  if (p.includes('veg')) return 'protein-veg';
+  if (p.includes('egg')) return 'protein-egg';
+  if (p.includes('seafood')) return 'protein-seafood';
+
+  return '';
+}
+function generateSummary() {
+  let html = "";
+
+  VISIBLE_DATES.forEach(date => {
+
+    const dayState = STATE[date];
+    if (!dayState) return;
+
+    const hasSelection =
+      dayState.cancel ||
+      Object.values(dayState.sections).some(sec =>
+        Object.values(sec.items || {}).some(i => i.qty > 0) ||
+        Object.values(sec.altItems || {}).some(i => i.qty > 0)
+      );
+
+    if (!hasSelection) return;
+
+    const dayName = new Date(date)
+      .toLocaleDateString('en-US',{ weekday:'long' });
+
+    html += `<div class="summary-day">`;
+    html += `<h4>${dayName} – ${date}</h4>`;
+
+    if (dayState.cancel) {
+      html += `<div>❌ Cancelled</div></div>`;
+      return;
+    }
+
+    // 🔹 GROUP BY SLOT + LOCATION
+    const grouped = {};
+
+   Object.values(dayState.sections).forEach(sec => {
+
+      const merged = Object.assign({}, sec.items || {}, sec.altItems || {});
+      const selectedItems = Object.entries(merged)
+        .filter(([_, item]) => item.qty > 0);
+
+      if (!selectedItems.length) return;
+
+      const key = (sec.slot || '') + "||" + (sec.location || '');
+
+      if (!grouped[key]) {
+        grouped[key] = {
+          slot: sec.slot || '',
+          location: sec.location || '',
+          items: []
+        };
+      }
+
+      selectedItems.forEach(([label, item]) => {
+        grouped[key].items.push({
+          label,
+          qty: item.qty
+        });
+      });
+
+    });
+
+    // 🔹 RENDER GROUPED OUTPUT
+    Object.values(grouped).forEach(group => {
+
+      const cap = s => {
+        s = String(s || '').trim();
+        return s.length > 50 ? s.slice(0, 50).trim() + '…' : s;
+      };
+
+      const slotTxt = group.slot ? `🕒 ${group.slot}` : '';
+      const locTxt  = group.location ? `📍 ${cap(group.location)}` : '';
+
+      if (slotTxt || locTxt) {
+        html += `<div class="summary-slot">` +
+          [slotTxt, locTxt].filter(Boolean).join('  ·  ') +
+          `</div>`;
+      }
+
+      group.items.forEach(item => {
+        html += `<div>• ${item.qty > 1 ? item.qty + 'x ' : ''}${item.label}</div>`;
+      });
+
+    });
+
+    html += `</div>`;
+  });
+
+  document.getElementById("summaryContent").innerHTML = html;
+  document.getElementById("summaryModal").style.display = "flex";
+}
+
+
+function closeSummary() {
+  document.getElementById("summaryModal").style.display = "none";
+}
+function showLoader() {
+  const el = document.getElementById("loader");
+  if (el) el.style.display = "flex";
+}
+
+function hideLoader() {
+  const el = document.getElementById("loader");
+  if (el) el.style.display = "none";
+}
+
+let OPTION_PRESET = { option1: null, option2: null };
+
+function setOptionPreset(optionSlot, newProtein){
+  const prev = OPTION_PRESET[optionSlot] || null;
+  const next = newProtein || null;
+  if (prev === next) return;
+
+  // Remove previous protein preset (-1 across all days)
+  if (prev) {
+    Object.keys(STATE).forEach(date => {
+      const sec = STATE[date].sections[optionSlot];
+      if (!sec) return;
+      Object.values(sec.items || {}).forEach(item => {
+        if ((item.protein || '').toLowerCase() === prev) {
+          item.qty = Math.max(0, item.qty - 1);
+        }
+      });
+    });
+  }
+
+  // Apply new protein preset (+1 across all days)
+  if (next) {
+    Object.keys(STATE).forEach(date => {
+      const sec = STATE[date].sections[optionSlot];
+      if (!sec) return;
+      Object.values(sec.items || {}).forEach(item => {
+        if ((item.protein || '').toLowerCase() === next) {
+          item.qty = Math.max(0, item.qty + 1);
+        }
+      });
+    });
+  }
+
+  OPTION_PRESET[optionSlot] = next;
+  renderCurrentDay();
+}
+function togglePreset(type, protein, checkbox) {
+
+  const isChecked = checkbox.checked;
+
+  Object.keys(STATE).forEach(date => {
+
+    const sections = STATE[date].sections;
+
+    /* =======================
+       MEALS (Option1 + Option2)
+    ======================== */
+    if (type === 'meals') {
+
+  ['option1', 'option2'].forEach(slot => {
+
+    Object.entries(sections[slot].items).forEach(([label, item]) => {
+
+      const proteinType = (item.protein || '').toLowerCase();
+      const labelLower = label.toLowerCase();
+
+      // Regular protein presets (chicken / veg / seafood / egg)
+      if (
+        ['chicken','veg','seafood','egg'].includes(protein) &&
+        proteinType === protein.toLowerCase()
+      ) {
+        item.qty = Math.max(0, item.qty + (isChecked ? 1 : -1));
+      }
+
+      // Fish preset
+      if (
+        protein === 'fish' &&
+        proteinType === 'seafood' &&
+        labelLower.includes('fish')
+      ) {
+        item.qty = Math.max(0, item.qty + (isChecked ? 1 : -1));
+      }
+
+      // Prawns preset
+      if (
+        protein === 'prawns' &&
+        proteinType === 'seafood' &&
+        labelLower.includes('prawn')
+      ) {
+        item.qty = Math.max(0, item.qty + (isChecked ? 1 : -1));
+      }
+
+    });
+
+  });
+
+}
+
+
+    /* =======================
+       BREAKFAST
+    ======================== */
+    if (type === 'breakfast') {
+
+      Object.values(sections.breakfast.items).forEach(item => {
+    
+        const proteinType = item.protein.toLowerCase().trim();
+    
+        // Veg Breakfast preset
+        if (protein === 'veg' && proteinType === 'veg breakfast') {
+          item.qty = Math.max(0, item.qty + (isChecked ? 1 : -1));
+        }
+    
+        // Breakfast (Egg) preset
+        if (protein === 'breakfast' && proteinType === 'breakfast') {
+          item.qty = Math.max(0, item.qty + (isChecked ? 1 : -1));
+        }
+    
+      });
+    
+    }
+
+
+    /* =======================
+       SNACK
+    ======================== */
+    if (type === 'snack') {
+
+      Object.values(sections.snack.items).forEach(item => {
+
+        const snackType = (item.type || '').toLowerCase();
+
+        // Normal snack only
+        if (protein === 'all' && snackType === 'snack') {
+          item.qty = Math.max(0, item.qty + (isChecked ? 1 : -1));
+        }
+
+        // Veg snack only
+        if (protein === 'veg' && snackType === 'veg snack') {
+          item.qty = Math.max(0, item.qty + (isChecked ? 1 : -1));
+        }
+
+      });
+
+    }
+
+   /* =======================
+       JUICES
+    ======================== */
+    if (type === 'juice') {
+
+      const target = protein === 'j1' ? 'juice1' : protein === 'j2' ? 'juice2' : null;
+      if (target) {
+        Object.values(sections[target].items).forEach(item => {
+          item.qty = Math.max(0, item.qty + (isChecked ? 1 : -1));
+        });
+      }
+
+    }
+
+  });
+
+  renderCurrentDay();
+}
+function toggleDayDropdown(e) {
+  e.stopPropagation();
+  const dd = document.getElementById("dayDropdown");
+  dd.style.display = dd.style.display === "block" ? "none" : "block";
+}
+
+function jumpToDay(index) {
+  currentIndex = index;
+  renderCurrentDay();
+}
+
+document.addEventListener("click", function(){
+  const dd = document.getElementById("dayDropdown");
+  if (dd) dd.style.display = "none";
+});
+function resetAllSelections() {
+
+  Object.keys(STATE).forEach(date => {
+
+    const day = STATE[date];
+    if (!day) return;
+
+    day.cancel = false;
+
+    Object.values(day.sections).forEach(sec => {
+
+      Object.values(sec.items || {}).forEach(item => {
+        item.qty = 0;
+      });
+
+    });
+
+  });
+
+  renderCurrentDay();
+}
+async function shareSummary() {
+
+  const summaryDiv = document.getElementById("summaryContent");
+
+  let text = summaryDiv.innerText;
+
+  const clientName = document.getElementById("clientName").value;
+  const phone = document.getElementById("phone").value;
+
+  const header =
+`Friska Wellness - Weekly Meal Confirmation
+Client: ${clientName}
+Phone: ${phone}
+
+`;
+
+  const finalText = header + text;
+
+  // ✅ Use native share if supported
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: "Friska Weekly Meal Summary",
+        text: finalText
+      });
+    } catch (err) {
+      console.log("Share cancelled");
+    }
+  } else {
+    // Fallback for desktop
+    navigator.clipboard.writeText(finalText);
+    alert("Summary copied to clipboard. Paste anywhere to share.");
+  }
+}
+
+function openOrdersPage(){
+
+  const phone = document.getElementById("phone").value.trim();
+
+  if(!phone){
+    alert("Login first");
+    return;
+  }
+
+  const url =
+    "orders.html?phone=" + encodeURIComponent(phone);
+
+  window.open(url, "_blank");
+
+}
+
+/* ========= ADMIN NAME SEARCH ========= */
+(function initAdminSearch(){
+  if (!ADMIN_MODE) return;
+  const wrap = document.getElementById('adminSearchWrap');
+  if (wrap) wrap.style.display = 'block';
+  const note = document.getElementById('adminNote');
+  if (note) note.style.display = 'block';
+  // preload master clients once (POST → doPost, where getMasterClientsAll lives)
+  const _mp = new URLSearchParams();
+  _mp.append("action", "getMasterClientsAll");
+  fetch(API_URL, { method: "POST", body: _mp })
+    .then(r => r.json())
+    .then(d => { MASTER_CLIENTS = (d && d.clients) ? d.clients : []; })
+    .catch(() => { MASTER_CLIENTS = []; });
+})();
+
+function onAdminSearch(q){
+  const box = document.getElementById('adminResults');
+  q = (q || '').trim().toLowerCase();
+
+  if (q.length < 2) { box.style.display = 'none'; box.innerHTML = ''; return; }
+
+  const matches = MASTER_CLIENTS
+    .filter(c => c.phone && c.name && c.name.toLowerCase().includes(q))
+    .sort((a, b) => {
+      const an = a.name.toLowerCase(), bn = b.name.toLowerCase();
+      const aStarts = an.startsWith(q) ? 0 : 1;
+      const bStarts = bn.startsWith(q) ? 0 : 1;
+      if (aStarts !== bStarts) return aStarts - bStarts;   // prefix matches first
+      return an.localeCompare(bn);                          // then alphabetical
+    })
+    .slice(0, 8);
+
+  if (!matches.length) {
+    box.innerHTML = `<div style="padding:11px 16px; font-size:13px; color:var(--muted);">No matches</div>`;
+    box.style.display = 'block';
+    return;
+  }
+
+  box.innerHTML = matches.map(c => `
+    <div onclick="pickAdminClient('${c.phone}', ${JSON.stringify(c.name).replace(/"/g,'&quot;')})"
+         style="padding:11px 16px; font-size:14px; cursor:pointer; display:flex; justify-content:space-between; gap:10px;"
+         onmouseover="this.style.background='var(--accent-soft)'"
+         onmouseout="this.style.background='#fff'">
+      <span style="font-weight:600; color:var(--navy);">${c.name}</span>
+      <span style="color:var(--muted); font-size:13px;">${c.phone}</span>
+    </div>
+  `).join('');
+  box.style.display = 'block';
+}
+
+function pickAdminClient(phone, name){
+  document.getElementById('phone').value = phone;
+  const cn = document.getElementById('clientName');
+  if (cn) cn.value = name || '';
+  document.getElementById('adminSearch').value = name || '';
+  document.getElementById('adminResults').style.display = 'none';
+  // no auto-login — user presses Login (spinner works on click)
+}
+
+// close the results dropdown when clicking elsewhere
+document.addEventListener('click', function(e){
+  const wrap = document.getElementById('adminSearchWrap');
+  const box = document.getElementById('adminResults');
+  if (wrap && box && !wrap.contains(e.target)) box.style.display = 'none';
+});
+
+/* ========= REMARKS (this-day / permanent) ========= */
+function currentDate(){ return VISIBLE_DATES[currentIndex]; }
+
+async function toggleRemarkMode(mode, cb){
+  const box = document.getElementById('clientRemarks');
+  const day = STATE[currentDate()];
+  const other = mode === 'day' ? document.getElementById('rmPerm')
+                               : document.getElementById('rmDay');
+
+  if (!cb.checked) {
+    // unticking → re-lock, keep whatever text is there
+    box.readOnly = true;
+    if (day) day.remarkMode = null;
+    return;
+  }
+
+  // ticking one unticks the other (mutually exclusive)
+  if (other) other.checked = false;
+
+  if (mode === 'permanent') {
+    const ok = await askPermConfirm();
+    if (!ok) { cb.checked = false; box.readOnly = true; return; }
+  }
+
+  box.readOnly = false;
+  box.focus();
+  if (day) day.remarkMode = mode;
+}
+
+function onRemarkInput(val){
+  const day = STATE[currentDate()];
+  if (!day) return;
+
+  if (day.remarkMode === 'day') {
+    day.remark = val;                       // this day only
+  } else if (day.remarkMode === 'permanent') {
+    // apply to all days that don't have their own this-day remark, + master default
+    MASTER_REMARK = val;
+    VISIBLE_DATES.forEach(d => {
+      const s = STATE[d];
+      if (s && s.remarkMode !== 'day') s.remark = val;
+    });
+    savePermanentRemark(val);               // debounced write to Master
+  }
+}
+
+let _permTimer = null;
+function savePermanentRemark(val){
+  clearTimeout(_permTimer);
+  _permTimer = setTimeout(() => {
+    const phone = document.getElementById('phone').value.trim();
+    if (!phone) return;
+    const p = new URLSearchParams();
+    p.append("action", "updateClientRemark");
+    p.append("phone", phone);
+    p.append("remark", val);
+    fetch(API_URL, { method: "POST", body: p }).catch(()=>{});
+  }, 800);   // wait until typing pauses, then save once
+}
+
+let _permResolve = null;
+function askPermConfirm(){
+  return new Promise(resolve => {
+    _permResolve = resolve;
+    document.getElementById('permModal').style.display = 'flex';
+  });
+}
+function resolvePermModal(ok){
+  document.getElementById('permModal').style.display = 'none';
+  if (_permResolve) { _permResolve(ok); _permResolve = null; }
+}
+
+async function finishLogin(){
+  initState();
+  await restorePastSelections(document.getElementById('phone').value.trim());
+  renderCurrentDay();
+}
+
+function openDefaultsPopup(){
+  const modal = document.getElementById('defaultsModal');
+  const body = document.getElementById('defaultsBody');
+  const slots = [];
+  if (CLIENT_DELIVERY.morning)   slots.push('Morning');
+  if (CLIENT_DELIVERY.afternoon) slots.push('Afternoon');
+  if (CLIENT_DELIVERY.evening)   slots.push('Evening');
+
+  body.innerHTML = slots.map(s => `
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
+      <span style="font-weight:600; color:var(--navy); min-width:80px;">${s}</span>
+      <select id="def_${s}" style="flex:1; padding:9px 10px; border-radius:10px; border:1.5px solid #e2e7f1; background:#fbfcfe; font-family:inherit;">
+        <option value="${CLIENT_LOCATION_1}">${CLIENT_LOCATION_1}</option>
+        <option value="${CLIENT_LOCATION_2}">${CLIENT_LOCATION_2}</option>
+      </select>
+    </div>
+  `).join('');
+
+  modal.style.display = 'flex';
+}
+
+async function saveDefaultsFromPopup(){
+  const slots = [];
+  if (CLIENT_DELIVERY.morning)   slots.push('Morning');
+  if (CLIENT_DELIVERY.afternoon) slots.push('Afternoon');
+  if (CLIENT_DELIVERY.evening)   slots.push('Evening');
+
+  const out = {};
+  slots.forEach(s => {
+    const el = document.getElementById('def_' + s);
+    out[s] = el ? el.value : (CLIENT_LOCATION_1 || '');
+  });
+
+  const phone = document.getElementById('phone').value.trim();
+  const p = new URLSearchParams();
+  p.append("action", "saveClientDefaults");
+  p.append("phone", phone);
+  p.append("defaults", JSON.stringify(out));
+
+  const btn = document.getElementById('defaultsSaveBtn');
+  btn.classList.add("loading");
+  try {
+    const r = await fetch(API_URL, { method: "POST", body: p });
+    const j = await r.json();
+    if (!j.success) { alert(j.message || 'Save failed'); btn.classList.remove("loading"); return; }
+  } catch(e) {
+    alert('Network error'); btn.classList.remove("loading"); return;
+  }
+  btn.classList.remove("loading");
+
+  SLOT_DEFAULTS = out;
+  document.getElementById('defaultsModal').style.display = 'none';
+  await finishLogin();
+}
+
+// Delivery Defaults section (called by renderCurrentDay on first day only)
+function renderDefaultsSection(){
+  const _slots = (CLIENT_DELIVERY.morning?1:0) + (CLIENT_DELIVERY.afternoon?1:0) + (CLIENT_DELIVERY.evening?1:0);
+  const _twoLocs = !!(CLIENT_LOCATION_1 && CLIENT_LOCATION_2);
+  if (_slots <= 1 || !_twoLocs || !SLOT_DEFAULTS) return '';
+
+  const slots = [];
+  if (CLIENT_DELIVERY.morning)   slots.push('Morning');
+  if (CLIENT_DELIVERY.afternoon) slots.push('Afternoon');
+  if (CLIENT_DELIVERY.evening)   slots.push('Evening');
+
+  const rows = slots.map(s => `
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 0;">
+      <span style="font-weight:600; color:var(--navy); min-width:80px;">${s}</span>
+      <select onchange="updateSlotDefault('${s}', this.value)"
+        style="flex:1; padding:8px 10px; border-radius:10px; border:1.5px solid #e2e7f1; background:#fbfcfe; font-family:inherit;">
+        <option value="${CLIENT_LOCATION_1}" ${SLOT_DEFAULTS[s] === CLIENT_LOCATION_1 ? 'selected' : ''}>${CLIENT_LOCATION_1}</option>
+        <option value="${CLIENT_LOCATION_2}" ${SLOT_DEFAULTS[s] === CLIENT_LOCATION_2 ? 'selected' : ''}>${CLIENT_LOCATION_2}</option>
+      </select>
+    </div>
+  `).join('');
+
+  return `
+    <div class="box" id="defaultsBox">
+      <details>
+        <summary style="font-weight:600; cursor:pointer;">Delivery Defaults</summary>
+        <div style="padding-top:8px;">${rows}</div>
+      </details>
+    </div>
+  `;
+}
+
+async function updateSlotDefault(slot, newLoc){
+  SLOT_DEFAULTS[slot] = newLoc;
+
+  // propagate to all days: every section whose slot matches, refresh its location
+  Object.keys(STATE).forEach(date => {
+    const secs = STATE[date].sections;
+    Object.keys(secs).forEach(name => {
+      if (secs[name].slot === slot) secs[name].location = newLoc;
+    });
+  });
+
+  // persist
+  const phone = document.getElementById('phone').value.trim();
+  const p = new URLSearchParams();
+  p.append("action", "saveClientDefaults");
+  p.append("phone", phone);
+  p.append("defaults", JSON.stringify(SLOT_DEFAULTS));
+  fetch(API_URL, { method: "POST", body: p }).catch(()=>{});
+
+  renderCurrentDay();
+}
+
+/* ========= BOOT ========= */
+function runBoot(){
+
+  const stored = ADMIN_MODE ? null : readAuth();
+  const hasToken = !!(stored && stored.phone && stored.token);
+
+  // no saved session -> just show the login card
+  if (!hasToken) return;
+
+  // hide the login card immediately so it never flashes, then verify the token
+  const ls = $id('loginScreen');
+  if (ls) ls.style.display = 'none';
+  showSplash(true);
+
+  (async function(){
+    let ok = false;
+    try { ok = await tryAutoLogin(); } catch (e) { ok = false; }
+
+    showSplash(false);
+
+    if (!ok) {
+      if (ls) ls.style.display = 'flex';       // token dead/expired -> back to login
+      if (AUTO_LOGIN_ERROR) {
+        // pre-fill the number we know, and say why the session didn't resume
+        if (stored && stored.phone) $id('phone').value = stored.phone;
+        authError(AUTO_LOGIN_ERROR);
+      }
+    }
+  })();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', runBoot);
+} else {
+  runBoot();
+}
+
+/* ========= ROUND B: PAST-SELECTION RESTORE ========= */
+
+async function restorePastSelections(phone){
+
+  if (!phone || !VISIBLE_DATES.length) return;
+
+  const p = new URLSearchParams();
+  p.append("action", "getClientOrdersByDateRange");
+  p.append("phone", phone);
+  p.append("startDate", VISIBLE_DATES[0]);
+  p.append("endDate", VISIBLE_DATES[VISIBLE_DATES.length - 1]);
+
+  try {
+    const res = await fetch(API_URL, { method: "POST", body: p });
+    const data = await res.json();
+    if (data && data.success && data.rows && data.rows.length) {
+      applyRestoredOrders(data.rows);
+    }
+  } catch (err) {
+    console.warn("restore failed", err);   // blank form is a valid fallback
+  }
+}
+
+function applyRestoredOrders(rows){
+
+  const byDate = {};
+  rows.forEach(r => { (byDate[r.date] = byDate[r.date] || []).push(r); });
+
+  Object.keys(byDate).forEach(date => {
+
+    if (!STATE[date]) return;
+
+    const drows = byDate[date];
+    const secs  = STATE[date].sections;
+
+    // remark from the row (no checkbox tick - client edits normally)
+    const remRow = drows.find(r => String(r.remarks || '').trim());
+    if (remRow) STATE[date].remark = String(remRow.remarks).trim();
+
+    // cancelled day: slot written as N/A
+    if (drows.some(r => r.slot === 'N/A')) {
+      STATE[date].cancel = true;
+      return;
+    }
+
+    /* ---- OPTIONS: col H = "X 1", col I = "X 2", one row per unit ---- */
+    const eMap = {};
+    drows.forEach(r => {
+      ['option1','option2'].forEach(col => {
+        const c = r[col];
+        if (!c || c.toUpperCase() === 'N/A') return;
+        const m = c.match(/^(.+?)\s*([12])$/);
+        if (!m) return;
+        const protein = m[1].trim().toLowerCase();
+        const optNo   = Number(m[2]);
+        const key = optNo + '|' + protein + '|' + r.slot + '|' + r.location;
+        if (!eMap[key]) {
+          eMap[key] = { optNo, protein, slot: r.slot, location: r.location, qty: 0 };
+        }
+        eMap[key].qty++;
+      });
+    });
+
+    let entries = Object.values(eMap);
+
+    const cards = [
+      { name: 'option1', native: 1, sec: secs.option1, taken: false },
+      { name: 'option2', native: 2, sec: secs.option2, taken: false }
+    ].filter(c => !!c.sec);
+
+    function place(entry, card){
+      card.taken = true;
+      const sec = card.sec;
+
+      if (entry.slot)     sec.slot = entry.slot;
+      if (entry.location) sec.location = entry.location;
+
+      const isAlt = entry.optNo !== card.native;
+      sec.view = isAlt
+        ? (card.name === 'option1' ? 'option2' : 'option1')
+        : card.name;
+
+      const store = (isAlt ? sec.altItems : sec.items) || {};
+      const label = Object.keys(store).find(l =>
+        store[l].optNo === entry.optNo &&
+        String(store[l].protein || '').toLowerCase() === entry.protein);
+
+      if (!label) return;   // that code is no longer on this day's menu
+      store[label].qty = entry.qty;
+      store[label].slotFrom = sec.slot;
+    }
+
+    function drain(match){
+      for (let i = entries.length - 1; i >= 0; i--) {
+        const e = entries[i];
+        const c = cards.find(c => !c.taken && match(c, e));
+        if (c) { place(e, c); entries.splice(i, 1); }
+      }
+    }
+
+    drain((c,e) => c.native === e.optNo && c.sec.slot === e.slot);  // exact match
+    drain((c,e) => c.native === e.optNo);                            // same option, other slot
+    drain((c,e) => c.sec.slot === e.slot);                           // same slot -> swapped card
+    drain(() => true);                                               // fallback
+
+    /* ---- BREAKFAST (col J = protein) ---- */
+    restoreSimple(secs.breakfast, drows, 'breakfast',
+      (it, code) => String(it.protein || '').toLowerCase() === code);
+
+    /* ---- SNACK (col K = "Snack" / "Veg Snack") ---- */
+    restoreSimple(secs.snack, drows, 'snack',
+      (it, code) => String(it.type || '').toLowerCase() === code);
+
+    /* ---- JUICES (cols L/M = "Juice 1" / "Juice 2") ---- */
+    restoreSimple(secs.juice1, drows, 'juice1', () => true);
+    restoreSimple(secs.juice2, drows, 'juice2', () => true);
+  });
+}
+
+function restoreSimple(sec, drows, col, matchFn){
+
+  if (!sec) return;
+
+  const map = {};
+  drows.forEach(r => {
+    const v = r[col];
+    if (!v || v.toUpperCase() === 'N/A') return;
+    const k = v.toLowerCase();
+    if (!map[k]) map[k] = { qty: 0, slot: r.slot, location: r.location };
+    map[k].qty++;
+  });
+
+  Object.keys(map).forEach(code => {
+    const e = map[code];
+
+    if (e.slot)     sec.slot = e.slot;
+    if (e.location) sec.location = e.location;
+
+    const store = sec.items || {};
+    const label = Object.keys(store).find(l => matchFn(store[l], code));
+    if (!label) return;
+
+    store[label].qty = e.qty;
+    store[label].slotFrom = sec.slot;
+  });
+}
+
+</script>
+  <div id="summaryModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-head">
+      <h3 style="color:#2e7d32;">Submitted Successfully ✅</h3>
+      <h4 style="text-align:center;margin-top:-6px;">Order Summary</h4>
+    </div>
+    <div class="modal-scroll">
+      <div id="summaryContent"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn secondary" onclick="shareSummary()">Share</button>
+      <button class="btn" onclick="closeSummary()">Make Changes</button>
+    </div>
+  </div>
+</div>
+<div id="permModal" class="modal">
+  <div class="modal-content" style="text-align:center; padding:28px 24px 22px; max-width:380px;">
+    <div style="font-size:34px; margin-bottom:10px;">📝</div>
+    <h3 style="margin:0 0 8px;">Permanent Change</h3>
+    <p style="font-size:14.5px; color:#445; line-height:1.55; margin:0 0 22px;">
+      This will permanently update the remark saved in the client's profile (Master Client List).
+    </p>
+    <div style="display:flex; gap:10px;">
+      <button class="btn secondary" style="margin-top:0;" onclick="resolvePermModal(false)">Cancel</button>
+      <button class="btn" style="margin-top:0;" onclick="resolvePermModal(true)">Confirm</button>
+    </div>
+  </div>
+</div>
+<div id="upgradeModal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeUpgradeModal()">✕</button>
+    <div class="modal-icon">🍽️</div>
+    <p>Lunch, Dinner & Snack dishes are not available in your morning slot.<br><br>Please contact our team to subscribe for them.</p>
+    <button class="btn" onclick="closeUpgradeModal()">OK</button>
+  </div>
+</div>
+<div id="forgotModal" class="modal">
+  <div class="modal-content" style="text-align:center; padding:28px 24px 22px; max-width:390px;">
+    <div style="font-size:34px; margin-bottom:10px;">🔑</div>
+    <h3 style="margin:0 0 6px;">Reset your password</h3>
+    <div id="forgotWho" style="font-size:12.5px; color:var(--muted); font-weight:600; margin-bottom:12px;"></div>
+    <p style="font-size:14px; color:#445; line-height:1.6; margin:0 0 20px;">
+      Passwords are stored securely and cannot be looked up, so we clear yours instead.
+      Send us the request below and you will be asked to create a new password
+      the next time you sign in.
+    </p>
+    <a class="wa-btn" id="forgotWaBtn" href="#" target="_blank" rel="noopener"
+       onclick="logResetRequest()">Request Reset on WhatsApp</a>
+    <button class="btn secondary" style="margin-top:10px;" onclick="closeForgotModal()">Cancel</button>
+  </div>
+</div>
+<div id="inactiveModal" class="modal">
+  <div class="modal-content" style="text-align:center; padding:28px 24px 22px; max-width:380px;">
+    <div style="font-size:34px; margin-bottom:10px;">⏸️</div>
+    <h3 style="margin:0 0 8px;">Account Inactive</h3>
+    <p style="font-size:14.5px; color:#445; line-height:1.55; margin:0 0 22px;">
+      Your account is currently inactive. Please contact Friska Wellness to place your order.
+    </p>
+    <button class="btn" style="margin-top:0;" onclick="document.getElementById('inactiveModal').style.display='none'">OK</button>
+  </div>
+</div>
+<div id="defaultsModal" class="modal">
+  <div class="modal-content" style="padding:24px 22px 20px; max-width:400px;">
+    <div style="font-size:30px; text-align:center; margin-bottom:8px;">📍</div>
+    <h3 style="margin:0 0 6px; text-align:center;">Set Delivery Locations</h3>
+    <p style="font-size:13.5px; color:#556; line-height:1.5; margin:0 0 18px; text-align:center;">
+      Choose the delivery location for each of your slots. You can change these later.
+    </p>
+    <div id="defaultsBody"></div>
+    <button id="defaultsSaveBtn" class="btn" style="margin-top:14px;" onclick="saveDefaultsFromPopup()">Save</button>
+  </div>
+</div>
+</body>
+</html>

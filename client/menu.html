@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weekly Menu</title>
+
+<!-- All endpoint settings come from config.js -->
+<script src="config.js"></script>
+
+<style>
+
+body{
+font-family:"Georgia",serif;
+margin:0;
+padding:20px;
+color:#111;
+
+background:linear-gradient(
+180deg,
+#f7e27a 0%,
+#f2d35a 40%,
+#e6b93f 100%
+);
+}
+.spinner{
+
+width:16px;
+height:16px;
+
+border:2px solid rgba(255,255,255,0.4);
+border-top:2px solid white;
+
+border-radius:50%;
+
+display:inline-block;
+
+margin-left:8px;
+
+animation:spin 0.8s linear infinite;
+
+}
+
+@keyframes spin{
+
+0%{ transform:rotate(0deg); }
+
+100%{ transform:rotate(360deg); }
+
+}
+.menu-wrapper{
+max-width:1200px;
+margin:auto;
+}
+
+.menu-header{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:15px;
+margin-bottom:25px;
+}
+
+.logo{
+height:55px;
+}
+
+.menu-title{
+font-size:44px;
+letter-spacing:6px;
+margin:0;
+}
+
+/* TABS */
+
+.tabs{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:10px;
+margin-bottom:35px;
+}
+
+.tab{
+padding:8px 18px;
+border:1px solid #bbb;
+background:white;
+cursor:pointer;
+font-weight:bold;
+letter-spacing:1px;
+}
+
+.tab.active{
+background:black;
+color:white;
+}
+
+/* DOWNLOAD BUTTON */
+
+.download-btn{
+background:#0a1a6e;
+color:white;
+border:none;
+padding:8px 18px;
+font-weight:bold;
+letter-spacing:1px;
+cursor:pointer;
+}
+
+/* GRID */
+
+.menu-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:30px;
+}
+
+/* DAY CARD */
+
+.day-card{
+
+background:
+linear-gradient(rgba(255,255,255,0.85),rgba(255,255,255,0.85)),
+url("bg.webp");
+
+background-size:cover;
+background-position:center;
+
+padding:28px;
+
+border:2px solid #000;   /* BLACK BORDER */
+
+border-radius:4px;
+
+box-shadow:0 6px 18px rgba(0,0,0,0.08);
+
+}
+
+.day-card h2{
+text-align:center;
+letter-spacing:4px;
+font-size:26px;
+margin-bottom:25px;
+}
+
+/* SECTION */
+
+.section{
+margin-bottom:24px;
+}
+
+.label{
+text-align:center;
+font-weight:bold;
+letter-spacing:2px;
+text-decoration:underline;
+font-size:14px;
+margin-bottom:10px;
+}
+
+/* DISH */
+
+.dish{
+font-size:15px;
+line-height:1.7;
+margin-bottom:6px;
+color:#000;
+}
+
+/* DIVIDER */
+
+.divider{
+height:1px;
+background:#d6b85c;
+margin:18px 0;
+}
+
+/* MESSAGE / ERROR STATE */
+
+.menu-msg{
+text-align:center;
+padding:40px 20px;
+font-size:18px;
+line-height:1.6;
+}
+
+.menu-msg button{
+margin-top:14px;
+background:#0a1a6e;
+color:white;
+border:none;
+padding:8px 18px;
+font-weight:bold;
+letter-spacing:1px;
+cursor:pointer;
+font-family:inherit;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+.menu-grid{
+grid-template-columns:1fr;
+}
+
+.menu-title{
+font-size:34px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="menu-wrapper">
+
+<div class="menu-header">
+
+<img src="logo.png" class="logo">
+
+<h1 class="menu-title">WEEKLY MENU</h1>
+
+</div>
+
+
+<div class="tabs">
+
+<div class="tab active" onclick="switchProtein('all',this)">ALL</div>
+<div class="tab" onclick="switchProtein('veg',this)">VEGETARIAN</div>
+<div class="tab" onclick="switchProtein('chicken',this)">CHICKEN</div>
+<div class="tab" onclick="switchProtein('egg',this)">EGG</div>
+<div class="tab" onclick="switchProtein('seafood',this)">SEAFOOD</div>
+
+<button id="downloadBtn" class="download-btn" onclick="downloadMenuPDF()">
+
+<span id="downloadText">DOWNLOAD MENU</span>
+
+<span id="downloadSpinner" class="spinner" style="display:none;"></span>
+
+</button>
+
+</div>
+
+<div id="menuGrid" class="menu-grid">
+
+<div style="text-align:center;padding:40px;font-size:18px;">
+Loading menu...
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* ================= CONFIG =================
+   Everything endpoint-related is read from config.js, so changing the
+   deployment URL (or the action name) there is enough - no edit here.
+
+   config.js must define:   API_URL
+   config.js may optionally define:
+       MENU_ACTION   - defaults to "getGlideMenu"
+   Works whether config.js declares them with const, let or var.
+=========================================== */
+
+function cfgVal(name, fallback){
+try {
+/* covers const/let globals (not on window) and var/window globals */
+const v = eval("typeof " + name + " !== 'undefined' ? " + name + " : undefined");
+return (v === undefined || v === null || v === "") ? fallback : v;
+} catch(e){
+return fallback;
+}
+}
+
+const MENU_ENDPOINT     = cfgVal("API_URL", "");
+const MENU_FETCH_ACTION = cfgVal("MENU_ACTION", "getGlideMenu");
+
+let weeklyMenu = {};
+let activeProtein = "all";
+
+function showMsg(html){
+document.getElementById("menuGrid").innerHTML =
+`<div class="menu-msg">${html}</div>`;
+}
+
+async function loadMenu(){
+
+if(!MENU_ENDPOINT){
+showMsg(`Configuration missing.
+<br><span style="font-size:14px;opacity:0.75;">config.js did not load, or it does not define API_URL.</span>
+<br><button onclick="loadMenu()">RETRY</button>`);
+return;
+}
+
+document.getElementById("menuGrid").innerHTML =
+`<div style="text-align:center;padding:40px;font-size:18px;">Loading menu...</div>`;
+
+try {
+
+const url = MENU_ENDPOINT
++ (MENU_ENDPOINT.indexOf("?") >= 0 ? "&" : "?")
++ "action=" + encodeURIComponent(MENU_FETCH_ACTION)
++ "&t=" + Date.now();
+
+const res = await fetch(url, { cache: "no-store" });
+
+if(!res.ok) throw new Error("HTTP " + res.status);
+
+const text = await res.text();
+
+let data;
+try {
+data = JSON.parse(text);
+} catch(parseErr){
+/* Apps Script returned HTML - a sign-in page or an error page */
+throw new Error("The menu service did not return valid data. Check the deployment URL and its access setting.");
+}
+
+if(data && data.error) throw new Error(String(data.error));
+
+if(!data || typeof data !== "object" || Array.isArray(data))
+throw new Error("Unexpected menu format.");
+
+if(!Object.keys(data).length){
+showMsg(`No menu has been published for this week yet.
+<br><button onclick="loadMenu()">RETRY</button>`);
+return;
+}
+
+weeklyMenu = data;
+renderMenu();
+
+} catch(err){
+
+console.error("loadMenu failed:", err);
+
+showMsg(`Could not load the menu.
+<br><span style="font-size:14px;opacity:0.75;">${String(err.message || err)}</span>
+<br><button onclick="loadMenu()">RETRY</button>`);
+
+}
+
+}
+
+function switchProtein(type,el){
+
+activeProtein = type;
+
+document.querySelectorAll(".tab")
+.forEach(t=>t.classList.remove("active"));
+
+el.classList.add("active");
+
+renderMenu();
+
+}
+
+function renderMenu(){
+
+const grid = document.getElementById("menuGrid");
+grid.innerHTML="";
+
+const dates = Object.keys(weeklyMenu).sort();
+
+dates.forEach(date=>{
+
+const d = weeklyMenu[date];
+
+const dayName = new Date(date)
+.toLocaleDateString('en-US',{weekday:'long'});
+
+function filterProtein(arr){
+
+if(!arr) return "";
+
+return arr
+.filter(x=>{
+
+if(activeProtein==="all") return true;
+
+const p=(x.protein||"").toLowerCase();
+return p===activeProtein;
+
+})
+.map(x=>`<div class="dish">${x.label}</div>`)
+.join("");
+
+}
+
+/* Breakfast appears on ALL, VEGETARIAN and CHICKEN only.
+   Menu proteins are "Breakfast" (standard) and "Veg Breakfast".
+   veg tab      -> Veg Breakfast
+   chicken tab  -> Breakfast
+   egg/seafood  -> nothing */
+function filterBreakfast(arr){
+
+if(!arr) return "";
+
+if(activeProtein==="egg" || activeProtein==="seafood") return "";
+
+return arr
+.filter(x=>{
+
+if(activeProtein==="all") return true;
+
+const p=(x.protein||"").toLowerCase();
+
+if(activeProtein==="veg")     return p==="veg breakfast";
+if(activeProtein==="chicken") return p==="breakfast";
+
+return false;
+
+})
+.map(x=>`<div class="dish">${x.label}</div>`)
+.join("");
+
+}
+
+function simpleList(arr){
+
+if(!arr) return "";
+
+return arr
+.map(x=>`<div class="dish">${x.label||x}</div>`)
+.join("");
+
+}
+
+const breakfastHTML = filterBreakfast(d.breakfast);
+
+const card = `
+<div class="day-card">
+
+<h2>${dayName.toUpperCase()}</h2>
+
+${breakfastHTML ? `
+<div class="section">
+<div class="label">BREAKFAST</div>
+${breakfastHTML}
+</div>
+
+<div class="divider"></div>
+` : ``}
+
+<div class="section">
+<div class="label">OPTION 1</div>
+${filterProtein(d.option1)}
+</div>
+
+<div class="divider"></div>
+
+<div class="section">
+<div class="label">OPTION 2</div>
+${filterProtein(d.option2)}
+</div>
+
+<div class="divider"></div>
+
+<div class="section">
+<div class="label">SNACK</div>
+${simpleList(d.snack)}
+</div>
+
+<div class="divider"></div>
+
+<div class="section">
+<div class="label">JUICES</div>
+${simpleList(d.juice1)}
+${simpleList(d.juice2)}
+</div>
+
+</div>
+`;
+
+grid.innerHTML += card;
+
+});
+
+}
+
+/* PDF DOWNLOAD */
+
+async function downloadMenuPDF(){
+
+if(!Object.keys(weeklyMenu).length){
+alert("Menu has not loaded yet.");
+return;
+}
+
+const btn = document.getElementById("downloadBtn");
+const text = document.getElementById("downloadText");
+const spinner = document.getElementById("downloadSpinner");
+
+text.innerText = "Preparing PDF";
+spinner.style.display = "inline-block";
+btn.disabled = true;
+
+const { jsPDF } = window.jspdf;
+const pdf = new jsPDF("p","mm","a4");
+
+/* FORCE DESKTOP LAYOUT */
+
+const grid = document.querySelector(".menu-grid");
+grid.style.gridTemplateColumns = "repeat(3,1fr)";
+grid.style.width = "1200px";
+
+const categories = [
+{key:"veg",label:"VEGETARIAN"},
+{key:"chicken",label:"CHICKEN"},
+{key:"egg",label:"EGG"},
+{key:"seafood",label:"SEAFOOD"}
+];
+
+try {
+
+for(let i=0;i<categories.length;i++){
+
+const cat = categories[i];
+
+activeProtein = cat.key;
+renderMenu();
+
+await new Promise(r=>setTimeout(r,400));
+
+const canvas = await html2canvas(grid,{
+scale:2,
+useCORS:true
+});
+
+const imgData = canvas.toDataURL("image/png");
+
+const pdfWidth = 210;
+const pdfHeight = canvas.height * pdfWidth / canvas.width;
+
+if(i>0) pdf.addPage();
+
+pdf.setFontSize(22);
+pdf.text(cat.label + " MENU",105,15,{align:"center"});
+
+pdf.addImage(imgData,"PNG",5,20,200,pdfHeight);
+
+}
+
+pdf.save("Weekly_Menu.pdf");
+
+} catch(err){
+
+console.error("PDF failed:", err);
+alert("Could not build the PDF. Please try again.");
+
+} finally {
+
+/* RESTORE LAYOUT + ALL TAB */
+
+grid.style.gridTemplateColumns = "";
+grid.style.width = "";
+
+activeProtein="all";
+renderMenu();
+
+document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+document.querySelector(".tab").classList.add("active");
+
+text.innerText = "DOWNLOAD MENU";
+spinner.style.display = "none";
+btn.disabled = false;
+
+}
+
+}
+
+loadMenu();
+
+</script>
+
+</body>
+</html>
