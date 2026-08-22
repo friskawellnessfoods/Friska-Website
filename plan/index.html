@@ -995,7 +995,7 @@ document.addEventListener("click", function(e){
   let menu=document.getElementById("headerMenu"), button=document.querySelector(".menuButton");
   if(!menu.contains(e.target) && !button.contains(e.target)){ menu.style.display="none"; }
 });
-function openWeeklyMenu(){ window.open("https://friskawellnessfoods.github.io/weekly-choice/menu.html","_blank"); }
+function openWeeklyMenu(){ window.open("../client/menu.html","_blank"); }
 function contactSupport(){ let message="Hello Friska Wellness,%0A%0AI would like to know more about the meal plans."; window.open("https://wa.me/"+SUPPORT_NUMBER+"?text="+message,"_blank"); }
 function showPopup(message){ let p=document.getElementById("toastPopup"); document.getElementById("toastMessage").innerText=message; p.style.display="block"; setTimeout(()=>{ p.style.display="none"; },2500); }
 
