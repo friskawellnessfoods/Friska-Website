@@ -108,6 +108,24 @@ nav.main-nav a:hover::after{transform:scaleX(1);}
 .nav-toggle{display:none;background:none;border:0;cursor:pointer;padding:6px;}
 .nav-toggle span{display:block;width:24px;height:2px;background:var(--navy);margin:5px 0;border-radius:2px;}
 
+
+/* ---------- Client Login (existing clients, not prospects) ---------- */
+.nav-login{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 17px;border-radius:99px;
+  border:1.5px solid var(--line);background:var(--white);
+  font-family:var(--display);font-size:13.5px;font-weight:600;color:var(--navy);
+  text-decoration:none;
+  transition:border-color .2s ease, background .2s ease, transform .2s ease;
+}
+.nav-login::before{
+  content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;
+}
+.nav-login::after{display:none;}          /* no underline sweep, it's a pill */
+.nav-login:hover{
+  border-color:var(--accent);background:var(--accent-soft);transform:translateY(-1px);
+}
+
 /* ---------- Hero ---------- */
 .hero{padding:64px 0 0;}
 .hero .wrap{display:grid;grid-template-columns:1fr .92fr;gap:56px;align-items:center;}
@@ -687,6 +705,12 @@ footer{padding:0 0 32px;}
     border-bottom:1px solid var(--line);
   }
   nav.main-nav a::after{display:none;}
+  nav.main-nav .nav-login{
+    width:100%;border:none;background:transparent;padding:14px 0;
+    border-bottom:1px solid var(--line);border-radius:0;
+    font-size:17px;color:var(--accent);
+  }
+  nav.main-nav .nav-login:hover{background:transparent;transform:none;}
   .nav-toggle{display:block;}
   .header-cta{display:none;}
 }
