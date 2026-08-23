@@ -8,13 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0a1a6e">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Friska">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <script src="config.js"></script>
   <style>
   :root{
@@ -928,7 +921,7 @@ let MASTER_REMARK = '';
 let SLOT_DEFAULTS = null;   // {"Morning":"loc","Afternoon":"loc",...} or null
 /* ========= CONFIG ========= */
 const ADMIN_MODE = false;              // admin repo = true, client repo = false
-const CUTOFF_HOUR = 0;                // cutoff time (only used when cutoff is active)
+const CUTOFF_HOUR = 4;                // orders for a day close at 04:00 that morning
 const CUTOFF_ENABLED = !ADMIN_MODE;   // admin = no cutoff, client = cutoff on
 
 let MASTER_CLIENTS = [];              // admin name search cache
@@ -1901,11 +1894,14 @@ function applyCutoff() {
     return;
   }
 
+  // Earliest day still open for ordering.
+  // Before CUTOFF_HOUR the current day is still selectable; from CUTOFF_HOUR
+  // onwards it closes and the next day becomes the earliest.
+  // e.g. Tuesday 03:59 -> Tuesday is still open. Tuesday 04:00 -> Wednesday.
   let targetDate = new Date(today);
-  targetDate.setDate(today.getDate() + 1);
 
-  if (CUTOFF_HOUR > 0 && now.getHours() >= CUTOFF_HOUR) {
-    targetDate.setDate(targetDate.getDate() + 1);
+  if (now.getHours() >= CUTOFF_HOUR) {
+    targetDate.setDate(today.getDate() + 1);
   }
 
   const targetStr =
@@ -2044,6 +2040,30 @@ function initState(){
 function hasAfternoonEveningSlots() {
   return CLIENT_DELIVERY?.afternoon && CLIENT_DELIVERY?.evening;
 }
+
+function slotCount() {
+  return (CLIENT_DELIVERY?.morning ? 1 : 0)
+       + (CLIENT_DELIVERY?.afternoon ? 1 : 0)
+       + (CLIENT_DELIVERY?.evening ? 1 : 0);
+}
+
+/* The single "Location" dropdown under the day only appears when the
+   per-section dropdowns are NOT shown, so the two can never fight. */
+function showCommonLocation() {
+  const twoLocs = !!(CLIENT_LOCATION_1 && CLIENT_LOCATION_2);
+  return twoLocs && slotCount() <= 1;
+}
+
+/* Applies to EVERY section. It used to set option1/option2 only, which left
+   breakfast, snack and the juices on the old address - and because the
+   backend copies a main section's location onto snack/juice, a juice-only or
+   breakfast-only order was saved against the wrong location entirely. */
+function setDayLocation(date, value) {
+  const secs = STATE[date].sections;
+  ['breakfast','option1','option2','snack','juice1','juice2'].forEach(n => {
+    if (secs[n]) secs[n].location = value;
+  });
+}
 function hasAfternoonEveningOnly() {
   return (
     !CLIENT_DELIVERY?.morning &&
@@ -2125,13 +2145,9 @@ function renderCurrentDay(){
       ${renderBlock(date,'juice1','Juice 1')}
       ${renderBlock(date,'juice2','Juice 2')}
       
-     ${!hasAfternoonEveningSlots() ? `
+     ${showCommonLocation() ? `
         <label>Location</label>
-        <select id="loc_${date}"
-          onchange="
-            STATE['${date}'].sections.option1.location=this.value;
-            STATE['${date}'].sections.option2.location=this.value;
-          ">
+        <select id="loc_${date}" onchange="setDayLocation('${date}', this.value)">
       
           ${CLIENT_LOCATION_1 ? `
             <option value="${CLIENT_LOCATION_1}"
@@ -2593,6 +2609,25 @@ function getProteinClass(slot, item) {
 
   return '';
 }
+/* submitWeeklyOrder copies a main section's location onto snack and the
+   juices when they share a slot, walking option1 -> option2 -> breakfast and
+   letting the LAST match win. Reproduced here so the shared message shows the
+   same address that gets written to the sheet. */
+function effectiveLocation(sections, secName, sec) {
+  let location = sec.location || '';
+
+  if (secName === 'snack' || secName === 'juice1' || secName === 'juice2') {
+    ['option1', 'option2', 'breakfast'].forEach(mainSec => {
+      const main = sections[mainSec];
+      if (main && main.slot === sec.slot && main.location) {
+        location = main.location;
+      }
+    });
+  }
+
+  return location;
+}
+
 function generateSummary() {
   let html = "";
 
@@ -2624,7 +2659,7 @@ function generateSummary() {
     // 🔹 GROUP BY SLOT + LOCATION
     const grouped = {};
 
-   Object.values(dayState.sections).forEach(sec => {
+   Object.entries(dayState.sections).forEach(([secName, sec]) => {
 
       const merged = Object.assign({}, sec.items || {}, sec.altItems || {});
       const selectedItems = Object.entries(merged)
@@ -2632,12 +2667,16 @@ function generateSummary() {
 
       if (!selectedItems.length) return;
 
-      const key = (sec.slot || '') + "||" + (sec.location || '');
+      // Mirror the backend rule exactly, so the message can never disagree
+      // with the address the order is actually saved against.
+      const shownLocation = effectiveLocation(dayState.sections, secName, sec);
+
+      const key = (sec.slot || '') + "||" + (shownLocation || '');
 
       if (!grouped[key]) {
         grouped[key] = {
           slot: sec.slot || '',
-          location: sec.location || '',
+          location: shownLocation || '',
           items: []
         };
       }
