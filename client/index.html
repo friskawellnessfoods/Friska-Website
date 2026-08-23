@@ -2611,8 +2611,7 @@ function getProteinClass(slot, item) {
 }
 /* submitWeeklyOrder copies a main section's location onto snack and the
    juices when they share a slot, walking option1 -> option2 -> breakfast and
-   letting the LAST match win. Reproduced here so the shared message shows the
-   same address that gets written to the sheet. */
+   letting the LAST match win. */
 function effectiveLocation(sections, secName, sec) {
   let location = sec.location || '';
 
@@ -2626,6 +2625,54 @@ function effectiveLocation(sections, secName, sec) {
   }
 
   return location;
+}
+
+/* Rebuilds the day the same way submitWeeklyOrder does, so the summary can
+   never show something the sheet will not contain.
+
+   The key point: the backend keys its buckets by SLOT ALONE, so one slot has
+   exactly one location - the first section with items sets it and later ones
+   cannot change it. Grouping the summary by slot AND location was inventing a
+   second row (e.g. two "Afternoon" lines at different addresses) that never
+   existed in Orders_Log. */
+function buildSummaryGroups(sections) {
+
+  const ORDER = ['option1', 'option2', 'breakfast', 'snack', 'juice1', 'juice2'];
+  const buckets = {};
+
+  function bucketFor(slot, location) {
+    if (!buckets[slot]) buckets[slot] = { slot: slot, location: location || '', items: [] };
+    if (!buckets[slot].location && location) buckets[slot].location = location;
+    return buckets[slot];
+  }
+
+  ORDER.forEach(name => {
+
+    const sec = sections[name];
+    if (!sec) return;
+
+    const merged = Object.assign({}, sec.items || {}, sec.altItems || {});
+    const chosen = Object.entries(merged).filter(([_, item]) => item.qty > 0);
+    if (!chosen.length) return;
+
+    const location = effectiveLocation(sections, name, sec);
+
+    if (name === 'option1' || name === 'option2') {
+      // a swapped card sends its items to the slot they were picked in
+      chosen.forEach(([label, item]) => {
+        const b = bucketFor(item.slotFrom || sec.slot, location);
+        b.items.push({ label: label, qty: item.qty });
+      });
+    } else {
+      const b = bucketFor(sec.slot, location);
+      chosen.forEach(([label, item]) => b.items.push({ label: label, qty: item.qty }));
+    }
+  });
+
+  const SLOT_ORDER = ['Morning', 'Afternoon', 'Evening'];
+  return Object.values(buckets).sort(function (a, b) {
+    return SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot);
+  });
 }
 
 function generateSummary() {
@@ -2656,42 +2703,11 @@ function generateSummary() {
       return;
     }
 
-    // 🔹 GROUP BY SLOT + LOCATION
-    const grouped = {};
-
-   Object.entries(dayState.sections).forEach(([secName, sec]) => {
-
-      const merged = Object.assign({}, sec.items || {}, sec.altItems || {});
-      const selectedItems = Object.entries(merged)
-        .filter(([_, item]) => item.qty > 0);
-
-      if (!selectedItems.length) return;
-
-      // Mirror the backend rule exactly, so the message can never disagree
-      // with the address the order is actually saved against.
-      const shownLocation = effectiveLocation(dayState.sections, secName, sec);
-
-      const key = (sec.slot || '') + "||" + (shownLocation || '');
-
-      if (!grouped[key]) {
-        grouped[key] = {
-          slot: sec.slot || '',
-          location: shownLocation || '',
-          items: []
-        };
-      }
-
-      selectedItems.forEach(([label, item]) => {
-        grouped[key].items.push({
-          label,
-          qty: item.qty
-        });
-      });
-
-    });
+    // 🔹 ONE GROUP PER SLOT — exactly how the backend buckets a day
+    const grouped = buildSummaryGroups(dayState.sections);
 
     // 🔹 RENDER GROUPED OUTPUT
-    Object.values(grouped).forEach(group => {
+    grouped.forEach(group => {
 
       const cap = s => {
         s = String(s || '').trim();
