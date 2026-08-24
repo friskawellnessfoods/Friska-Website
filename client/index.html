@@ -963,6 +963,24 @@ function readAuth(){
   try { return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null'); } catch(e){ return null; }
 }
 
+const SNAP_KEY = 'friska_snap_v1';
+
+function saveSnapshot(phone, client, menu){
+  try {
+    localStorage.setItem(SNAP_KEY, JSON.stringify({
+      phone: phone, client: client, menu: menu, at: Date.now()
+    }));
+  } catch(e){}
+}
+function readSnapshot(phone){
+  try {
+    const s = JSON.parse(localStorage.getItem(SNAP_KEY) || 'null');
+    if (!s || s.phone !== phone) return null;
+    if (Date.now() - s.at > 12*60*60*1000) return null;
+    return s;
+  } catch(e){ return null; }
+}
+
 function togglePw(id, btn){
   const el = $id(id);
   const show = el.type === 'password';
@@ -1167,6 +1185,7 @@ async function tryAutoLogin(){
 
 function doLogout(){
   clearAuth();
+  try { localStorage.removeItem(SNAP_KEY); } catch(e){}
   location.href = location.pathname;   // drop any query string, fresh start
 }
 
@@ -1271,6 +1290,8 @@ async function bootClient(client, menu, phone){
     openDefaultsPopup();
     return;   // popup will call finishLogin() after save
   }
+
+  saveSnapshot(phone, client, MENU);
 
   initState();
   await restorePastSelections(phone);
@@ -3256,11 +3277,31 @@ function runBoot(){
   const stored = ADMIN_MODE ? null : readAuth();
   const hasToken = !!(stored && stored.phone && stored.token);
 
-  // no saved session -> just show the login card
   if (!hasToken) return;
 
-  // hide the login card immediately so it never flashes, then verify the token
   const ls = $id('loginScreen');
+  const snap = readSnapshot(stored.phone);
+
+  /* cached client on this device — paint straight away, verify quietly after */
+  if (snap) {
+    if (ls) ls.style.display = 'none';
+    bootClient(snap.client, snap.menu, stored.phone).catch(function(){});
+
+    apiPost("authToken", { phone: stored.phone, token: stored.token })
+      .then(function(r){
+        if (r && r.ok === true) {
+          saveAuth(stored.phone, r.token);
+          saveSnapshot(stored.phone, r.client, r.menu || snap.menu);
+        } else if (r && typeof r.ok !== 'undefined') {
+          clearAuth();
+          try { localStorage.removeItem(SNAP_KEY); } catch(e){}
+        }
+      })
+      .catch(function(){});
+    return;
+  }
+
+  /* no cache yet — original path with the splash */
   if (ls) ls.style.display = 'none';
   showSplash(true);
 
@@ -3271,9 +3312,8 @@ function runBoot(){
     showSplash(false);
 
     if (!ok) {
-      if (ls) ls.style.display = 'flex';       // token dead/expired -> back to login
+      if (ls) ls.style.display = 'flex';
       if (AUTO_LOGIN_ERROR) {
-        // pre-fill the number we know, and say why the session didn't resume
         if (stored && stored.phone) $id('phone').value = stored.phone;
         authError(AUTO_LOGIN_ERROR);
       }
