@@ -665,6 +665,58 @@
     padding: 9px 15px; font-size: 12.5px; font-weight: 700;
     text-decoration: none; box-shadow: 0 4px 12px rgba(37,211,102,0.28);
   }
+
+  /* modal close cross */
+  .modal-x {
+    position: absolute; top: 10px; right: 12px;
+    width: 30px; height: 30px; border-radius: 50%;
+    border: none; background: rgba(20,33,62,0.06); color: var(--muted);
+    font-size: 15px; line-height: 1; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; z-index: 5;
+  }
+  .modal-x:active { background: rgba(20,33,62,0.12); }
+  .modal-head { position: relative; }
+  .modal-foot { flex-wrap: wrap; }
+  .modal-foot .btn { flex: 1 1 auto; min-width: 120px; }
+  .modal-foot .btn.full { flex: 1 1 100%; }
+
+  /* ===== CLIENT CENTRE STATUS ===== */
+  .home-status {
+    display: flex; align-items: center; gap: 11px;
+    background: #fff; border: 1px solid rgba(226,231,241,0.9);
+    border-radius: 15px; padding: 13px 15px; margin-bottom: 14px;
+    box-shadow: var(--shadow);
+  }
+  .home-status .hs-ic {
+    width: 38px; height: 38px; border-radius: 11px; flex: none;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    background: var(--accent-soft);
+  }
+  .home-status.none .hs-ic { background: #fff6e6; }
+  .home-status .hs-t { font-size: 13.5px; font-weight: 700; color: var(--navy); line-height: 1.3; }
+  .home-status .hs-s { font-size: 11.5px; color: var(--muted); font-weight: 500; margin-top: 2px; line-height: 1.4; }
+  .home-status .hs-go {
+    margin-left: auto; flex: none; background: var(--navy); color: #fff;
+    border: none; border-radius: 10px; padding: 9px 13px;
+    font-size: 12px; font-weight: 700; font-family: inherit; cursor: pointer;
+  }
+  .home-status .hs-go:active { background: var(--navy-deep); }
+
+  /* ===== TRANSITIONS ===== */
+  .tabpanel.anim { animation: tabIn .19s cubic-bezier(.22,.61,.36,1) both; }
+  @keyframes tabIn {
+    from { opacity: 0; transform: translateY(9px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .modal-content { animation: modalIn .2s cubic-bezier(.22,.61,.36,1) both; }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(14px) scale(.97); }
+    to   { opacity: 1; transform: none; }
+  }
+  .home-card { transition: transform .1s ease, border-color .15s, box-shadow .15s; }
+  @media (prefers-reduced-motion: reduce) {
+    .tabpanel.anim, .modal-content { animation: none; }
+  }
   </style>
 </head>
 
@@ -766,6 +818,7 @@
         <h3>What would you like to do?</h3>
         <p>Pick an option below.</p>
       </div>
+      <div id="homeStatus"></div>
       <div class="home-grid" id="homeGrid"></div>
     </div>
   </div>
@@ -1324,6 +1377,10 @@ function showApp(name, type){
   $id('heroName').textContent = name || 'Welcome';
   $id('heroMeta').textContent = type || 'Weekly Meal Selection';
   renderNav();
+
+  // base entry: pressing back from here leaves the app, like any native app
+  try { history.replaceState({ tab: 'home' }, '', location.href); } catch (e) {}
+
   showTab('home');
   window.scrollTo(0, 0);
 }
@@ -1335,7 +1392,7 @@ function renderNav(){
   if (grid) {
     grid.innerHTML = NAV_ITEMS.map(it => {
       const cls = 'home-card' + (it.soon ? ' soon' : '');
-      const click = it.soon ? '' : ' onclick="showTab(\'' + it.id + '\')"';
+      const click = it.soon ? '' : ' onclick="navTo(\'' + it.id + '\')"';
       return '' +
         '<button class="' + cls + '" type="button"' + click + '>' +
           '<span class="hc-icon">' + it.icon + '</span>' +
@@ -1349,29 +1406,189 @@ function renderNav(){
   const bar = $id('tabbar');
   if (bar) {
     bar.innerHTML =
-      '<button class="home-chip" type="button" title="Home" onclick="showTab(\'home\')">⌂</button>' +
+      '<button class="home-chip" type="button" title="Client Centre" onclick="navTo(\'home\')">⌂</button>' +
       NAV_ITEMS.filter(it => !it.soon).map(it =>
-        '<button type="button" id="tabbtn-' + it.id + '" onclick="showTab(\'' + it.id + '\')">' +
+        '<button type="button" id="tabbtn-' + it.id + '" onclick="navTo(\'' + it.id + '\')">' +
           esc(it.label) +
         '</button>'
       ).join('');
   }
 }
 
+/* ========= BACK-BUTTON ROUTER =========
+   One extra history entry is kept while a section is open, so:
+     Client Centre -> section      pushes an entry
+     back / swipe                  returns to the Client Centre
+     back again                    leaves the app
+   Switching straight between sections replaces that entry instead of
+   stacking, so back is never a long trail of tabs. */
+
+let CURRENT_TAB = 'home';
+
+const DISMISSIBLE_MODALS =
+  ['summaryModal', 'upgradeModal', 'forgotModal', 'inactiveModal', 'permModal'];
+
+function anyModalOpen(){
+  return DISMISSIBLE_MODALS.some(id => {
+    const m = $id(id);
+    return m && m.style.display === 'flex';
+  });
+}
+
+function closeDismissibleModals(){
+  DISMISSIBLE_MODALS.forEach(id => {
+    const m = $id(id);
+    if (m) m.style.display = 'none';
+  });
+}
+
+/* every user-initiated navigation goes through here */
+function navTo(name){
+
+  if (name === CURRENT_TAB && !anyModalOpen()) return;
+
+  if (name === 'home') {
+    // if we are sitting on a pushed entry, let the browser unwind it so the
+    // forward/back stack stays honest
+    const st = history.state || {};
+    if (st.tab && st.tab !== 'home') { history.back(); return; }
+    showTab('home');
+    return;
+  }
+
+  try {
+    if (CURRENT_TAB === 'home') history.pushState({ tab: name }, '', location.href);
+    else                        history.replaceState({ tab: name }, '', location.href);
+  } catch (e) {}
+
+  showTab(name);
+}
+
+/* opening a modal adds its own entry, so back closes the modal
+   rather than leaving the section */
+function pushModalState(id){
+  try { history.pushState({ tab: CURRENT_TAB, modal: id }, '', location.href); } catch (e) {}
+}
+
+window.addEventListener('popstate', function (ev) {
+
+  const st = ev.state || {};
+
+  // came back off a modal entry -> just shut the modal
+  if (!st.modal && anyModalOpen()) closeDismissibleModals();
+
+  const target = (st.tab && st.tab !== 'home') ? st.tab : 'home';
+
+  // only the app shell participates; the login screen is left alone
+  const shell = $id('appShell');
+  if (!shell || shell.style.display === 'none') return;
+
+  showTab(target);
+});
+
+/* A one-line read on where the client's week stands, so the launcher is not
+   identical whether or not they have ordered. Built from STATE, which already
+   holds their restored selections - no extra request. */
+function renderHomeStatus(){
+
+  const host = $id('homeStatus');
+  if (!host) return;
+
+  if (!VISIBLE_DATES.length) {
+    host.innerHTML =
+      '<div class="home-status none">' +
+        '<div class="hs-ic">\u{1F553}</div>' +
+        '<div><div class="hs-t">Ordering is closed for now</div>' +
+        '<div class="hs-s">The next week\u2019s menu will appear here.</div></div>' +
+      '</div>';
+    return;
+  }
+
+  let picked = 0, cancelled = 0, next = null;
+
+  VISIBLE_DATES.forEach(d => {
+    const s = STATE[d];
+    if (!s) return;
+    if (s.cancel) { cancelled++; return; }
+    if (hasSelectionForDate(d)) {
+      picked++;
+      if (!next) next = d;
+    }
+  });
+
+  const total = VISIBLE_DATES.length;
+
+  if (!picked) {
+    // paused every open day is a decision, not an empty week - say so
+    const allPaused = cancelled > 0 && cancelled >= total;
+
+    host.innerHTML =
+      '<div class="home-status none">' +
+        '<div class="hs-ic">' + (allPaused ? '\u23F8\uFE0F' : '\u{1F374}') + '</div>' +
+        '<div><div class="hs-t">' +
+          (allPaused ? 'All days paused' : 'No meals chosen yet') +
+        '</div>' +
+        '<div class="hs-s">' +
+          (allPaused
+            ? 'You have paused all ' + total + ' open ' + (total === 1 ? 'day' : 'days') + '.'
+            : total + ' ' + (total === 1 ? 'day is' : 'days are') + ' open for selection.') +
+        '</div></div>' +
+        '<button class="hs-go" onclick="navTo(\'order\')">' +
+          (allPaused ? 'Change' : 'Choose') +
+        '</button>' +
+      '</div>';
+    return;
+  }
+
+  const nextName = next
+    ? new Date(next).toLocaleDateString('en-US', { weekday: 'long' })
+    : '';
+
+  const title = (picked >= total)
+    ? 'Your week is set'
+    : (picked + ' of ' + total + ' days chosen');
+
+  let sub = nextName ? ('Next delivery on ' + nextName) : '';
+  if (cancelled) sub += (sub ? ' \u00b7 ' : '') + cancelled + ' day' + (cancelled === 1 ? '' : 's') + ' paused';
+
+  host.innerHTML =
+    '<div class="home-status">' +
+      '<div class="hs-ic">\u2705</div>' +
+      '<div><div class="hs-t">' + esc(title) + '</div>' +
+      (sub ? '<div class="hs-s">' + esc(sub) + '</div>' : '') + '</div>' +
+      '<button class="hs-go" onclick="navTo(\'order\')">' +
+        (picked >= total ? 'Review' : 'Continue') +
+      '</button>' +
+    '</div>';
+}
+
 function showTab(name){
+
+  CURRENT_TAB = name;
 
   const ids = ['home'].concat(NAV_ITEMS.map(it => it.id));
 
   ids.forEach(t => {
     const panel = $id('tab-' + t);
     const btn   = $id('tabbtn-' + t);
-    if (panel) panel.style.display = (t === name) ? 'block' : 'none';
+    if (panel) {
+      const on = (t === name);
+      panel.style.display = on ? 'block' : 'none';
+      if (on) {
+        // restart the entrance animation each time the panel is shown
+        panel.classList.remove('anim');
+        void panel.offsetWidth;
+        panel.classList.add('anim');
+      }
+    }
     if (btn) btn.classList.toggle('active', t === name);
   });
 
   // the launcher shows the options as cards, so the tab bar is hidden there
   const bar = $id('tabbar');
   if (bar) bar.style.display = (name === 'home') ? 'none' : 'flex';
+
+  if (name === 'home') renderHomeStatus();
 
   if (name === 'menu') renderMenuTab();
 
@@ -2760,11 +2977,23 @@ function generateSummary() {
 
   document.getElementById("summaryContent").innerHTML = html;
   document.getElementById("summaryModal").style.display = "flex";
+  pushModalState('summaryModal');   // so back / swipe closes the popup, not the section
 }
 
 
 function closeSummary() {
   document.getElementById("summaryModal").style.display = "none";
+  // unwind the entry the popup added, so back still means "leave this section"
+  const st = history.state || {};
+  if (st.modal === 'summaryModal') { try { history.back(); } catch (e) {} }
+}
+
+/* close the summary and land on the Client Centre */
+function summaryToHome() {
+  document.getElementById("summaryModal").style.display = "none";
+  const st = history.state || {};
+  if (st.modal === 'summaryModal') { try { history.back(); } catch (e) {} }
+  setTimeout(function () { navTo('home'); }, 30);
 }
 function showLoader() {
   const el = document.getElementById("loader");
@@ -3478,6 +3707,7 @@ function restoreSimple(sec, drows, col, matchFn){
   <div id="summaryModal" class="modal">
   <div class="modal-content">
     <div class="modal-head">
+      <button class="modal-x" onclick="closeSummary()" aria-label="Close">✕</button>
       <h3 style="color:#2e7d32;">Submitted Successfully ✅</h3>
       <h4 style="text-align:center;margin-top:-6px;">Order Summary</h4>
     </div>
@@ -3486,7 +3716,8 @@ function restoreSimple(sec, drows, col, matchFn){
     </div>
     <div class="modal-foot">
       <button class="btn secondary" onclick="shareSummary()">Share</button>
-      <button class="btn" onclick="closeSummary()">Make Changes</button>
+      <button class="btn secondary" onclick="closeSummary()">Make Changes</button>
+      <button class="btn full" onclick="summaryToHome()">Back to Client Centre</button>
     </div>
   </div>
 </div>
