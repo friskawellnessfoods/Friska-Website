@@ -1532,7 +1532,7 @@ function renderHomeStatus(){
   }
 
   const nextName = next
-    ? new Date(next).toLocaleDateString('en-US', { weekday: 'long' })
+    ? ymdLocal(next).toLocaleDateString('en-US', { weekday: 'long' })
     : '';
 
   const title = (picked >= total)
@@ -2017,8 +2017,33 @@ function dishHTML(label){
          '</div>';
 }
 
+/* ========= DATES =========
+   Two traps this app kept falling into on a phone set to a foreign timezone:
+
+   1. new Date("2026-09-07") parses as UTC MIDNIGHT, then prints in local time.
+      West of UTC that lands on the previous day, so every menu heading showed
+      the wrong weekday. ymdLocal() builds the date from its parts instead, at
+      midday so no DST shift can move it.
+
+   2. "Today" and the ordering cutoff were read from the device clock. The
+      kitchen runs on IST, so they must too - a phone set to New York would
+      otherwise open and close ordering at the wrong hour. istNow() converts
+      whatever the device thinks the time is into IST wall-clock. */
+
+function ymdLocal(ymd){
+  const p = String(ymd || '').split('-');
+  if (p.length !== 3) return new Date(ymd);
+  return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]), 12, 0, 0);
+}
+
+/* a Date whose local getters read as IST, whatever timezone the phone is on */
+function istNow(){
+  const now = new Date();
+  return new Date(now.getTime() + (now.getTimezoneOffset() + 330) * 60000);
+}
+
 function todayStr(){
-  const n = new Date();
+  const n = istNow();
   return n.getFullYear() + '-' +
     String(n.getMonth() + 1).padStart(2, '0') + '-' +
     String(n.getDate()).padStart(2, '0');
@@ -2041,7 +2066,7 @@ function renderMenuTab(){
   host.innerHTML = dates.map(date => {
 
     const day = MENU[date] || {};
-    const dt  = new Date(date);
+    const dt  = ymdLocal(date);
 
     const dayName = dt.toLocaleDateString('en-US', { weekday: 'long' });
     const nice =
@@ -2104,7 +2129,8 @@ function applyCutoff() {
     return;
   }
 
-  const now = new Date();
+  // IST, so the window matches the kitchen no matter what the phone is set to
+  const now = istNow();
   const today = new Date(
     now.getFullYear(),
     now.getMonth(),
@@ -2328,7 +2354,7 @@ function renderCurrentDay(){
     return;
   }
 
-  const parsedDate = new Date(date);
+  const parsedDate = ymdLocal(date);
   
 
 
@@ -2353,7 +2379,7 @@ function renderCurrentDay(){
 
         <div id="dayDropdown" class="day-dropdown">
           ${VISIBLE_DATES.map((d,i)=>{
-            const dn = new Date(d).toLocaleDateString('en-US',{weekday:'long'});
+            const dn = ymdLocal(d).toLocaleDateString('en-US',{weekday:'long'});
             return `<div onclick="jumpToDay(${i})">${dn}</div>`;
           }).join('')}
         </div>
@@ -2923,7 +2949,7 @@ function generateSummary() {
 
     if (!hasSelection) return;
 
-    const dayName = new Date(date)
+    const dayName = ymdLocal(date)
       .toLocaleDateString('en-US',{ weekday:'long' });
 
     html += `<div class="summary-day">`;
