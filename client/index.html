@@ -973,7 +973,7 @@ let MASTER_REMARK = '';
 let SLOT_DEFAULTS = null;   // {"Morning":"loc","Afternoon":"loc",...} or null
 /* ========= CONFIG ========= */
 const ADMIN_MODE = false;              // admin repo = true, client repo = false
-const CUTOFF_HOUR = 4;                // orders for a day close at 04:00 that morning
+const CUTOFF_HOUR = 4;                // orders for a day close at 04:00 IST that morning
 const CUTOFF_ENABLED = !ADMIN_MODE;   // admin = no cutoff, client = cutoff on
 
 let MASTER_CLIENTS = [];              // admin name search cache
@@ -983,6 +983,42 @@ let DATES = [];
 let VISIBLE_DATES = [];
 let STATE = {};
 let currentIndex = 0;
+
+/* ========= TRUSTED CLOCK =========
+   The phone's clock can be wrong (manually changed, or a foreign timezone).
+   Real time is read from the HTTP "Date" header of a request to this same
+   site (same-origin, so the header is readable) and kept as an offset from
+   the device clock. Every cutoff check uses nowMs(), never Date.now(). */
+let CLOCK_OFFSET = 0;       // ms to add to the device clock to get real time
+let CLOCK_SYNCED = false;
+
+async function syncClock(){
+  const ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const timer = ctrl ? setTimeout(() => ctrl.abort(), 4000) : null;
+  try {
+    const t0 = Date.now();
+    const res = await fetch(location.pathname + '?clk=' + t0, {
+      method: 'HEAD', cache: 'no-store', signal: ctrl ? ctrl.signal : undefined
+    });
+    const t1 = Date.now();
+    const h = res.headers.get('Date');
+    if (!h) return false;
+    const server = new Date(h).getTime();
+    if (isNaN(server)) return false;
+    CLOCK_OFFSET = server - Math.round((t0 + t1) / 2);
+    CLOCK_SYNCED = true;
+    return true;
+  } catch (e) {
+    return false;           // keep the last known offset
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+function nowMs(){ return Date.now() + CLOCK_OFFSET; }
+
+// start syncing immediately; bootClient waits for it before deciding open days
+const CLOCK_READY = syncClock();
 
 /* ========= AUTH ========= */
 const AUTH_KEY = 'friska_auth_v1';
@@ -1326,6 +1362,9 @@ async function bootClient(client, menu, phone){
   }
 
   DATES = Object.keys(MENU).sort();
+
+  // real IST time must be known before deciding which days are still open
+  await CLOCK_READY;
   applyCutoff();
 
   showApp(client.clientName || '', cleanedType);
@@ -2018,17 +2057,10 @@ function dishHTML(label){
 }
 
 /* ========= DATES =========
-   Two traps this app kept falling into on a phone set to a foreign timezone:
-
-   1. new Date("2026-09-07") parses as UTC MIDNIGHT, then prints in local time.
-      West of UTC that lands on the previous day, so every menu heading showed
-      the wrong weekday. ymdLocal() builds the date from its parts instead, at
-      midday so no DST shift can move it.
-
-   2. "Today" and the ordering cutoff were read from the device clock. The
-      kitchen runs on IST, so they must too - a phone set to New York would
-      otherwise open and close ordering at the wrong hour. istNow() converts
-      whatever the device thinks the time is into IST wall-clock. */
+   1. new Date("2026-09-07") parses as UTC midnight; ymdLocal() builds the
+      date from its parts at midday so no timezone/DST shift moves the day.
+   2. "Today" and the cutoff run on IST from the TRUSTED clock (nowMs), so a
+      wrong phone clock or a foreign timezone cannot move the 04:00 cutoff. */
 
 function ymdLocal(ymd){
   const p = String(ymd || '').split('-');
@@ -2036,17 +2068,20 @@ function ymdLocal(ymd){
   return new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]), 12, 0, 0);
 }
 
-/* a Date whose local getters read as IST, whatever timezone the phone is on */
+function ymdStr(d){
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+/* a Date whose local getters read as real IST, whatever the phone says */
 function istNow(){
-  const now = new Date();
-  return new Date(now.getTime() + (now.getTimezoneOffset() + 330) * 60000);
+  const ms = nowMs();
+  return new Date(ms + (new Date(ms).getTimezoneOffset() + 330) * 60000);
 }
 
 function todayStr(){
-  const n = istNow();
-  return n.getFullYear() + '-' +
-    String(n.getMonth() + 1).padStart(2, '0') + '-' +
-    String(n.getDate()).padStart(2, '0');
+  return ymdStr(istNow());
 }
 
 function renderMenuTab(){
@@ -2120,7 +2155,17 @@ function openMenu(){
 window.open("menu.html","_blank");
 
 }
-/* ========= CUTOFF ========= */
+/* ========= CUTOFF =========
+   Earliest day still open for ordering, in real IST.
+   Before CUTOFF_HOUR today is open; from CUTOFF_HOUR it closes.
+   e.g. Tuesday 03:59 IST -> Tuesday open. Tuesday 04:00 IST -> Wednesday. */
+function earliestOpenDate(){
+  const now = istNow();
+  const d = new Date(now.getFullYear(), now.getMonth(),
+                     now.getDate() + (now.getHours() >= CUTOFF_HOUR ? 1 : 0), 12, 0, 0);
+  return ymdStr(d);
+}
+
 function applyCutoff() {
 
   if (!CUTOFF_ENABLED) {
@@ -2129,47 +2174,57 @@ function applyCutoff() {
     return;
   }
 
-  // IST, so the window matches the kitchen no matter what the phone is set to
-  const now = istNow();
-  const today = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate()
-  );
-
-  const todayStr =
-    today.getFullYear() + '-' +
-    String(today.getMonth() + 1).padStart(2, '0') + '-' +
-    String(today.getDate()).padStart(2, '0');
-
-  const todayExists = DATES.includes(todayStr);
-
-  if (!todayExists) {
-    // Show only valid dates that exist in MENU
-    VISIBLE_DATES = DATES.filter(d => MENU[d]);
-    currentIndex = 0;
-    return;
-  }
-
-  // Earliest day still open for ordering.
-  // Before CUTOFF_HOUR the current day is still selectable; from CUTOFF_HOUR
-  // onwards it closes and the next day becomes the earliest.
-  // e.g. Tuesday 03:59 -> Tuesday is still open. Tuesday 04:00 -> Wednesday.
-  let targetDate = new Date(today);
-
-  if (now.getHours() >= CUTOFF_HOUR) {
-    targetDate.setDate(today.getDate() + 1);
-  }
-
-  const targetStr =
-    targetDate.getFullYear() + '-' +
-    String(targetDate.getMonth() + 1).padStart(2, '0') + '-' +
-    String(targetDate.getDate()).padStart(2, '0');
-
-  VISIBLE_DATES = DATES.filter(d => d >= targetStr && MENU[d]);
+  const open = earliestOpenDate();
+  VISIBLE_DATES = DATES.filter(d => d >= open && MENU[d]);   // never shows past days
 
   currentIndex = 0;
 }
+
+/* Re-check the cutoff while the page is already open (resume, timer).
+   Can only REMOVE days that have closed; keeps the client on the same day
+   if it is still open. Returns true if something was removed. */
+function refreshCutoff(){
+
+  if (!CUTOFF_ENABLED || !DATES.length) return false;
+
+  const cur = VISIBLE_DATES[currentIndex];
+  const open = earliestOpenDate();
+  const next = VISIBLE_DATES.filter(d => d >= open && STATE[d]);
+
+  if (next.length === VISIBLE_DATES.length) return false;
+
+  VISIBLE_DATES = next;
+  const i = VISIBLE_DATES.indexOf(cur);
+  currentIndex = i >= 0 ? i : 0;
+
+  renderCurrentDay();
+  if (CURRENT_TAB === 'home') renderHomeStatus();
+  return true;
+}
+
+function cutoffShellActive(){
+  const shell = $id('appShell');
+  return CUTOFF_ENABLED && shell && shell.style.display !== 'none' && DATES.length;
+}
+
+// app brought back to the foreground: re-sync real time, drop closed days
+document.addEventListener('visibilitychange', async function(){
+  if (document.visibilityState !== 'visible' || !cutoffShellActive()) return;
+  await syncClock();
+  refreshCutoff();
+});
+
+// page restored from the back/forward cache without reloading
+window.addEventListener('pageshow', async function(ev){
+  if (!ev.persisted || !cutoffShellActive()) return;
+  await syncClock();
+  refreshCutoff();
+});
+
+// left open on screen across 04:00
+setInterval(function(){
+  if (document.visibilityState === 'visible' && cutoffShellActive()) refreshCutoff();
+}, 60000);
 
 /* ========= STATE ========= */
 function initState(){
@@ -2351,6 +2406,8 @@ function renderCurrentDay(){
 
   if (!date) {
     container.innerHTML = '<div class="box">Ordering closed.</div>';
+    backBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
     return;
   }
 
@@ -2717,6 +2774,17 @@ async function saveCurrentDay(btn) {
 
   const date = VISIBLE_DATES[currentIndex];
 
+  // cutoff guard (real IST)
+  if (CUTOFF_ENABLED && date) {
+    await syncClock();
+    if (date < earliestOpenDate()) {
+      if (btn) btn.classList.remove("loading");
+      alert('Ordering for this day closed at ' + CUTOFF_HOUR + ':00 AM IST.');
+      refreshCutoff();
+      return { success: false };
+    }
+  }
+
   // 🔴 IMPORTANT FIX — Skip backend if nothing selected
   if (!hasSelectionForDate(date)) {
     if (btn) btn.classList.remove("loading");
@@ -2768,17 +2836,47 @@ async function saveCurrentDay(btn) {
   btn.disabled = true;
   btn.classList.add("loading");
 
-  const phone = document.getElementById('phone').value.trim();
-  if (!phone) {
+  const unlock = () => {
     btn.disabled = false;
     btn.dataset.locked = "false";
     btn.classList.remove("loading");
+  };
+
+  const phone = document.getElementById('phone').value.trim();
+  if (!phone) {
+    unlock();
     return alert("Phone missing");
   }
 
+  /* ---- CUTOFF GUARD: real IST time, not the phone clock ----
+     If any selected day has passed its 04:00 IST cutoff, NOTHING is sent. */
+  if (CUTOFF_ENABLED) {
+    await syncClock();
+    const open = earliestOpenDate();
+    const closed = VISIBLE_DATES.filter(d => d < open && hasSelectionForDate(d));
+
+    if (closed.length) {
+      const names = closed.map(d => {
+        const dt = ymdLocal(d);
+        return dt.toLocaleDateString('en-US', { weekday: 'long' }) + ' (' +
+               String(dt.getDate()).padStart(2, '0') + '-' +
+               dt.toLocaleDateString('en-US', { month: 'short' }) + ')';
+      }).join(', ');
+
+      unlock();
+      refreshCutoff();
+      return alert(
+        'It is past ' + CUTOFF_HOUR + ':00 AM IST. Ordering for ' + names + ' is closed.\n\n' +
+        'Nothing was submitted. That day has been removed \u2014 please review and submit again.'
+      );
+    }
+  }
+
+  const open = CUTOFF_ENABLED ? earliestOpenDate() : '';
   const allDays = [];
 
   VISIBLE_DATES.forEach(date => {
+    if (CUTOFF_ENABLED && date < open) return;   // belt and braces
     if (!hasSelectionForDate(date)) return;
 
     allDays.push({
@@ -2790,28 +2888,27 @@ async function saveCurrentDay(btn) {
   });
 
   if (!allDays.length) {
-    btn.disabled = false;
-    btn.dataset.locked = "false";
-    btn.classList.remove("loading");
+    unlock();
     return alert("No selections made.");
   }
 
- const now = new Date();
-    const pad = n => String(n).padStart(2,'0');
-    const submissionTimestamp =
-      now.getFullYear() + '-' +
-      pad(now.getMonth()+1) + '-' +
-      pad(now.getDate()) + ' ' +
-      pad(now.getHours()) + ':' +
-      pad(now.getMinutes()) + ':' +
-      pad(now.getSeconds());
-  
-    const payload = {
-      phone,
-      remarks: clientRemarks.value || '',
-      submissionTimestamp,
-      days: allDays
-    };
+  // timestamp in real IST
+  const now = istNow();
+  const pad = n => String(n).padStart(2,'0');
+  const submissionTimestamp =
+    now.getFullYear() + '-' +
+    pad(now.getMonth()+1) + '-' +
+    pad(now.getDate()) + ' ' +
+    pad(now.getHours()) + ':' +
+    pad(now.getMinutes()) + ':' +
+    pad(now.getSeconds());
+
+  const payload = {
+    phone,
+    remarks: clientRemarks.value || '',
+    submissionTimestamp,
+    days: allDays
+  };
 
   const params = new URLSearchParams();
   params.append("action", "submitOrder");
@@ -2831,7 +2928,7 @@ async function saveCurrentDay(btn) {
 
   btn.classList.remove("loading");
 
-  // ⏳ Keep disabled for 60 seconds
+  // ⏳ Keep disabled for 30 seconds
   let countdown = 30;
     btn.textContent = `Wait ${countdown}s`;
   
