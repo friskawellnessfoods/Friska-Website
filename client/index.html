@@ -711,6 +711,24 @@
   @media (prefers-reduced-motion: reduce) {
     .tabpanel.anim, .modal-content { animation: none; }
   }
+
+  /* ===== BILLING HOLD ===== */
+  .hold-wrap { padding: 0 14px 18px; }
+  .hold-card {
+    background: #fff; border: 1px solid #f3d9a6; border-left: 4px solid #e0a52e;
+    border-radius: 16px; padding: 22px 20px; box-shadow: var(--shadow); text-align: center;
+  }
+  .hold-card .h-ic { font-size: 34px; margin-bottom: 10px; }
+  .hold-card h4 { margin: 0 0 8px; font-size: 16.5px; color: var(--navy); }
+  .hold-card p { margin: 0 0 6px; font-size: 13.5px; color: var(--muted); line-height: 1.6; }
+  .hold-card .h-days { font-size: 12px; color: #8a6112; font-weight: 600; margin-top: 10px; }
+  .hold-card .h-act { margin-top: 18px; }
+  .home-card.held { opacity: .55; }
+  .home-card.held .hc-title { color: var(--muted); }
+  .hc-held {
+    font-size: 9.5px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
+    background: #fdf1dc; color: #8a6112; border-radius: 5px; padding: 2px 6px; margin-top: 2px;
+  }
   </style>
 </head>
 
@@ -875,7 +893,10 @@
 
   <!-- ---- TAB: ORDER ---- -->
   <div id="tab-order" class="tabpanel">
-  <div class="content wrapper">
+
+  <div id="orderHold" class="hold-wrap" style="display:none;"></div>
+
+  <div class="content wrapper" id="orderBody">
 
 <div class="box">
   <label>Client Name</label>
@@ -1048,10 +1069,11 @@ function readAuth(){
 
 const SNAP_KEY = 'friska_snap_v1';
 
-function saveSnapshot(phone, client, menu){
+function saveSnapshot(phone, client, menu, billing){
   try {
     localStorage.setItem(SNAP_KEY, JSON.stringify({
-      phone: phone, client: client, menu: menu, at: Date.now()
+      phone: phone, client: client, menu: menu,
+      billing: billing || null, at: Date.now()
     }));
   } catch(e){}
 }
@@ -1108,7 +1130,7 @@ async function authContinue(ev){
         $id('inactiveModal').style.display = 'flex';
         return;
       }
-      await bootClient(d.client, d.menu, phone);
+      await bootClient(d.client, d.menu, phone, d.billing);
       return;
     }
 
@@ -1206,7 +1228,7 @@ async function authSubmit(ev){
     saveAuth(phone, r.token);
     $id('password').value = '';
     $id('password2').value = '';
-    await bootClient(r.client, r.menu, phone);
+    await bootClient(r.client, r.menu, phone, r.billing);
 
   } catch (e) {
     btn.classList.remove("loading");
@@ -1257,7 +1279,7 @@ async function tryAutoLogin(){
   try {
     $id('phone').value = a.phone;
     saveAuth(a.phone, r.token);        // roll the token forward
-    await bootClient(r.client, r.menu, a.phone);
+    await bootClient(r.client, r.menu, a.phone, r.billing);
     return true;
   } catch (e) {
     AUTO_LOGIN_ERROR = 'Signed in, but the page failed to load: ' + (e.message || e);
@@ -1327,7 +1349,10 @@ function closeForgotModal(){
 }
 
 /* ========= BOOT CLIENT INTO THE APP ========= */
-async function bootClient(client, menu, phone){
+async function bootClient(client, menu, phone, billing){
+
+  // whether this client may choose meals (billing hold); see applyBillingHold
+  BILLING_HOLD = billing || { blocked: false };
 
   $id('phone').value = phone;
 
@@ -1377,7 +1402,7 @@ async function bootClient(client, menu, phone){
     return;   // popup will call finishLogin() after save
   }
 
-  saveSnapshot(phone, client, MENU);
+  saveSnapshot(phone, client, MENU, BILLING_HOLD);
 
   initState();
   await restorePastSelections(phone);
@@ -1388,6 +1413,52 @@ async function bootClient(client, menu, phone){
 /* ========= NAVIGATION =========
    Add a new section by adding one entry here and one <div id="tab-<id>">
    panel in the markup. Set soon:true to show it greyed out as "coming soon". */
+/* ========= BILLING HOLD =========
+   Set from the login payload (code.gs decides it from two columns in Master
+   Client List). A client with unbilled orders past the grace window can sign
+   in and see everything else, but cannot choose meals. ADVISORY only - the
+   admin copy can still submit on their behalf. */
+let BILLING_HOLD = { blocked: false };
+
+function holdActive(){
+  return !ADMIN_MODE && !!(BILLING_HOLD && BILLING_HOLD.blocked);
+}
+
+/* swaps the Order tab between the picker and the hold notice */
+function applyBillingHold(){
+  const body = $id('orderBody');
+  const hold = $id('orderHold');
+  if (!body || !hold) return;
+
+  if (!holdActive()) {
+    body.style.display = '';
+    hold.style.display = 'none';
+    hold.innerHTML = '';
+    return;
+  }
+
+  const days = BILLING_HOLD.days;
+  const since = BILLING_HOLD.since ? prettyDate(BILLING_HOLD.since) : '';
+
+  body.style.display = 'none';
+  hold.style.display = 'block';
+  hold.innerHTML =
+    '<div class="hold-card">' +
+      '<div class="h-ic">\u{1F9FE}</div>' +
+      '<h4>Your account needs to be settled</h4>' +
+      '<p>We have not raised a bill for your meals yet, so meal selection is paused ' +
+        'until that is sorted out.</p>' +
+      '<p>Please contact Friska Wellness — it only takes a moment, and your ' +
+        'selection opens again straight away.</p>' +
+      (days != null && since
+        ? '<div class="h-days">Unbilled since ' + esc(since) + ' · ' + days + ' days</div>'
+        : '') +
+      '<div class="h-act">' +
+        '<button class="btn" onclick="navTo(\'feedback\')">Contact us</button>' +
+      '</div>' +
+    '</div>';
+}
+
 const NAV_ITEMS = [
   { id: 'order', label: 'Order',            icon: '🍱', desc: 'Choose your meals for the week' },
   { id: 'menu',  label: 'Menu at Glance',   icon: '📋', desc: "See what's cooking each day" },
@@ -1424,13 +1495,15 @@ function renderNav(){
   const grid = $id('homeGrid');
   if (grid) {
     grid.innerHTML = NAV_ITEMS.map(it => {
-      const cls = 'home-card' + (it.soon ? ' soon' : '');
+      const held = (it.id === 'order') && holdActive();
+      const cls = 'home-card' + (it.soon ? ' soon' : '') + (held ? ' held' : '');
       const click = it.soon ? '' : ' onclick="navTo(\'' + it.id + '\')"';
       return '' +
         '<button class="' + cls + '" type="button"' + click + '>' +
           '<span class="hc-icon">' + it.icon + '</span>' +
           '<span class="hc-title">' + esc(it.label) + '</span>' +
-          '<span class="hc-desc">' + esc(it.desc || '') + '</span>' +
+          '<span class="hc-desc">' + esc(held ? 'Paused \u2014 account not settled' : (it.desc || '')) + '</span>' +
+          (held ? '<span class="hc-held">On hold</span>' : '') +
           (it.soon ? '<span class="hc-soon">Coming soon</span>' : '') +
         '</button>';
     }).join('');
@@ -1527,6 +1600,17 @@ function renderHomeStatus(){
   const host = $id('homeStatus');
   if (!host) return;
 
+  if (holdActive()) {
+    host.innerHTML =
+      '<div class="home-status none">' +
+        '<div class="hs-ic">\u{1F9FE}</div>' +
+        '<div><div class="hs-t">Meal selection is paused</div>' +
+        '<div class="hs-s">Your account has not been billed yet \u2014 ' +
+          'please contact Friska Wellness.</div></div>' +
+      '</div>';
+    return;
+  }
+
   if (!VISIBLE_DATES.length) {
     host.innerHTML =
       '<div class="home-status none">' +
@@ -1614,6 +1698,8 @@ function showTab(name){
   // the launcher shows the options as cards, so the tab bar is hidden there
   const bar = $id('tabbar');
   if (bar) bar.style.display = (name === 'home') ? 'none' : 'flex';
+
+  if (name === 'order') applyBillingHold();
 
   if (name === 'home') renderHomeStatus();
 
@@ -2827,6 +2913,13 @@ async function saveCurrentDay(btn) {
 
   async function handleSubmit(event) {
 
+  // last line of defence: the Order tab is already swapped out when on hold,
+  // but never let a submission through from a stale page
+  if (holdActive()) {
+    alert('Meal selection is paused until your account is billed. Please contact Friska Wellness.');
+    return;
+  }
+
   const btn = event.target;
 
   // 🔒 Prevent double click
@@ -3625,13 +3718,17 @@ function runBoot(){
   /* cached client on this device — paint straight away, verify quietly after */
   if (snap) {
     if (ls) ls.style.display = 'none';
-    bootClient(snap.client, snap.menu, stored.phone).catch(function(){});
+    bootClient(snap.client, snap.menu, stored.phone, snap.billing).catch(function(){});
 
     apiPost("authToken", { phone: stored.phone, token: stored.token })
       .then(function(r){
         if (r && r.ok === true) {
           saveAuth(stored.phone, r.token);
-          saveSnapshot(stored.phone, r.client, r.menu || snap.menu);
+          saveSnapshot(stored.phone, r.client, r.menu || snap.menu, r.billing);
+          // the hold may have appeared (or lifted) since this device last looked
+          BILLING_HOLD = r.billing || { blocked: false };
+          renderNav();
+          if (CURRENT_TAB === 'order') applyBillingHold();
         } else if (r && typeof r.ok !== 'undefined') {
           clearAuth();
           try { localStorage.removeItem(SNAP_KEY); } catch(e){}
