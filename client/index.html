@@ -1829,9 +1829,38 @@ async function loadClientUsage(){
 const STATUS_META = {
   'Cooking':    { icon: '\u{1F373}', label: 'Cooking' },
   'Packaging':  { icon: '\u{1F4E6}', label: 'Packing' },
-  'Dispatched': { icon: '\u{1F6F5}', label: 'On the way' }
+  'Dispatched': { icon: '\u{1F6F5}', label: 'On the way' },
+  'Delivered':  { icon: '\u2705',    label: 'Delivered' }
 };
 
+/* "2026-11-25 13:40" -> "1:40 pm" */
+function prettyTime(s){
+  const m = String(s || '').match(/(\d{2}):(\d{2})/);
+  if (!m) return '';
+  let h = +m[1];
+  const ap = h < 12 ? 'am' : 'pm';
+  h = h % 12; if (!h) h = 12;
+  return h + ':' + m[2] + ' ' + ap;
+}
+
+/* The status for today, as this phone last saw it. One key per client, with
+   the date inside it, so yesterday's answer is ignored rather than cleaned up. */
+function cachedStatus(phone, date){
+  try {
+    const o = JSON.parse(localStorage.getItem('friska_status_' + phone) || 'null');
+    return (o && o.date === date && o.data) ? o.data : null;
+  } catch (e) { return null; }
+}
+
+function storeStatus(phone, date, data){
+  try { localStorage.setItem('friska_status_' + phone, JSON.stringify({ date: date, data: data })); }
+  catch (e) {}
+}
+
+/* Show what we already know the instant the tab opens, then go and check.
+   The round trip to Apps Script is a second or more and nothing can make it
+   shorter — so the fix is to stop waiting for it. A status thirty seconds old
+   is harmless; a spinner is what people actually notice. */
 async function loadClientStatus(){
 
   const host = $id('statusBody');
@@ -1840,12 +1869,18 @@ async function loadClientStatus(){
   const phone = ($id('phone') || {}).value.trim();
   if (!phone) { host.innerHTML = '<div class="box st-pending">Please sign in again.</div>'; return; }
 
-  host.innerHTML = '<div class="box st-pending">Checking your order\u2026</div>';
+  const today = todayStr();
+  const seen  = cachedStatus(phone, today);
+
+  if (seen) renderClientStatus(host, seen, true);
+  else host.innerHTML = '<div class="box st-pending">Checking your order\u2026</div>';
 
   let data;
   try {
-    data = await apiPost('getClientStatus', { phone: phone, date: todayStr() });
+    data = await apiPost('getClientStatus', { phone: phone, date: today });
   } catch (e) {
+    // a stale answer beats an error message, so keep it on screen
+    if (seen) { renderClientStatus(host, seen, false, 'Showing your last update \u2014 could not reach the kitchen.'); return; }
     host.innerHTML =
       '<div class="box st-pending">Could not load your order status.<br>' +
       '<span style="font-size:12px;opacity:.75;">' + esc(e.message || e) + '</span></div>';
@@ -1853,9 +1888,16 @@ async function loadClientStatus(){
   }
 
   if (!data || !data.ok) {
+    if (seen) { renderClientStatus(host, seen, false, 'Showing your last update.'); return; }
     host.innerHTML = '<div class="box st-pending">Could not load your order status.</div>';
     return;
   }
+
+  storeStatus(phone, today, data);
+  renderClientStatus(host, data, false);
+}
+
+function renderClientStatus(host, data, stale, note){
 
   if (!data.entries || !data.entries.length) {
     host.innerHTML =
@@ -1866,7 +1908,7 @@ async function loadClientStatus(){
     return;
   }
 
-  const steps = data.steps || ['Cooking','Packaging','Dispatched'];
+  const steps = data.steps || ['Cooking','Dispatched','Delivered'];
 
   host.innerHTML = data.entries.map(en => {
 
@@ -1878,8 +1920,10 @@ async function loadClientStatus(){
         (en.location ? '<div class="st-loc">' + esc(en.location) + '</div>' : '') +
       '</div>';
 
-    /* the slot's window has closed for today */
-    if (en.expired) {
+    /* the slot's window has closed for today. A delivered meal is never
+       "closed" — the rider's mark outranks the clock, whatever the server
+       says about expiry. */
+    if (en.expired && en.status !== 'Delivered') {
       return '<div class="box st-card">' + head +
                '<div class="st-closed">' +
                  '<div class="st-closed-ic">\u{1F319}</div>' +
@@ -1907,13 +1951,38 @@ async function loadClientStatus(){
       foot = '<div class="st-foot" style="text-align:center;">' +
                'Your order is confirmed. We will update this as soon as cooking begins.' +
              '</div>';
+    } else if (en.status === 'Delivered') {
+      const t = prettyTime(en.updated);
+      foot = '<div class="st-foot" style="text-align:center;">' +
+               'Delivered' + (t ? ' at ' + esc(t) : '') + '. Enjoy your meal.' +
+             '</div>';
     } else {
       const t = en.updated ? String(en.updated).slice(11, 16) : '';
       let line = esc((STATUS_META[en.status] || {}).label || en.status);
       if (en.status === 'Dispatched') line = 'On the way to you';
+
+      /* Only ever shown when every leg between the rider and this door has
+         been measured, and it re-bases on his last real drop, so it moves
+         with him instead of drifting. */
+      let when = '';
+      if (en.eta) {
+        const at = prettyTime(en.eta);
+        const n  = Number(en.etaMins);
+        const away = Number(en.etaStops);
+        when = '<div class="st-foot" style="text-align:center;font-weight:600;">' +
+                 'Arriving around ' + esc(at) +
+                 (isFinite(n) && n >= 0 ? ' \u00b7 about ' + Math.max(1, n) + ' min' : '') +
+               '</div>' +
+               (isFinite(away) && away > 1
+                 ? '<div class="st-foot" style="text-align:center;opacity:.6;">' +
+                     (away - 1) + (away - 1 === 1 ? ' stop' : ' stops') + ' before yours' +
+                   '</div>'
+                 : '');
+      }
+
       foot = '<div class="st-foot" style="text-align:center;">' +
                line + (t ? ' \u00b7 updated at ' + esc(t) : '') +
-             '</div>';
+             '</div>' + when;
     }
 
     let agent = '';
@@ -1946,6 +2015,8 @@ async function loadClientStatus(){
            '</div>';
 
   }).join('') +
+  (stale ? '<div class="st-foot" style="text-align:center;opacity:.55;">Checking for an update\u2026</div>' : '') +
+  (note  ? '<div class="st-foot" style="text-align:center;opacity:.55;">' + esc(note) + '</div>' : '') +
   '<button class="btn secondary" onclick="loadClientStatus()">Refresh</button>';
 }
 
