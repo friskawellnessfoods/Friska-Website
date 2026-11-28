@@ -1488,6 +1488,9 @@ function showApp(name, type){
 
   showTab('home');
   window.scrollTo(0, 0);
+
+  // get the slow call moving before they pick a tab
+  try { primeClientStatus(); } catch (e) {}
 }
 
 /* builds both the home cards and the top tab bar from NAV_ITEMS */
@@ -1862,7 +1865,25 @@ function storeStatus(phone, date, data){
    The round trip to Apps Script is a second or more and nothing can make it
    shorter — so the fix is to stop waiting for it. A status thirty seconds old
    is harmless; a spinner is what people actually notice. */
-async function loadClientStatus(){
+/* The cached copy below means the tab is never blank, but on the first visit
+   of the day there is nothing cached and the client still waits on Apps
+   Script. So the request is started the moment the app opens, whichever tab
+   they go to first — by the time Order Status is tapped it is usually
+   already in hand. One request either way: the tab joins the one in flight
+   rather than firing a second. */
+let statusWait = null;
+
+function primeClientStatus(force){
+  const phone = (($id('phone') || {}).value || '').trim();
+  if (!phone) return Promise.reject(new Error('not signed in'));
+  if (!force && statusWait) return statusWait;
+  statusWait = apiPost('getClientStatus', { phone: phone, date: todayStr() })
+    .then(d => { statusWait = null; return d; })
+    .catch(e => { statusWait = null; throw e; });
+  return statusWait;
+}
+
+async function loadClientStatus(force){
 
   const host = $id('statusBody');
   if (!host) return;
@@ -1878,7 +1899,7 @@ async function loadClientStatus(){
 
   let data;
   try {
-    data = await apiPost('getClientStatus', { phone: phone, date: today });
+    data = await primeClientStatus(force);
   } catch (e) {
     // a stale answer beats an error message, so keep it on screen
     if (seen) { renderClientStatus(host, seen, false, 'Showing your last update \u2014 could not reach the kitchen.'); return; }
@@ -2018,7 +2039,7 @@ function renderClientStatus(host, data, stale, note){
   }).join('') +
   (stale ? '<div class="st-foot" style="text-align:center;opacity:.55;">Checking for an update\u2026</div>' : '') +
   (note  ? '<div class="st-foot" style="text-align:center;opacity:.55;">' + esc(note) + '</div>' : '') +
-  '<button class="btn secondary" onclick="loadClientStatus()">Refresh</button>';
+  '<button class="btn secondary" onclick="loadClientStatus(true)">Refresh</button>';
 }
 
 /* ========= FEEDBACK ========= */
